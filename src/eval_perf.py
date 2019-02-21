@@ -20,9 +20,9 @@ from src.params import (
 from src.utils import get_max_draw_down
 
 
-def eval_perf(e, actor):
+def eval_perf(e, actor, render_plots):
     """
-    This function evaluates the performance of the different types of agents. 
+    This function evaluates the performance of the different types of agents.
 
 
     """
@@ -84,20 +84,26 @@ def eval_perf(e, actor):
     print("Min of test PF value:", round(np.min(p_list_eval)))
     print("Max of test PF value:", round(np.max(p_list_eval)))
     print("Mean of test PF value:", round(np.mean(p_list_eval)))
-    print("Max Draw Down of test PF value:", round(get_max_draw_down(p_list_eval)))
+    print("Max Draw Down of test PF value:",
+          round(get_max_draw_down(p_list_eval)))
     print("End of test weights:", w_list_eval[-1])
-    plt.title("Portfolio evolution (validation set) episode {}".format(e))
-    plt.plot(p_list_eval, label="Agent Portfolio Value")
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
-    plt.show()
-    plt.title("Portfolio weights (end of validation set) episode {}".format(e))
-    plt.bar(np.arange(m + 1), list_weight_end_val[-1])
-    plt.xticks(np.arange(m + 1), ["Money"] + list_stock, rotation=45)
-    plt.show()
+
+    if render_plots:
+        plt.title("Portfolio evolution (validation set) episode {}".format(e))
+        plt.plot(p_list_eval, label="Agent Portfolio Value")
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
+        plt.show()
+        plt.title("Portfolio weights (end of validation set) episode {}".format(e))
+        plt.bar(np.arange(m + 1), list_weight_end_val[-1])
+        plt.xticks(np.arange(m + 1), ["Money"] + list_stock, rotation=45)
+        plt.show()
 
     names = ["Money"] + list_stock
     w_list_eval = np.array(w_list_eval)
-    for j in range(m + 1):
-        plt.plot(w_list_eval[:, j], label="Weight Stock {}".format(names[j]))
-        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
-    plt.show()
+
+    if render_plots:
+        for j in range(m + 1):
+            plt.plot(w_list_eval[:, j],
+                     label="Weight Stock {}".format(names[j]))
+            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
+        plt.show()

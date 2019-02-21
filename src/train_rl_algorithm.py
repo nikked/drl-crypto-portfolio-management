@@ -25,7 +25,7 @@ from src.trade_envs import env, env_eq, env_s, action_fu, env_fu
 from src.PVM import PVM
 
 
-def train_rl_algorithm():
+def train_rl_algorithm(interactive_session: bool):
     ############# TRAINING #####################
     ###########################################
     tf.reset_default_graph()
@@ -58,7 +58,7 @@ def train_rl_algorithm():
     for e in range(n_episodes):
         print("Start Episode", e)
         if e == 0:
-            eval_perf("Before Training", actor)
+            eval_perf("Before Training", actor, interactive_session)
         print("Episode:", e)
         # init the PVM with the training parameters
         memory = PVM(
@@ -75,7 +75,8 @@ def train_rl_algorithm():
 
             # reset the environment with the weight from PVM at the starting point
             # reset also with a portfolio value with initial portfolio value
-            state, done = env.reset(memory.get_W(i_start), pf_init_train, t=i_start)
+            state, done = env.reset(memory.get_W(
+                i_start), pf_init_train, t=i_start)
             state_eq, done_eq = env_eq.reset(w_eq, pf_init_train, t=i_start)
             state_s, done_s = env_s.reset(w_s, pf_init_train, t=i_start)
 
@@ -170,7 +171,7 @@ def train_rl_algorithm():
             actor.train(
                 list_X_t, list_W_previous, list_pf_value_previous, list_dailyReturn_t
             )
-        eval_perf(e, actor)
+        eval_perf(e, actor, interactive_session)
 
     return actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s
 
