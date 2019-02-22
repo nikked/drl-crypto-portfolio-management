@@ -22,7 +22,7 @@ from src.params import (
 )
 
 from src.eval_perf import eval_perf
-from environment import TradeEnv
+from src.environment import TradeEnv
 from src.PVM import PVM
 
 

@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from environment import TradeEnv
+from src.environment import TradeEnv
 from src.params import (
-    PATH_DATA,
     n,
     m,
     pf_init_train,
@@ -15,9 +14,8 @@ from src.params import (
     total_steps_train,
     total_steps_val,
     list_stock,
+    DEFAULT_TRADE_ENV_ARGS
 )
-
-from src.utils import get_max_draw_down
 
 
 def eval_perf(e, actor, render_plots):
@@ -35,14 +33,7 @@ def eval_perf(e, actor, render_plots):
 
     #######TEST#######
     # environment for trading of the agent
-    env_eval = TradeEnv(
-        path=PATH_DATA,
-        window_length=n,
-        portfolio_value=pf_init_train,
-        trading_cost=trading_cost,
-        interest_rate=interest_rate,
-        train_size=dict_hp_pb["ratio_train"],
-    )
+    env_eval = TradeEnv(**DEFAULT_TRADE_ENV_ARGS)
 
     # initialization of the environment
     state_eval, done_eval = env_eval.reset(
@@ -78,14 +69,14 @@ def eval_perf(e, actor, render_plots):
     list_pf_max_training.append(np.max(p_list_eval))
     list_pf_mean_training.append(np.mean(p_list_eval))
 
-    list_pf_dd_training.append(get_max_draw_down(p_list_eval))
+    list_pf_dd_training.append(_get_max_draw_down(p_list_eval))
 
     print("End of test PF value:", round(p_list_eval[-1]))
     print("Min of test PF value:", round(np.min(p_list_eval)))
     print("Max of test PF value:", round(np.max(p_list_eval)))
     print("Mean of test PF value:", round(np.mean(p_list_eval)))
     print("Max Draw Down of test PF value:",
-          round(get_max_draw_down(p_list_eval)))
+          round(_get_max_draw_down(p_list_eval)))
     print("End of test weights:", w_list_eval[-1])
 
     if render_plots:
@@ -107,3 +98,10 @@ def eval_perf(e, actor, render_plots):
                      label="Weight Stock {}".format(names[j]))
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
         plt.show()
+
+def _get_max_draw_down(xs):
+    xs = np.array(xs)
+    i = np.argmax(np.maximum.accumulate(xs) - xs)  # end of the period
+    j = np.argmax(xs[:i])  # start of period
+
+    return xs[j] - xs[i]

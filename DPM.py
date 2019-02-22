@@ -19,15 +19,24 @@ import argparse
 from src.train_rl_algorithm import train_rl_algorithm
 from src.test_rl_algorithm import test_rl_algorithm
 from src.analysis import analysis
-from environment import TradeEnv
+from src.environment import TradeEnv
 
 from src.params import PATH_DATA, DEFAULT_TRADE_ENV_ARGS, m
+
+
+"""
+TODO:
+- add PATH_DATA as args. for example crypto or stocks
+- clean params.py
+
+"""
 
 
 def main(interactive_session=False):
 
     input_data_path = PATH_DATA
 
+    # Creation of the trading environment
     env, env_eq, env_s, action_fu, env_fu = _get_train_environments()
 
     # Agent training

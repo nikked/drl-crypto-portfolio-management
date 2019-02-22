@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from environment import TradeEnv
+from src.environment import TradeEnv
 
 
 # dataset

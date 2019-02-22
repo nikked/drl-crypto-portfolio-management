@@ -13,13 +13,10 @@ from src.params import (
     ratio_regul,
     total_steps_train,
     total_steps_val,
-    PATH_DATA
-
 )
 
 
 def analysis(
-        input_data_type,
         p_list,
         p_list_eq,
         p_list_s,
@@ -28,6 +25,7 @@ def analysis(
         list_final_pf,
         list_final_pf_eq,
         list_final_pf_s,
+        input_data_type
 ):
 
     path = "individual_stocks_5yr/"
