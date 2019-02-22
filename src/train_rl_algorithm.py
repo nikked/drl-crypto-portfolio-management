@@ -13,9 +13,7 @@ from src.params import (
     w_s,
     pf_init_train,
     ratio_greedy,
-    sample_bias,
     batch_size,
-    w_init_train,
     n_episodes,
     n_batches,
     dict_hp_pb,
@@ -70,12 +68,14 @@ def train_rl_algorithm(interactive_session: bool,
             _eval_perf("Before Training", actor, interactive_session)
         print("Episode:", e)
         # init the PVM with the training parameters
+
+        w_init_train = np.array(np.array([1] + [0] * m))  # dict_train['w_init_train']
+
         memory = PVM(
             m,
-            sample_bias,
-            total_steps=total_steps_train,
-            batch_size=batch_size,
-            w_init=w_init_train,
+            total_steps_train,
+            batch_size,
+            w_init_train,
         )
 
         for nb in range(n_batches):

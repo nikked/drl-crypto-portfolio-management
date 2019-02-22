@@ -1,6 +1,9 @@
 import numpy as np
 
-from src.params import total_steps_train, batch_size, w_init_train, sample_bias
+
+SAMPLE_BIAS = (
+    5e-5
+)  # Beta in the geometric distribution for online training sample batches
 
 
 class PVM(object):
@@ -11,16 +14,15 @@ class PVM(object):
     def __init__(
         self,
         m,
-        sample_bias,
-        total_steps=total_steps_train,
-        batch_size=batch_size,
-        w_init=w_init_train,
+        total_steps,
+        batch_size,
+        w_init
     ):
 
         # initialization of the memory
         # we have a total_step_times the initialization portfolio tensor
         self.memory = np.transpose(np.array([w_init] * total_steps))
-        self.sample_bias = sample_bias
+        self.sample_bias = SAMPLE_BIAS
         self.total_steps = total_steps
         self.batch_size = batch_size
 
@@ -32,7 +34,7 @@ class PVM(object):
         # update the weight at time t
         self.memory[:, t] = w
 
-    def draw(self, beta=sample_bias):
+    def draw(self, beta=SAMPLE_BIAS):
         """
         returns a valid step so you can get a training batch starting at this step
         """

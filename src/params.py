@@ -125,7 +125,6 @@ sample_bias = (
 
 # Training Parameters
 
-w_init_train = np.array(np.array([1] + [0] * m))  # dict_train['w_init_train']
 
 pf_init_train = dict_train["pf_init_train"]
 
