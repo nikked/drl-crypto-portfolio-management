@@ -1,4 +1,3 @@
-from src.trade_envs import env, env_eq, env_s, action_fu, env_fu
 from src.params import (
     m,
     n,
@@ -12,7 +11,7 @@ from src.params import (
 )
 
 
-def test_rl_algorithm(actor, state_fu, done_fu):
+def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, env_fu):
     #######TEST#######
 
     # initialization of the environment

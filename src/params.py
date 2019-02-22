@@ -1,18 +1,21 @@
 import numpy as np
 import tensorflow as tf
+from environment import TradeEnv
+
 
 # dataset
 
 # can be changed following the type of stocks studied
 
-# path_data = './np_data/inputCrypto.npy'
-path_data = "./np_data/input.npy"
+# PATH_DATA = './np_data/inputCrypto.npy'
+PATH_DATA = "./np_data/input.npy"
 
 
-data_type = path_data.split("/")[2][5:].split(".")[0]
+data_type = PATH_DATA.split("/")[2][5:].split(".")[0]
 namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
 namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+namesTech = ["FB", "AMZN", "MSFT", "AAPL",
+             "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
 namesCrypto = [
     "ETCBTC",
     "ETHBTC",
@@ -27,7 +30,7 @@ namesCrypto = [
 ]
 
 # determine the length of the data, #features, #stocks
-data = np.load(path_data)
+data = np.load(PATH_DATA)
 trading_period = data.shape[2]
 nb_feature_map = data.shape[0]
 nb_stocks = data.shape[1]
@@ -71,12 +74,12 @@ dict_train = {
 dict_test = {"pf_init_test": 10000, "w_init_test": "d"}
 
 
-######HP of the network
+# HP of the network
 n_filter_1 = dict_hp_net["n_filter_1"]
 n_filter_2 = dict_hp_net["n_filter_2"]
 kernel1_size = dict_hp_net["kernel1_size"]
 
-######HP of the problem
+# HP of the problem
 
 # Size of mini-batch during training
 batch_size = dict_hp_pb["batch_size"]
@@ -97,7 +100,7 @@ ratio_greedy = dict_hp_pb["ratio_greedy"]
 
 ratio_regul = dict_hp_pb["ratio_regul"]
 
-######HP of the optimization
+# HP of the optimization
 
 
 # The L2 regularization coefficient applied to network training
@@ -114,13 +117,13 @@ trading_cost = dict_fin["trading_cost"]
 interest_rate = dict_fin["interest_rate"]
 cash_bias_init = dict_fin["cash_bias_init"]
 
-######## PVM Parameters
+# PVM Parameters
 sample_bias = (
     5e-5
 )  # Beta in the geometric distribution for online training sample batches
 
 
-######## Training Parameters
+# Training Parameters
 
 w_init_train = np.array(np.array([1] + [0] * m))  # dict_train['w_init_train']
 
@@ -129,15 +132,25 @@ pf_init_train = dict_train["pf_init_train"]
 n_episodes = dict_train["n_episodes"]
 n_batches = dict_train["n_batches"]
 
-######## Test Parameters
+# Test Parameters
 
 w_init_test = np.array(np.array([1] + [0] * m))  # dict_test['w_init_test']
 
 pf_init_test = dict_test["pf_init_test"]
 
 
-######## other environment Parameters
+# other environment Parameters
 
 w_eq = np.array(np.array([1 / (m + 1)] * (m + 1)))
 
 w_s = np.array(np.array([1] + [0.0] * m))
+
+
+DEFAULT_TRADE_ENV_ARGS = {
+    "path": PATH_DATA,
+    "window_length": n,
+    "portfolio_value": pf_init_train,
+    "trading_cost": trading_cost,
+    "interest_rate": interest_rate,
+    "train_size": dict_hp_pb["ratio_train"],
+}

@@ -13,12 +13,13 @@ from src.params import (
     ratio_regul,
     total_steps_train,
     total_steps_val,
-    path_data
+    PATH_DATA
 
 )
 
 
 def analysis(
+        input_data_type,
         p_list,
         p_list_eq,
         p_list_s,
@@ -26,7 +27,7 @@ def analysis(
         w_list,
         list_final_pf,
         list_final_pf_eq,
-        list_final_pf_s
+        list_final_pf_s,
 ):
 
     path = "individual_stocks_5yr/"
@@ -34,7 +35,7 @@ def analysis(
     test_start_day = total_steps_train + total_steps_val - int(n / 2) + 10
     times = list(times[test_start_day:])
 
-    data_type = path_data.split('/')[2][5:].split('.')[0]
+    data_type = input_data_type.split('/')[2][5:].split('.')[0]
     namesBio = ['JNJ',
                 'PFE', 'AMGN', 'MDT', 'CELG', 'LLY']
     namesUtilities = ['XOM', 'CVX', 'MRK', 'SLB', 'MMM']

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from environment import TradeEnv
 from src.params import (
-    path_data,
+    PATH_DATA,
     n,
     m,
     pf_init_train,
@@ -36,7 +36,7 @@ def eval_perf(e, actor, render_plots):
     #######TEST#######
     # environment for trading of the agent
     env_eval = TradeEnv(
-        path=path_data,
+        path=PATH_DATA,
         window_length=n,
         portfolio_value=pf_init_train,
         trading_cost=trading_cost,

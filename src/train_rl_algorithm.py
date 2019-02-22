@@ -18,14 +18,17 @@ from src.params import (
     n_episodes,
     n_batches,
     total_steps_train,
+    DEFAULT_TRADE_ENV_ARGS
 )
 
 from src.eval_perf import eval_perf
-from src.trade_envs import env, env_eq, env_s, action_fu, env_fu
+from environment import TradeEnv
 from src.PVM import PVM
 
 
-def train_rl_algorithm(interactive_session: bool):
+def train_rl_algorithm(interactive_session: bool,
+                       env, env_eq, env_s, action_fu, env_fu):
+
     ############# TRAINING #####################
     ###########################################
     tf.reset_default_graph()
