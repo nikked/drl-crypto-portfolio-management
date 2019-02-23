@@ -11,7 +11,11 @@ from src.params import (
 )
 
 
-def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, env_fu):
+def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, env_fu,
+    total_steps_train,
+    total_steps_val,
+    total_steps_test,
+    ):
     #######TEST#######
 
     # initialization of the environment

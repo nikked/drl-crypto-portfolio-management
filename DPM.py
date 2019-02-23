@@ -21,36 +21,45 @@ from src.test_rl_algorithm import test_rl_algorithm
 from src.analysis import analysis
 from src.environment import TradeEnv
 
-from src.params import PATH_DATA, DEFAULT_TRADE_ENV_ARGS, m
+from src.params import PATH_DATA, n, m, pf_init_train, trading_cost, interest_rate, RATIO_TRAIN, BATCH_SIZE, total_steps_train,total_steps_val,total_steps_test
 
 
 """
 TODO:
-- add PATH_DATA as args. for example crypto or stocks
 - clean params.py
+    - datastuff out of params. data_type, data, trading_period, nb_feature_map, nb_stocks
+    - big important params like trading cost to own big param
 
 """
 
+DEFAULT_TRADE_ENV_ARGS = {
+    "path": PATH_DATA,
+    "window_length": n,
+    "portfolio_value": pf_init_train,
+    "trading_cost": trading_cost,
+    "interest_rate": interest_rate,
+    "train_size": RATIO_TRAIN,
+}
+
 
 def main(interactive_session=False):
-
-    input_data_path = PATH_DATA
-
     # Creation of the trading environment
     env, env_eq, env_s, action_fu, env_fu = _get_train_environments()
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
-        interactive_session, env, env_eq, env_s, action_fu, env_fu)
+        interactive_session, env, env_eq, env_s, action_fu, env_fu, DEFAULT_TRADE_ENV_ARGS)
 
     # Agent evaluation
     p_list, p_list_eq, p_list_fu, p_list_s, w_list = test_rl_algorithm(
-        actor, state_fu, done_fu, env, env_eq, env_s, action_fu, env_fu)
+        actor, state_fu, done_fu, env, env_eq, env_s, action_fu, env_fu,     total_steps_train,
+        total_steps_val,
+        total_steps_test,)
 
     # Analysis
     analysis(p_list, p_list_eq, p_list_s, p_list_fu, w_list,
              list_final_pf, list_final_pf_eq, list_final_pf_s,
-             input_data_path)
+             PATH_DATA)
 
 
 def _get_train_environments():

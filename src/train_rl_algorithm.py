@@ -16,14 +16,12 @@ from src.params import (
     batch_size,
     n_episodes,
     n_batches,
-    dict_hp_pb,
     w_init_test,
     pf_init_test,
     total_steps_train,
     total_steps_train,
     total_steps_val,
     list_stock,
-    DEFAULT_TRADE_ENV_ARGS
 )
 
 from src.environment import TradeEnv
@@ -31,7 +29,7 @@ from src.PVM import PVM
 
 
 def train_rl_algorithm(interactive_session: bool,
-                       env, env_eq, env_s, action_fu, env_fu):
+                       env, env_eq, env_s, action_fu, env_fu, trade_env_args):
 
     ############# TRAINING #####################
     ###########################################
@@ -65,7 +63,7 @@ def train_rl_algorithm(interactive_session: bool,
     for e in range(n_episodes):
         print("Start Episode", e)
         if e == 0:
-            _eval_perf("Before Training", actor, interactive_session)
+            _eval_perf("Before Training", actor, interactive_session, trade_env_args)
         print("Episode:", e)
         # init the PVM with the training parameters
 
@@ -180,7 +178,7 @@ def train_rl_algorithm(interactive_session: bool,
             actor.train(
                 list_X_t, list_W_previous, list_pf_value_previous, list_dailyReturn_t
             )
-        _eval_perf(e, actor, interactive_session)
+        _eval_perf(e, actor, interactive_session, trade_env_args)
 
     return actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s
 
@@ -193,7 +191,7 @@ def _get_random_action(m):
     return random_vec / np.sum(random_vec)
 
 
-def _eval_perf(e, actor, render_plots):
+def _eval_perf(e, actor, render_plots, trade_env_args):
     """
     This function evaluates the performance of the different types of agents.
 
@@ -208,7 +206,7 @@ def _eval_perf(e, actor, render_plots):
 
     #######TEST#######
     # environment for trading of the agent
-    env_eval = TradeEnv(**DEFAULT_TRADE_ENV_ARGS)
+    env_eval = TradeEnv(**trade_env_args)
 
     # initialization of the environment
     state_eval, done_eval = env_eval.reset(
