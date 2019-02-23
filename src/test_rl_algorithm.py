@@ -24,14 +24,14 @@ def test_rl_algorithm(
     w_init_test = np.array(np.array([1] + [0] * nb_stocks))
 
     # initialization of the environment
-    state, done = env.reset(w_init_test, PF_INIT_TEST, t=total_steps_train)
+    state, done = env.reset(w_init_test, PF_INIT_TEST, index=total_steps_train)
 
-    state_eq, done_eq = env_eq.reset(w_eq, PF_INIT_TEST, t=total_steps_train)
-    state_s, done_s = env_s.reset(w_s, PF_INIT_TEST, t=total_steps_train)
+    state_eq, done_eq = env_eq.reset(w_eq, PF_INIT_TEST, index=total_steps_train)
+    state_s, done_s = env_s.reset(w_s, PF_INIT_TEST, index=total_steps_train)
 
     for i in range(nb_stocks):
         state_fu[i], done_fu[i] = env_fu[i].reset(
-            action_fu[i], PF_INIT_TEST, t=total_steps_train
+            action_fu[i], PF_INIT_TEST, index=total_steps_train
         )
 
     # first element of the weight and portfolio value

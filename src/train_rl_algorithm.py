@@ -100,13 +100,15 @@ def train_rl_algorithm(
 
             # reset the environment with the weight from PVM at the starting point
             # reset also with a portfolio value with initial portfolio value
-            state, done = env.reset(memory.get_W(i_start), PF_INITIAL_VALUE, t=i_start)
-            state_eq, done_eq = env_eq.reset(w_eq, PF_INITIAL_VALUE, t=i_start)
-            state_s, done_s = env_s.reset(w_s, PF_INITIAL_VALUE, t=i_start)
+            state, done = env.reset(
+                memory.get_W(i_start), PF_INITIAL_VALUE, index=i_start
+            )
+            state_eq, done_eq = env_eq.reset(w_eq, PF_INITIAL_VALUE, index=i_start)
+            state_s, done_s = env_s.reset(w_s, PF_INITIAL_VALUE, index=i_start)
 
             for i in range(nb_stocks):
                 state_fu[i], done_fu[i] = env_fu[i].reset(
-                    action_fu[i], PF_INITIAL_VALUE, t=i_start
+                    action_fu[i], PF_INITIAL_VALUE, index=i_start
                 )
 
             list_X_t, list_W_previous, list_pf_value_previous, list_dailyReturn_t = (
@@ -247,7 +249,7 @@ def _eval_perf(
 
     # initialization of the environment
     state_eval, done_eval = env_eval.reset(
-        w_init_test, PF_INIT_TEST, t=total_steps_train
+        w_init_test, PF_INIT_TEST, index=total_steps_train
     )
 
     # first element of the weight and portfolio value
