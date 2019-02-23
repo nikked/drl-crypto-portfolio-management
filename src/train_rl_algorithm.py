@@ -4,13 +4,10 @@ from src.Policy import Policy
 import matplotlib.pyplot as plt
 
 from src.params import (
-    m,
+    nb_stocks,
     n,
-    optimizer,
     trading_cost,
     interest_rate,
-    w_eq,
-    w_s,
     pf_init_train,
     ratio_greedy,
     batch_size,
@@ -29,7 +26,7 @@ from src.PVM import PVM
 
 
 def train_rl_algorithm(interactive_session: bool,
-                       env, env_eq, env_s, action_fu, env_fu, trade_env_args):
+                       env, env_eq, env_s, action_fu, env_fu, trade_env_args, w_eq, w_s):
 
     ############# TRAINING #####################
     ###########################################
@@ -40,7 +37,7 @@ def train_rl_algorithm(interactive_session: bool,
 
     # initialize networks
     actor = Policy(
-        m, n, sess, optimizer, trading_cost=trading_cost, interest_rate=interest_rate
+        nb_stocks, n, sess, w_eq, trading_cost=trading_cost, interest_rate=interest_rate
     )  # policy initialization
 
     # initialize tensorflow graphs
@@ -51,12 +48,12 @@ def train_rl_algorithm(interactive_session: bool,
     list_final_pf_s = list()
 
     list_final_pf_fu = list()
-    state_fu = [0] * m
-    done_fu = [0] * m
+    state_fu = [0] * nb_stocks
+    done_fu = [0] * nb_stocks
 
-    pf_value_t_fu = [0] * m
+    pf_value_t_fu = [0] * nb_stocks
 
-    for i in range(m):
+    for i in range(nb_stocks):
         list_final_pf_fu.append(list())
 
     ###### Train #####
@@ -67,10 +64,10 @@ def train_rl_algorithm(interactive_session: bool,
         print("Episode:", e)
         # init the PVM with the training parameters
 
-        w_init_train = np.array(np.array([1] + [0] * m))  # dict_train['w_init_train']
+        w_init_train = np.array(np.array([1] + [0] * nb_stocks))  # dict_train['w_init_train']
 
         memory = PVM(
-            m,
+            nb_stocks,
             total_steps_train,
             batch_size,
             w_init_train,
@@ -87,7 +84,7 @@ def train_rl_algorithm(interactive_session: bool,
             state_eq, done_eq = env_eq.reset(w_eq, pf_init_train, t=i_start)
             state_s, done_s = env_s.reset(w_s, pf_init_train, t=i_start)
 
-            for i in range(m):
+            for i in range(nb_stocks):
                 state_fu[i], done_fu[i] = env_fu[i].reset(
                     action_fu[i], pf_init_train, t=i_start
                 )
@@ -100,7 +97,7 @@ def train_rl_algorithm(interactive_session: bool,
             )
             list_pf_value_previous_eq, list_pf_value_previous_s = [], []
             list_pf_value_previous_fu = list()
-            for i in range(m):
+            for i in range(nb_stocks):
                 list_pf_value_previous_fu.append(list())
 
             for bs in range(batch_size):
@@ -115,7 +112,7 @@ def train_rl_algorithm(interactive_session: bool,
                     # computation of the action of the agent
                     action = actor.compute_W(X_t, W_previous)
                 else:
-                    action = _get_random_action(m)
+                    action = _get_random_action(nb_stocks)
 
                 # given the state and the action, call the environment to go one
                 # time step later
@@ -123,7 +120,7 @@ def train_rl_algorithm(interactive_session: bool,
                 state_eq, reward_eq, done_eq = env_eq.step(w_eq)
                 state_s, reward_s, done_s = env_s.step(w_s)
 
-                for i in range(m):
+                for i in range(nb_stocks):
                     state_fu[i], _, done_fu[i] = env_fu[i].step(action_fu[i])
 
                 # get the new state
@@ -134,7 +131,7 @@ def train_rl_algorithm(interactive_session: bool,
                 pf_value_t_eq = state_eq[2]
                 pf_value_t_s = state_s[2]
 
-                for i in range(m):
+                for i in range(nb_stocks):
                     pf_value_t_fu[i] = state_fu[i][2]
 
                 # let us compute the returns
@@ -150,14 +147,14 @@ def train_rl_algorithm(interactive_session: bool,
                 list_pf_value_previous_eq.append(pf_value_t_eq)
                 list_pf_value_previous_s.append(pf_value_t_s)
 
-                for i in range(m):
+                for i in range(nb_stocks):
                     list_pf_value_previous_fu[i].append(pf_value_t_fu[i])
 
                 if bs == batch_size - 1:
                     list_final_pf.append(pf_value_t)
                     list_final_pf_eq.append(pf_value_t_eq)
                     list_final_pf_s.append(pf_value_t_s)
-                    for i in range(m):
+                    for i in range(nb_stocks):
                         list_final_pf_fu[i].append(pf_value_t_fu[i])
 
             #             #printing
@@ -186,8 +183,8 @@ def train_rl_algorithm(interactive_session: bool,
 # random action function
 
 
-def _get_random_action(m):
-    random_vec = np.random.rand(m + 1)
+def _get_random_action(nb_stocks):
+    random_vec = np.random.rand(nb_stocks + 1)
     return random_vec / np.sum(random_vec)
 
 
@@ -258,15 +255,15 @@ def _eval_perf(e, actor, render_plots, trade_env_args):
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
         plt.show()
         plt.title("Portfolio weights (end of validation set) episode {}".format(e))
-        plt.bar(np.arange(m + 1), list_weight_end_val[-1])
-        plt.xticks(np.arange(m + 1), ["Money"] + list_stock, rotation=45)
+        plt.bar(np.arange(nb_stocks + 1), list_weight_end_val[-1])
+        plt.xticks(np.arange(nb_stocks + 1), ["Money"] + list_stock, rotation=45)
         plt.show()
 
     names = ["Money"] + list_stock
     w_list_eval = np.array(w_list_eval)
 
     if render_plots:
-        for j in range(m + 1):
+        for j in range(nb_stocks + 1):
             plt.plot(w_list_eval[:, j],
                      label="Weight Stock {}".format(names[j]))
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)

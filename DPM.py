@@ -21,7 +21,7 @@ from src.test_rl_algorithm import test_rl_algorithm
 from src.analysis import analysis
 from src.environment import TradeEnv
 
-from src.params import PATH_DATA, n, m, pf_init_train, trading_cost, interest_rate, RATIO_TRAIN, BATCH_SIZE, total_steps_train,total_steps_val,total_steps_test
+from src.params import PATH_DATA, n, nb_stocks, pf_init_train, trading_cost, interest_rate, RATIO_TRAIN, BATCH_SIZE, total_steps_train, total_steps_val, total_steps_test
 
 
 """
@@ -43,18 +43,25 @@ DEFAULT_TRADE_ENV_ARGS = {
 
 
 def main(interactive_session=False):
+
+    # other environment Parameters
+
+    w_eq = np.array(np.array([1 / (nb_stocks + 1)] * (nb_stocks + 1)))
+
+    w_s = np.array(np.array([1] + [0.0] * nb_stocks))
+
     # Creation of the trading environment
     env, env_eq, env_s, action_fu, env_fu = _get_train_environments()
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
-        interactive_session, env, env_eq, env_s, action_fu, env_fu, DEFAULT_TRADE_ENV_ARGS)
+        interactive_session, env, env_eq, env_s, action_fu, env_fu, DEFAULT_TRADE_ENV_ARGS, w_eq, w_s)
 
     # Agent evaluation
     p_list, p_list_eq, p_list_fu, p_list_s, w_list = test_rl_algorithm(
         actor, state_fu, done_fu, env, env_eq, env_s, action_fu, env_fu,     total_steps_train,
         total_steps_val,
-        total_steps_test,)
+        total_steps_test, w_eq, w_s)
 
     # Analysis
     analysis(p_list, p_list_eq, p_list_s, p_list_fu, w_list,
@@ -84,8 +91,8 @@ def _get_train_environments():
     action_fu = list()
     env_fu = list()
 
-    for i in range(m):
-        action = np.array([0] * (i + 1) + [1] + [0] * (m - (i + 1)))
+    for i in range(nb_stocks):
+        action = np.array([0] * (i + 1) + [1] + [0] * (nb_stocks - (i + 1)))
         action_fu.append(action)
 
         env_fu_i = TradeEnv(**DEFAULT_TRADE_ENV_ARGS)

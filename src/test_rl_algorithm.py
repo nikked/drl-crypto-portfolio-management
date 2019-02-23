@@ -1,8 +1,6 @@
 from src.params import (
-    m,
+    nb_stocks,
     n,
-    w_eq,
-    w_s,
     pf_init_test,
     w_init_test,
     total_steps_train,
@@ -15,6 +13,7 @@ def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, e
     total_steps_train,
     total_steps_val,
     total_steps_test,
+    w_eq, w_s
     ):
     #######TEST#######
 
@@ -24,7 +23,7 @@ def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, e
     state_eq, done_eq = env_eq.reset(w_eq, pf_init_test, t=total_steps_train)
     state_s, done_s = env_s.reset(w_s, pf_init_test, t=total_steps_train)
 
-    for i in range(m):
+    for i in range(nb_stocks):
         state_fu[i], done_fu[i] = env_fu[i].reset(
             action_fu[i], pf_init_test, t=total_steps_train
         )
@@ -37,10 +36,10 @@ def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, e
     p_list_s = [pf_init_test]
 
     p_list_fu = list()
-    for i in range(m):
+    for i in range(nb_stocks):
         p_list_fu.append([pf_init_test])
 
-    pf_value_t_fu = [0] * m
+    pf_value_t_fu = [0] * nb_stocks
 
     for k in range(
         total_steps_train + total_steps_val - int(n / 2),
@@ -56,7 +55,7 @@ def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, e
         state_eq, reward_eq, done_eq = env_eq.step(w_eq)
         state_s, reward_s, done_s = env_s.step(w_s)
 
-        for i in range(m):
+        for i in range(nb_stocks):
             state_fu[i], _, done_fu[i] = env_fu[i].step(action_fu[i])
 
         X_next = state[0]
@@ -65,7 +64,7 @@ def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, e
 
         pf_value_t_eq = state_eq[2]
         pf_value_t_s = state_s[2]
-        for i in range(m):
+        for i in range(nb_stocks):
             pf_value_t_fu[i] = state_fu[i][2]
 
         dailyReturn_t = X_next[-1, :, -1]
@@ -77,7 +76,7 @@ def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, e
 
         p_list_eq.append(pf_value_t_eq)
         p_list_s.append(pf_value_t_s)
-        for i in range(m):
+        for i in range(nb_stocks):
             p_list_fu[i].append(pf_value_t_fu[i])
 
         # here to breack the loop/not in original code

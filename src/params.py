@@ -15,8 +15,13 @@ RATIO_TRAIN = 0.6
 RATIO_VAL = 0.2
 BATCH_SIZE = 50
 
+# Size of mini-batch during training
+batch_size = 50
 
-data_type = PATH_DATA.split("/")[2][5:].split(".")[0]
+
+# Parameter alpha (i.e. the step size) of the Adam optimization
+LEARNING_RATE = 9e-2
+
 namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
 namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
 namesTech = ["FB", "AMZN", "MSFT", "AAPL",
@@ -35,16 +40,16 @@ namesCrypto = [
 ]
 
 # determine the length of the data, #features, #stocks
-data = np.load(PATH_DATA)
-trading_period = data.shape[2]
-nb_feature_map = data.shape[0]
-nb_stocks = data.shape[1]
+DATA_SOURCE = np.load(PATH_DATA)
+trading_period = DATA_SOURCE.shape[2]
+nb_feature_map = DATA_SOURCE.shape[0]
+nb_stocks = DATA_SOURCE.shape[1]
+
+
+data_type = PATH_DATA.split("/")[2][5:].split(".")[0]
 
 
 # HP of the problem
-
-# Size of mini-batch during training
-batch_size = 50
 # Total number of steps for pre-training in the training set
 total_steps_train = int(RATIO_TRAIN * trading_period)
 
@@ -56,7 +61,6 @@ total_steps_test = trading_period - total_steps_train - total_steps_val
 
 
 # fix parameters of the network
-m = nb_stocks
 if data_type == "Utilities":
     list_stock = namesUtilities
 elif data_type == "Bio":
@@ -66,7 +70,12 @@ elif data_type == "Tech":
 elif data_type == "Crypto":
     list_stock = namesCrypto
 else:
-    list_stock = [i for i in range(m)]
+    list_stock = [i for i in range(nb_stocks)]
+
+# Test Parameters
+
+# dict_test['w_init_test']
+w_init_test = np.array(np.array([1] + [0] * nb_stocks))
 
 
 # Dicts of the problem
@@ -93,6 +102,8 @@ dict_train = {
 }
 dict_test = {"pf_init_test": 10000, "w_init_test": "d"}
 
+pf_init_test = dict_test["pf_init_test"]
+
 
 # HP of the network
 n_filter_1 = dict_hp_net["n_filter_1"]
@@ -112,10 +123,6 @@ ratio_regul = dict_hp_pb["ratio_regul"]
 
 # The L2 regularization coefficient applied to network training
 regularization = dict_hp_opt["regularization"]
-# Parameter alpha (i.e. the step size) of the Adam optimization
-learning = dict_hp_opt["learning"]
-
-optimizer = tf.train.AdamOptimizer(learning)
 
 
 # Finance parameters
@@ -130,16 +137,3 @@ pf_init_train = dict_train["pf_init_train"]
 
 n_episodes = dict_train["n_episodes"]
 n_batches = dict_train["n_batches"]
-
-# Test Parameters
-
-w_init_test = np.array(np.array([1] + [0] * m))  # dict_test['w_init_test']
-
-pf_init_test = dict_test["pf_init_test"]
-
-
-# other environment Parameters
-
-w_eq = np.array(np.array([1 / (m + 1)] * (m + 1)))
-
-w_s = np.array(np.array([1] + [0.0] * m))

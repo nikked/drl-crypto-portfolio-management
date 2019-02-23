@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 from src.params import (
     ratio_greedy,
     batch_size,
-    learning,
+    LEARNING_RATE,
     n_episodes,
     kernel1_size,
     n,
-    m,
+    nb_stocks,
     n_batches,
     ratio_regul,
     total_steps_train,
@@ -47,14 +47,14 @@ def analysis(
     elif data_type == 'Tech':
         list_stock = namesTech
     else:
-        list_stock = [i for i in range(m)]
+        list_stock = [i for i in range(nb_stocks)]
 
     plt.title('Portfolio Value (Test Set) {}: {}, {}, {}, {}, {}, {}, {}, {}'.format(
-        data_type, batch_size, learning, ratio_greedy, n_episodes, n, kernel1_size, n_batches, ratio_regul))
+        data_type, batch_size, LEARNING_RATE, ratio_greedy, n_episodes, n, kernel1_size, n_batches, ratio_regul))
     plt.plot(p_list, label='Agent Portfolio Value')
     plt.plot(p_list_eq, label='Equi-weighted Portfolio Value')
     plt.plot(p_list_s, label='Secured Portfolio Value')
-    for i in range(m):
+    for i in range(nb_stocks):
         plt.plot(
             p_list_fu[i], label='Full Stock {} Portfolio Value'.format(list_stock[i]))
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
@@ -64,7 +64,7 @@ def analysis(
 
     names = ['Money'] + list_stock
     w_list = np.array(w_list)
-    for j in range(m + 1):
+    for j in range(nb_stocks + 1):
         plt.plot(w_list[:, j], label='Weight Stock {}'.format(names[j]))
         plt.title('Weight evolution during testing')
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
