@@ -51,7 +51,6 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         total_steps_train + total_steps_val + total_steps_test - LENGTH_TENSOR,
     ):
         x_current = state[0].reshape([-1] + list(state[0].shape))
-        print(x_current)
         w_previous = state[1].reshape([-1] + list(state[1].shape))
         pf_value_previous = state[2]
         # compute the action
