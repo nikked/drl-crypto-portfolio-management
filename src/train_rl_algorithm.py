@@ -315,8 +315,8 @@ def _get_max_draw_down(p_list_eval):
 
     # end of the period
     i = np.argmax(
-        np.maximum.accumulate(p_list_eval) - p_list_eval
-    )  # pylint: disable=no-member
+        np.maximum.accumulate(p_list_eval) - p_list_eval  # pylint: disable=no-member
+    )
     j = np.argmax(p_list_eval[:i])  # start of period
 
     return p_list_eval[j] - p_list_eval[i]

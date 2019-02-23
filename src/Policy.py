@@ -170,9 +170,9 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                         dtype=tf.float32,
                     )
 
-                    vec_zero = tf.tile(
+                    vec_zero = tf.tile(  #  pylint: disable=no-member
                         zero, tf.stack([shape_x_current, 1])
-                    )  # pylint: disable=no-member
+                    )
                     vec_cost = tf.concat([cost, vec_zero], axis=1)
 
                     v_second_t = v_prime_t - vec_cost
