@@ -139,7 +139,7 @@ def main(interactive_session=False, crypto_data=False):
         list_final_pf,
         list_final_pf_eq,
         list_final_pf_s,
-        PATH_DATA,
+        data_source_fp,
         total_steps_train,
         total_steps_val,
         nb_stocks,
