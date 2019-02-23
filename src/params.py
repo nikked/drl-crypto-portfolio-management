@@ -40,8 +40,6 @@ namesCrypto = [
 
 # determine the length of the data, #features, #stocks
 DATA_SOURCE = np.load(PATH_DATA)
-trading_period = DATA_SOURCE.shape[2]
-nb_feature_map = DATA_SOURCE.shape[0]
 nb_stocks = DATA_SOURCE.shape[1]
 
 

@@ -33,6 +33,7 @@ def train_rl_algorithm(
     list_stock,
     total_steps_train,
     total_steps_val,
+    nb_feature_map,
 ):
 
     ############# TRAINING #####################
@@ -44,7 +45,13 @@ def train_rl_algorithm(
 
     # initialize networks
     actor = Policy(
-        nb_stocks, n, sess, w_eq, trading_cost=trading_cost, interest_rate=interest_rate
+        nb_stocks,
+        n,
+        sess,
+        w_eq,
+        nb_feature_map,
+        trading_cost=trading_cost,
+        interest_rate=interest_rate,
     )  # policy initialization
 
     # initialize tensorflow graphs

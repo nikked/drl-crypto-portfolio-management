@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 # # Introduction
@@ -22,7 +21,6 @@ from src.analysis import analysis
 from src.environment import TradeEnv
 
 from src.params import (
-    trading_period,
     PATH_DATA,
     n,
     nb_stocks,
@@ -31,7 +29,8 @@ from src.params import (
     interest_rate,
     RATIO_TRAIN,
     RATIO_VAL,
-    BATCH_SIZE)
+    BATCH_SIZE,
+)
 
 
 """
@@ -53,6 +52,12 @@ DEFAULT_TRADE_ENV_ARGS = {
 
 
 def main(interactive_session=False):
+
+    DATA_SOURCE = np.load(PATH_DATA)
+    nb_stocks = DATA_SOURCE.shape[1]
+
+    nb_feature_map = DATA_SOURCE.shape[0]
+    trading_period = DATA_SOURCE.shape[2]
 
     # HP of the problem
     # Total number of steps for pre-training in the training set
@@ -78,22 +83,52 @@ def main(interactive_session=False):
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
-        interactive_session, env, env_eq, env_s, action_fu, env_fu, DEFAULT_TRADE_ENV_ARGS, w_eq, w_s, list_stock,
+        interactive_session,
+        env,
+        env_eq,
+        env_s,
+        action_fu,
+        env_fu,
+        DEFAULT_TRADE_ENV_ARGS,
+        w_eq,
+        w_s,
+        list_stock,
         total_steps_train,
-        total_steps_val,)
+        total_steps_val,
+        nb_feature_map,
+    )
 
     # Agent evaluation
     p_list, p_list_eq, p_list_fu, p_list_s, w_list = test_rl_algorithm(
-        actor, state_fu, done_fu, env, env_eq, env_s, action_fu, env_fu,     total_steps_train,
+        actor,
+        state_fu,
+        done_fu,
+        env,
+        env_eq,
+        env_s,
+        action_fu,
+        env_fu,
+        total_steps_train,
         total_steps_val,
-        total_steps_test, w_eq, w_s)
+        total_steps_test,
+        w_eq,
+        w_s,
+    )
 
     # Analysis
-    analysis(p_list, p_list_eq, p_list_s, p_list_fu, w_list,
-             list_final_pf, list_final_pf_eq, list_final_pf_s,
-             PATH_DATA,
-             total_steps_train,
-        total_steps_val)
+    analysis(
+        p_list,
+        p_list_eq,
+        p_list_s,
+        p_list_fu,
+        w_list,
+        list_final_pf,
+        list_final_pf_eq,
+        list_final_pf_s,
+        PATH_DATA,
+        total_steps_train,
+        total_steps_val,
+    )
 
 
 def _get_list_stock(data_type):
@@ -150,10 +185,10 @@ if __name__ == "__main__":
     PARSER = argparse.ArgumentParser()
 
     PARSER.add_argument(
-        '-i',
-        '--interactive_session',
+        "-i",
+        "--interactive_session",
         action="store_true",
-        help="plot stuff and other interactive shit"
+        help="plot stuff and other interactive shit",
     )
 
     ARGS = PARSER.parse_args()
