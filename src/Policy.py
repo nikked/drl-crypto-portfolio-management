@@ -61,17 +61,15 @@ class Policy:  # pylint: disable=too-many-instance-attributes
 
                 # tensor of the prices
                 self.x_current = tf.placeholder(
-                    tf.float32, [None, nb_feature_map,
-                                 self.nb_stocks, self.length_tensor]
+                    tf.float32,
+                    [None, nb_feature_map, self.nb_stocks, self.length_tensor],
                 )  # The Price tensor
                 # weights at the previous time step
-                self.w_previous = tf.placeholder(
-                    tf.float32, [None, self.nb_stocks + 1])
+                self.w_previous = tf.placeholder(tf.float32, [None, self.nb_stocks + 1])
                 # portfolio value at the previous time step
                 self.pf_value_previous = tf.placeholder(tf.float32, [None, 1])
                 # vector of Open(t+1)/Open(t)
-                self.daily_return_t = tf.placeholder(
-                    tf.float32, [None, self.nb_stocks])
+                self.daily_return_t = tf.placeholder(tf.float32, [None, self.nb_stocks])
 
                 # self.pf_value_previous_eq = tf.placeholder(tf.float32, [None, 1])
 
@@ -87,7 +85,8 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                 shape_x_current = tf.shape(self.x_current)[0]
                 # trick to get a "tensor size" for the cash bias
                 self.cash_bias = tf.tile(  # pylint: disable=no-member
-                    bias, tf.stack([shape_x_current, 1, 1, 1]))
+                    bias, tf.stack([shape_x_current, 1, 1, 1])
+                )
                 # print(self.cash_bias.shape)
 
                 with tf.variable_scope("Conv1"):
@@ -135,8 +134,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
 
                 with tf.variable_scope("Tensor4"):
                     # last feature map WITH cash bias
-                    self.tensor4 = tf.concat(
-                        [self.cash_bias, self.conv3], axis=2)
+                    self.tensor4 = tf.concat([self.cash_bias, self.conv3], axis=2)
                     # we squeeze to reduce and get the good dimension
                     self.squeezed_tensor4 = tf.squeeze(self.tensor4, [1, 3])
 
@@ -147,10 +145,10 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                 with tf.variable_scope("Reward"):
                     # computation of the reward
                     # please look at the chronological map to understand
-                    constant_return = tf.constant(
-                        1 + self.interest_rate, shape=[1, 1])
+                    constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
                     cash_return = tf.tile(  # pylint: disable=no-member
-                        constant_return, tf.stack([shape_x_current, 1]))
+                        constant_return, tf.stack([shape_x_current, 1])
+                    )
                     y_t = tf.concat([cash_return, self.daily_return_t], axis=1)
                     v_prime_t = self.action * self.pf_value_previous
                     v_previous = self.w_previous * self.pf_value_previous
@@ -167,13 +165,14 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                     cost = tf.expand_dims(cost, 1)
 
                     zero = tf.constant(
-                        np.array([0.0] * self.nb_stocks).reshape(1,
-                                                                 self.nb_stocks),
+                        np.array([0.0] * self.nb_stocks).reshape(1, self.nb_stocks),
                         shape=[1, self.nb_stocks],
                         dtype=tf.float32,
                     )
 
-                    vec_zero = tf.tile(zero, tf.stack([shape_x_current, 1])) # pylint: disable=no-member
+                    vec_zero = tf.tile(
+                        zero, tf.stack([shape_x_current, 1])
+                    )  # pylint: disable=no-member
                     vec_cost = tf.concat([cost, vec_zero], axis=1)
 
                     v_second_t = v_prime_t - vec_cost
@@ -185,10 +184,10 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                     ) / self.pf_value_previous
 
                 with tf.variable_scope("Reward_Equiweighted"):
-                    constant_return = tf.constant(
-                        1 + self.interest_rate, shape=[1, 1])
-                    cash_return = tf.tile( # pylint: disable=no-member
-                        constant_return, tf.stack([shape_x_current, 1]))
+                    constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
+                    cash_return = tf.tile(  # pylint: disable=no-member
+                        constant_return, tf.stack([shape_x_current, 1])
+                    )
                     y_t = tf.concat([cash_return, self.daily_return_t], axis=1)
 
                     v_eq = w_eq * self.pf_value_previous
@@ -233,8 +232,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
         with tf.device(self.tf_device):
             return self.sess.run(
                 tf.squeeze(self.action),
-                feed_dict={self.x_current: x_current,
-                           self.w_previous: w_previous},
+                feed_dict={self.x_current: x_current, self.w_previous: w_previous},
             )
 
     def train(self, x_current, w_previous, pf_value_previous, daily_return_t):

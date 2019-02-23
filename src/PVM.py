@@ -6,12 +6,12 @@ SAMPLE_BIAS = (
 )  # Beta in the geometric distribution for online training sample batches
 
 
-class PVM(object):
+class PVM:
     """
     This is the memory stack called PVM in the paper
     """
 
-    def __init__(self, m, total_steps, batch_size, w_init):
+    def __init__(self, total_steps, batch_size, w_init):
 
         # initialization of the memory
         # we have a total_step_times the initialization portfolio tensor
@@ -20,23 +20,23 @@ class PVM(object):
         self.total_steps = total_steps
         self.batch_size = batch_size
 
-    def get_W(self, t):
+    def get_w(self, index):
         # return the weight from the PVM at time t
-        return self.memory[:, t]
+        return self.memory[:, index]
 
-    def update(self, t, w):
+    def update(self, index, w_t):
         # update the weight at time t
-        self.memory[:, t] = w
+        self.memory[:, index] = w_t
 
     def draw(self, beta=SAMPLE_BIAS):
         """
         returns a valid step so you can get a training batch starting at this step
         """
         while 1:
-            z = np.random.geometric(p=beta)
-            tb = self.total_steps - self.batch_size + 1 - z
-            if tb >= 0:
-                return tb
+            zeta = np.random.geometric(p=beta)
+            i_start = self.total_steps - self.batch_size + 1 - zeta
+            if i_start >= 0:
+                return i_start
 
     def test(self):
         # just to test

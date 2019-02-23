@@ -13,7 +13,7 @@ from src.params import (
 )
 
 
-def analysis(
+def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     p_list,
     p_list_eq,
     p_list_s,
@@ -34,16 +34,27 @@ def analysis(
     times = list(times[test_start_day:])
 
     data_type = input_data_type.split("/")[2][5:].split(".")[0]
-    namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
-    namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-    namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+    names_bio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
+    names_utilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
+    names_tech = [
+        "FB",
+        "AMZN",
+        "MSFT",
+        "AAPL",
+        "T",
+        "VZ",
+        "CMCSA",
+        "IBM",
+        "CRM",
+        "INTC",
+    ]
 
     if data_type == "Utilities":
-        list_stock = namesUtilities
+        list_stock = names_utilities
     elif data_type == "Bio":
-        list_stock = namesBio
+        list_stock = names_bio
     elif data_type == "Tech":
-        list_stock = namesTech
+        list_stock = names_tech
     else:
         list_stock = [i for i in range(nb_stocks)]
 

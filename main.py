@@ -11,8 +11,8 @@
 # - Agent Evaluation
 # - Analysis
 
-import numpy as np
 import argparse
+import numpy as np
 
 
 from src.train_rl_algorithm import train_rl_algorithm
@@ -48,7 +48,9 @@ DEFAULT_TRADE_ENV_ARGS = {
 }
 
 
-def main(interactive_session=False, crypto_data=False, gpu_device=None):
+def main(
+    interactive_session=False, crypto_data=False, gpu_device=None
+):  # pylint: disable=too-many-locals
 
     if crypto_data:
         data_source_fp = CRYPTO_PATH_DATA
@@ -145,10 +147,21 @@ def main(interactive_session=False, crypto_data=False, gpu_device=None):
 
 def _get_list_stock(data_type, nb_stocks):
 
-    namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
-    namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-    namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
-    namesCrypto = [
+    names_bio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
+    names_utilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
+    names_tech = [
+        "FB",
+        "AMZN",
+        "MSFT",
+        "AAPL",
+        "T",
+        "VZ",
+        "CMCSA",
+        "IBM",
+        "CRM",
+        "INTC",
+    ]
+    names_crypto = [
         "ETCBTC",
         "ETHBTC",
         "DOGEBTC",
@@ -163,13 +176,13 @@ def _get_list_stock(data_type, nb_stocks):
 
     # fix parameters of the network
     if data_type == "Utilities":
-        list_stock = namesUtilities
+        list_stock = names_utilities
     elif data_type == "Bio":
-        list_stock = namesBio
+        list_stock = names_bio
     elif data_type == "Tech":
-        list_stock = namesTech
+        list_stock = names_tech
     elif data_type == "Crypto":
-        list_stock = namesCrypto
+        list_stock = names_crypto
     else:
         list_stock = [i for i in range(nb_stocks)]
 
