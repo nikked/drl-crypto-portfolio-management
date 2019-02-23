@@ -12,7 +12,7 @@ from src.params import (
     batch_size,
     n_episodes,
     n_batches,
-    pf_init_test,
+    PF_INIT_TEST,
 )
 
 from src.environment import TradeEnv
@@ -33,7 +33,7 @@ def train_rl_algorithm(
     total_steps_train,
     total_steps_val,
     nb_feature_map,
-    nb_stocks
+    nb_stocks,
 ):
 
     ############# TRAINING #####################
@@ -82,7 +82,7 @@ def train_rl_algorithm(
                 list_stock,
                 total_steps_train,
                 total_steps_val,
-                nb_stocks
+                nb_stocks,
             )
         print("Episode:", e)
         # init the PVM with the training parameters
@@ -201,7 +201,7 @@ def train_rl_algorithm(
             list_stock,
             total_steps_train,
             total_steps_val,
-            nb_stocks
+            nb_stocks,
         )
 
     return actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s
@@ -223,7 +223,7 @@ def _eval_perf(
     list_stock,
     total_steps_train,
     total_steps_val,
-    nb_stocks
+    nb_stocks,
 ):
     """
     This function evaluates the performance of the different types of agents.
@@ -245,11 +245,11 @@ def _eval_perf(
 
     # initialization of the environment
     state_eval, done_eval = env_eval.reset(
-        w_init_test, pf_init_test, t=total_steps_train
+        w_init_test, PF_INIT_TEST, t=total_steps_train
     )
 
     # first element of the weight and portfolio value
-    p_list_eval = [pf_init_test]
+    p_list_eval = [PF_INIT_TEST]
     w_list_eval = [w_init_test]
 
     for k in range(total_steps_train, total_steps_train + total_steps_val - int(n / 2)):

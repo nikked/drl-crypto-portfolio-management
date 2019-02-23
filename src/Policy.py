@@ -4,9 +4,9 @@ import numpy as np
 from src.params import (
     trading_cost,
     interest_rate,
-    n_filter_1,
-    n_filter_2,
-    kernel1_size,
+    N_FILTER_1,
+    N_FILTER_2,
+    KERNEL1_SIZE,
     cash_bias_init,
     ratio_regul,
     LEARNING_RATE,
@@ -33,8 +33,8 @@ class Policy(object):
         nb_feature_map,
         trading_cost=trading_cost,
         interest_rate=interest_rate,
-        n_filter_1=n_filter_1,
-        n_filter_2=n_filter_2,
+        n_filter_1=N_FILTER_1,
+        n_filter_2=N_FILTER_2,
     ):
 
         # parameters
@@ -84,7 +84,7 @@ class Policy(object):
                     activation=tf.nn.relu,
                     filters=self.n_filter_1,
                     strides=(1, 1),
-                    kernel_size=kernel1_size,
+                    kernel_size=KERNEL1_SIZE,
                     padding="same",
                 )
 

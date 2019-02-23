@@ -1,4 +1,4 @@
-from src.params import n, pf_init_test
+from src.params import n, PF_INIT_TEST
 
 import numpy as np
 
@@ -17,33 +17,33 @@ def test_rl_algorithm(
     total_steps_test,
     w_eq,
     w_s,
-    nb_stocks
+    nb_stocks,
 ):
     #######TEST#######
 
     w_init_test = np.array(np.array([1] + [0] * nb_stocks))
 
     # initialization of the environment
-    state, done = env.reset(w_init_test, pf_init_test, t=total_steps_train)
+    state, done = env.reset(w_init_test, PF_INIT_TEST, t=total_steps_train)
 
-    state_eq, done_eq = env_eq.reset(w_eq, pf_init_test, t=total_steps_train)
-    state_s, done_s = env_s.reset(w_s, pf_init_test, t=total_steps_train)
+    state_eq, done_eq = env_eq.reset(w_eq, PF_INIT_TEST, t=total_steps_train)
+    state_s, done_s = env_s.reset(w_s, PF_INIT_TEST, t=total_steps_train)
 
     for i in range(nb_stocks):
         state_fu[i], done_fu[i] = env_fu[i].reset(
-            action_fu[i], pf_init_test, t=total_steps_train
+            action_fu[i], PF_INIT_TEST, t=total_steps_train
         )
 
     # first element of the weight and portfolio value
-    p_list = [pf_init_test]
+    p_list = [PF_INIT_TEST]
     w_list = [w_init_test]
 
-    p_list_eq = [pf_init_test]
-    p_list_s = [pf_init_test]
+    p_list_eq = [PF_INIT_TEST]
+    p_list_s = [PF_INIT_TEST]
 
     p_list_fu = list()
     for i in range(nb_stocks):
-        p_list_fu.append([pf_init_test])
+        p_list_fu.append([PF_INIT_TEST])
 
     pf_value_t_fu = [0] * nb_stocks
 

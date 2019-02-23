@@ -1,4 +1,3 @@
-
 # can be changed following the type of stocks studied
 
 
@@ -13,10 +12,17 @@ batch_size = 50
 # Parameter alpha (i.e. the step size) of the Adam optimization
 LEARNING_RATE = 9e-2
 
+
+PF_INIT_TEST = 10000
+
+# Dict hp net
+N_FILTER_1 = 2
+N_FILTER_2 = 20
+KERNEL1_SIZE = (1, 3)
+
 namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
 namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-namesTech = ["FB", "AMZN", "MSFT", "AAPL",
-             "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
 namesCrypto = [
     "ETCBTC",
     "ETHBTC",
@@ -54,13 +60,10 @@ dict_train = {
 }
 dict_test = {"pf_init_test": 10000, "w_init_test": "d"}
 
-pf_init_test = dict_test["pf_init_test"]
-
 
 # HP of the network
-n_filter_1 = dict_hp_net["n_filter_1"]
-n_filter_2 = dict_hp_net["n_filter_2"]
-kernel1_size = dict_hp_net["kernel1_size"]
+
+kernel1_size = (1, 3)
 
 # Number of the columns (number of the trading periods) in each input
 # price matrix

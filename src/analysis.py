@@ -6,7 +6,7 @@ from src.params import (
     batch_size,
     LEARNING_RATE,
     n_episodes,
-    kernel1_size,
+    KERNEL1_SIZE,
     n,
     n_batches,
     ratio_regul,
@@ -25,7 +25,7 @@ def analysis(
     input_data_type,
     total_steps_train,
     total_steps_val,
-    nb_stocks
+    nb_stocks,
 ):
 
     path = "individual_stocks_5yr/"
@@ -55,7 +55,7 @@ def analysis(
             ratio_greedy,
             n_episodes,
             n,
-            kernel1_size,
+            KERNEL1_SIZE,
             n_batches,
             ratio_regul,
         )

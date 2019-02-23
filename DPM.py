@@ -39,11 +39,11 @@ TODO:
 
 """
 
-# PATH_DATA = './np_data/inputCrypto.npy'
-PATH_DATA = "./np_data/input.npy"
+CRYPTO_PATH_DATA = "./np_data/inputCrypto.npy"
+STOCK_PATH_DATA = "./np_data/input.npy"
 
 DEFAULT_TRADE_ENV_ARGS = {
-    "path": PATH_DATA,
+    "path": None,
     "window_length": n,
     "portfolio_value": pf_init_train,
     "trading_cost": trading_cost,
@@ -52,16 +52,22 @@ DEFAULT_TRADE_ENV_ARGS = {
 }
 
 
+def main(interactive_session=False, crypto_data=False):
 
+    if crypto_data:
+        data_source_fp = CRYPTO_PATH_DATA
 
+    else:
+        data_source_fp = STOCK_PATH_DATA
 
-def main(interactive_session=False):
+    trade_env_args = DEFAULT_TRADE_ENV_ARGS
+    trade_env_args["path"] = data_source_fp
 
-    DATA_SOURCE = np.load(PATH_DATA)
-    nb_stocks = DATA_SOURCE.shape[1]
+    data_source = np.load(data_source_fp)
+    nb_stocks = data_source.shape[1]
 
-    nb_feature_map = DATA_SOURCE.shape[0]
-    trading_period = DATA_SOURCE.shape[2]
+    nb_feature_map = data_source.shape[0]
+    trading_period = data_source.shape[2]
 
     # HP of the problem
     # Total number of steps for pre-training in the training set
@@ -73,7 +79,7 @@ def main(interactive_session=False):
     # Total number of steps for the test
     total_steps_test = trading_period - total_steps_train - total_steps_val
 
-    data_type = PATH_DATA.split("/")[2][5:].split(".")[0]
+    data_type = data_source_fp.split("/")[2][5:].split(".")[0]
 
     list_stock = _get_list_stock(data_type, nb_stocks)
 
@@ -83,7 +89,9 @@ def main(interactive_session=False):
     w_s = np.array(np.array([1] + [0.0] * nb_stocks))
 
     # Creation of the trading environment
-    env, env_eq, env_s, action_fu, env_fu = _get_train_environments(nb_stocks)
+    env, env_eq, env_s, action_fu, env_fu = _get_train_environments(
+        nb_stocks, trade_env_args
+    )
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
@@ -93,14 +101,14 @@ def main(interactive_session=False):
         env_s,
         action_fu,
         env_fu,
-        DEFAULT_TRADE_ENV_ARGS,
+        trade_env_args,
         w_eq,
         w_s,
         list_stock,
         total_steps_train,
         total_steps_val,
         nb_feature_map,
-        nb_stocks
+        nb_stocks,
     )
 
     # Agent evaluation
@@ -118,7 +126,7 @@ def main(interactive_session=False):
         total_steps_test,
         w_eq,
         w_s,
-        nb_stocks
+        nb_stocks,
     )
 
     # Analysis
@@ -134,7 +142,7 @@ def main(interactive_session=False):
         PATH_DATA,
         total_steps_train,
         total_steps_val,
-        nb_stocks
+        nb_stocks,
     )
 
 
@@ -142,8 +150,7 @@ def _get_list_stock(data_type, nb_stocks):
 
     namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
     namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-    namesTech = ["FB", "AMZN", "MSFT", "AAPL",
-                 "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+    namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
     namesCrypto = [
         "ETCBTC",
         "ETHBTC",
@@ -172,22 +179,22 @@ def _get_list_stock(data_type, nb_stocks):
     return list_stock
 
 
-def _get_train_environments(nb_stocks):
+def _get_train_environments(nb_stocks, trade_env_args):
 
     # environment for trading of the agent
     # this is the agent trading environment (policy network agent)
 
-    env = TradeEnv(**DEFAULT_TRADE_ENV_ARGS)
+    env = TradeEnv(**trade_env_args)
 
     # environment for equiweighted
     # this environment is set up for an agent who only plays an equiweithed
     # portfolio (baseline)
-    env_eq = TradeEnv(**DEFAULT_TRADE_ENV_ARGS)
+    env_eq = TradeEnv(**trade_env_args)
 
     # environment secured (only money)
     # this environment is set up for an agentwho plays secure, keeps its money
 
-    env_s = TradeEnv(**DEFAULT_TRADE_ENV_ARGS)
+    env_s = TradeEnv(**trade_env_args)
 
     # full on one stock environment
     # these environments are set up for agents who play only on one stock
@@ -198,7 +205,7 @@ def _get_train_environments(nb_stocks):
         action = np.array([0] * (i + 1) + [1] + [0] * (nb_stocks - (i + 1)))
         action_fu.append(action)
 
-        env_fu_i = TradeEnv(**DEFAULT_TRADE_ENV_ARGS)
+        env_fu_i = TradeEnv(**trade_env_args)
 
         env_fu.append(env_fu_i)
 
@@ -213,11 +220,17 @@ if __name__ == "__main__":
         "--interactive_session",
         action="store_true",
         help="plot stuff and other interactive shit",
+        default=False,
+    )
+
+    PARSER.add_argument(
+        "-c",
+        "--crypto_data",
+        action="store_true",
+        help="plot stuff and other interactive shit",
+        default=False,
     )
 
     ARGS = PARSER.parse_args()
 
-    if ARGS.interactive_session:
-        main(interactive_session=True)
-    else:
-        main(interactive_session=False)
+    main(interactive_session=ARGS.interactive_session, crypto_data=ARGS.crypto_data)
