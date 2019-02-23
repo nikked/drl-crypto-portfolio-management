@@ -52,7 +52,7 @@ DEFAULT_TRADE_ENV_ARGS = {
 }
 
 
-def main(interactive_session=False, crypto_data=False):
+def main(interactive_session=False, crypto_data=False, gpu_device=None):
 
     if crypto_data:
         data_source_fp = CRYPTO_PATH_DATA
@@ -109,6 +109,7 @@ def main(interactive_session=False, crypto_data=False):
         total_steps_val,
         nb_feature_map,
         nb_stocks,
+        gpu_device,
     )
 
     # Agent evaluation
@@ -150,7 +151,8 @@ def _get_list_stock(data_type, nb_stocks):
 
     namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
     namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-    namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+    namesTech = ["FB", "AMZN", "MSFT", "AAPL",
+                 "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
     namesCrypto = [
         "ETCBTC",
         "ETHBTC",
@@ -231,6 +233,18 @@ if __name__ == "__main__":
         default=False,
     )
 
+    PARSER.add_argument(
+        "-g",
+        "--gpu_device",
+        type=int,
+        help="plot stuff and other interactive shit",
+        default=None
+    )
+
     ARGS = PARSER.parse_args()
 
-    main(interactive_session=ARGS.interactive_session, crypto_data=ARGS.crypto_data)
+    main(
+        interactive_session=ARGS.interactive_session,
+        crypto_data=ARGS.crypto_data,
+        gpu_device=ARGS.gpu_device
+    )

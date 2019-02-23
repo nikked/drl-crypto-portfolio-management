@@ -34,6 +34,7 @@ def train_rl_algorithm(
     total_steps_val,
     nb_feature_map,
     nb_stocks,
+    gpu_device
 ):
 
     ############# TRAINING #####################
@@ -52,6 +53,7 @@ def train_rl_algorithm(
         nb_feature_map,
         trading_cost=trading_cost,
         interest_rate=interest_rate,
+        gpu_device=gpu_device
     )  # policy initialization
 
     # initialize tensorflow graphs
