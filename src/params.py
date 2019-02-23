@@ -1,14 +1,5 @@
-import numpy as np
-import tensorflow as tf
-from src.environment import TradeEnv
-
-
-# dataset
 
 # can be changed following the type of stocks studied
-
-# PATH_DATA = './np_data/inputCrypto.npy'
-PATH_DATA = "./np_data/input.npy"
 
 
 RATIO_TRAIN = 0.6
@@ -24,7 +15,8 @@ LEARNING_RATE = 9e-2
 
 namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
 namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+namesTech = ["FB", "AMZN", "MSFT", "AAPL",
+             "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
 namesCrypto = [
     "ETCBTC",
     "ETHBTC",
@@ -37,11 +29,6 @@ namesCrypto = [
     "LTCBTC",
     "ETCETH",
 ]
-
-# determine the length of the data, #features, #stocks
-DATA_SOURCE = np.load(PATH_DATA)
-nb_stocks = DATA_SOURCE.shape[1]
-
 
 # Dicts of the problem
 dict_hp_net = {"n_filter_1": 2, "n_filter_2": 20, "kernel1_size": (1, 3)}

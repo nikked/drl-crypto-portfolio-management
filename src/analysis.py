@@ -8,7 +8,6 @@ from src.params import (
     n_episodes,
     kernel1_size,
     n,
-    nb_stocks,
     n_batches,
     ratio_regul,
 )
@@ -26,6 +25,7 @@ def analysis(
     input_data_type,
     total_steps_train,
     total_steps_val,
+    nb_stocks
 ):
 
     path = "individual_stocks_5yr/"

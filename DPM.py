@@ -21,9 +21,7 @@ from src.analysis import analysis
 from src.environment import TradeEnv
 
 from src.params import (
-    PATH_DATA,
     n,
-    nb_stocks,
     pf_init_train,
     trading_cost,
     interest_rate,
@@ -41,6 +39,9 @@ TODO:
 
 """
 
+# PATH_DATA = './np_data/inputCrypto.npy'
+PATH_DATA = "./np_data/input.npy"
+
 DEFAULT_TRADE_ENV_ARGS = {
     "path": PATH_DATA,
     "window_length": n,
@@ -49,6 +50,9 @@ DEFAULT_TRADE_ENV_ARGS = {
     "interest_rate": interest_rate,
     "train_size": RATIO_TRAIN,
 }
+
+
+
 
 
 def main(interactive_session=False):
@@ -71,7 +75,7 @@ def main(interactive_session=False):
 
     data_type = PATH_DATA.split("/")[2][5:].split(".")[0]
 
-    list_stock = _get_list_stock(data_type)
+    list_stock = _get_list_stock(data_type, nb_stocks)
 
     # other environment Parameters
 
@@ -79,7 +83,7 @@ def main(interactive_session=False):
     w_s = np.array(np.array([1] + [0.0] * nb_stocks))
 
     # Creation of the trading environment
-    env, env_eq, env_s, action_fu, env_fu = _get_train_environments()
+    env, env_eq, env_s, action_fu, env_fu = _get_train_environments(nb_stocks)
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
@@ -96,6 +100,7 @@ def main(interactive_session=False):
         total_steps_train,
         total_steps_val,
         nb_feature_map,
+        nb_stocks
     )
 
     # Agent evaluation
@@ -113,6 +118,7 @@ def main(interactive_session=False):
         total_steps_test,
         w_eq,
         w_s,
+        nb_stocks
     )
 
     # Analysis
@@ -128,10 +134,28 @@ def main(interactive_session=False):
         PATH_DATA,
         total_steps_train,
         total_steps_val,
+        nb_stocks
     )
 
 
-def _get_list_stock(data_type):
+def _get_list_stock(data_type, nb_stocks):
+
+    namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
+    namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
+    namesTech = ["FB", "AMZN", "MSFT", "AAPL",
+                 "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+    namesCrypto = [
+        "ETCBTC",
+        "ETHBTC",
+        "DOGEBTC",
+        "ETHUSDT",
+        "BTCUSDT",
+        "XRPBTC",
+        "DASHBTC",
+        "XMRBTC",
+        "LTCBTC",
+        "ETCETH",
+    ]
 
     # fix parameters of the network
     if data_type == "Utilities":
@@ -148,7 +172,7 @@ def _get_list_stock(data_type):
     return list_stock
 
 
-def _get_train_environments():
+def _get_train_environments(nb_stocks):
 
     # environment for trading of the agent
     # this is the agent trading environment (policy network agent)

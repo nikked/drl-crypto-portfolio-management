@@ -1,4 +1,4 @@
-from src.params import nb_stocks, n, pf_init_test
+from src.params import n, pf_init_test
 
 import numpy as np
 
@@ -17,6 +17,7 @@ def test_rl_algorithm(
     total_steps_test,
     w_eq,
     w_s,
+    nb_stocks
 ):
     #######TEST#######
 

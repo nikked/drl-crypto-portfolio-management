@@ -4,7 +4,6 @@ from src.Policy import Policy
 import matplotlib.pyplot as plt
 
 from src.params import (
-    nb_stocks,
     n,
     trading_cost,
     interest_rate,
@@ -34,6 +33,7 @@ def train_rl_algorithm(
     total_steps_train,
     total_steps_val,
     nb_feature_map,
+    nb_stocks
 ):
 
     ############# TRAINING #####################
@@ -82,6 +82,7 @@ def train_rl_algorithm(
                 list_stock,
                 total_steps_train,
                 total_steps_val,
+                nb_stocks
             )
         print("Episode:", e)
         # init the PVM with the training parameters
@@ -200,6 +201,7 @@ def train_rl_algorithm(
             list_stock,
             total_steps_train,
             total_steps_val,
+            nb_stocks
         )
 
     return actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s
@@ -221,6 +223,7 @@ def _eval_perf(
     list_stock,
     total_steps_train,
     total_steps_val,
+    nb_stocks
 ):
     """
     This function evaluates the performance of the different types of agents.
