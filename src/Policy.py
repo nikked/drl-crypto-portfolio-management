@@ -52,6 +52,8 @@ class Policy(object):
         else:
             self.tf_device = '/cpu:0'
 
+        print('Using tf device {}'.format(self.tf_device))
+
         with tf.device(self.tf_device):
             with tf.variable_scope("Inputs"):
 
