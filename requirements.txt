@@ -1,2 +1,4 @@
 gym
-tensorflow
+tensorflow==1.9.0
+tensorflow-gpu==1.9.0
+tensorboard==1.9.0

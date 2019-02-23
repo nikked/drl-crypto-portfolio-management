@@ -47,12 +47,12 @@ class Policy(object):
         self.m = m
 
         if gpu_device:
-            tf_device = '/device:GPU:{}'.format(gpu_device)
+            self.tf_device = '/device:GPU:{}'.format(gpu_device)
 
         else:
-            tf_device = '/cpu:0'
+            self.tf_device = '/cpu:0'
 
-        with tf.device(tf_device):
+        with tf.device(self.tf_device):
             with tf.variable_scope("Inputs"):
 
                 # Placeholder
@@ -207,7 +207,8 @@ class Policy(object):
         # objective function
         # maximize reward over the batch
         # min(-r) = max(r)
-        self.train_op = OPTIMIZER.minimize(-self.adjested_reward)
+        with tf.device(self.tf_device):
+            self.train_op = OPTIMIZER.minimize(-self.adjested_reward)
 
         # some bookkeeping
         self.optimizer = OPTIMIZER
@@ -221,11 +222,11 @@ class Policy(object):
         It is a vector of weight
 
         """
-
-        return self.sess.run(
-            tf.squeeze(self.action),
-            feed_dict={self.X_t: X_t_, self.W_previous: W_previous_},
-        )
+        with tf.device(self.tf_device):
+            return self.sess.run(
+                tf.squeeze(self.action),
+                feed_dict={self.X_t: X_t_, self.W_previous: W_previous_},
+            )
 
     def train(self, X_t_, W_previous_, pf_value_previous_, dailyReturn_t_):
         """
@@ -233,12 +234,13 @@ class Policy(object):
         maximizing the reward
         the input is a batch of the differents values
         """
-        self.sess.run(
-            self.train_op,
-            feed_dict={
-                self.X_t: X_t_,
-                self.W_previous: W_previous_,
-                self.pf_value_previous: pf_value_previous_,
-                self.dailyReturn_t: dailyReturn_t_,
-            },
-        )
+        with tf.device(self.tf_device):
+            self.sess.run(
+                self.train_op,
+                feed_dict={
+                    self.X_t: X_t_,
+                    self.W_previous: W_previous_,
+                    self.pf_value_previous: pf_value_previous_,
+                    self.dailyReturn_t: dailyReturn_t_,
+                },
+            )
