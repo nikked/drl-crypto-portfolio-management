@@ -1,4 +1,4 @@
-from src.params import n, PF_INIT_TEST
+from src.params import PF_INIT_TEST, LENGTH_TENSOR
 
 import numpy as np
 
@@ -48,8 +48,8 @@ def test_rl_algorithm(
     pf_value_t_fu = [0] * nb_stocks
 
     for k in range(
-        total_steps_train + total_steps_val - int(n / 2),
-        total_steps_train + total_steps_val + total_steps_test - n,
+        total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2),
+        total_steps_train + total_steps_val + total_steps_test - LENGTH_TENSOR,
     ):
         X_t = state[0].reshape([-1] + list(state[0].shape))
         W_previous = state[1].reshape([-1] + list(state[1].shape))
@@ -86,7 +86,7 @@ def test_rl_algorithm(
             p_list_fu[i].append(pf_value_t_fu[i])
 
         # here to breack the loop/not in original code
-        if k == total_steps_train + total_steps_val - int(n / 2) + 100:
+        if k == total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2) + 100:
             break
 
     return p_list, p_list_eq, p_list_fu, p_list_s, w_list

@@ -21,13 +21,12 @@ from src.analysis import analysis
 from src.environment import TradeEnv
 
 from src.params import (
-    n,
+    LENGTH_TENSOR,
     pf_init_train,
     trading_cost,
     interest_rate,
     RATIO_TRAIN,
     RATIO_VAL,
-    BATCH_SIZE,
 )
 
 
@@ -44,7 +43,7 @@ STOCK_PATH_DATA = "./np_data/input.npy"
 
 DEFAULT_TRADE_ENV_ARGS = {
     "path": None,
-    "window_length": n,
+    "window_length": LENGTH_TENSOR,
     "portfolio_value": pf_init_train,
     "trading_cost": trading_cost,
     "interest_rate": interest_rate,

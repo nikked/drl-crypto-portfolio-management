@@ -3,11 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from src.params import (
     ratio_greedy,
-    batch_size,
+    BATCH_SIZE,
     LEARNING_RATE,
     n_episodes,
     KERNEL1_SIZE,
-    n,
+    LENGTH_TENSOR,
     n_batches,
     ratio_regul,
 )
@@ -30,7 +30,7 @@ def analysis(
 
     path = "individual_stocks_5yr/"
     times = pd.read_csv(path + "A_data.csv").date
-    test_start_day = total_steps_train + total_steps_val - int(n / 2) + 10
+    test_start_day = total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2) + 10
     times = list(times[test_start_day:])
 
     data_type = input_data_type.split("/")[2][5:].split(".")[0]
@@ -50,11 +50,11 @@ def analysis(
     plt.title(
         "Portfolio Value (Test Set) {}: {}, {}, {}, {}, {}, {}, {}, {}".format(
             data_type,
-            batch_size,
+            BATCH_SIZE,
             LEARNING_RATE,
             ratio_greedy,
             n_episodes,
-            n,
+            LENGTH_TENSOR,
             KERNEL1_SIZE,
             n_batches,
             ratio_regul,

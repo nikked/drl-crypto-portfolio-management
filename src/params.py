@@ -3,10 +3,10 @@
 
 RATIO_TRAIN = 0.6
 RATIO_VAL = 0.2
-BATCH_SIZE = 50
+
 
 # Size of mini-batch during training
-batch_size = 50
+BATCH_SIZE = 50
 
 
 # Parameter alpha (i.e. the step size) of the Adam optimization
@@ -22,7 +22,8 @@ KERNEL1_SIZE = (1, 3)
 
 namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
 namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+namesTech = ["FB", "AMZN", "MSFT", "AAPL",
+             "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
 namesCrypto = [
     "ETCBTC",
     "ETHBTC",
@@ -67,7 +68,7 @@ kernel1_size = (1, 3)
 
 # Number of the columns (number of the trading periods) in each input
 # price matrix
-n = dict_hp_pb["length_tensor"]
+LENGTH_TENSOR = 10
 
 ratio_greedy = dict_hp_pb["ratio_greedy"]
 

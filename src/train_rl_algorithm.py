@@ -4,12 +4,12 @@ from src.Policy import Policy
 import matplotlib.pyplot as plt
 
 from src.params import (
-    n,
+    LENGTH_TENSOR,
     trading_cost,
     interest_rate,
     pf_init_train,
     ratio_greedy,
-    batch_size,
+    BATCH_SIZE,
     n_episodes,
     n_batches,
     PF_INIT_TEST,
@@ -47,7 +47,7 @@ def train_rl_algorithm(
     # initialize networks
     actor = Policy(
         nb_stocks,
-        n,
+        LENGTH_TENSOR,
         sess,
         w_eq,
         nb_feature_map,
@@ -92,7 +92,7 @@ def train_rl_algorithm(
         # dict_train['w_init_train']
         w_init_train = np.array(np.array([1] + [0] * nb_stocks))
 
-        memory = PVM(nb_stocks, total_steps_train, batch_size, w_init_train)
+        memory = PVM(nb_stocks, total_steps_train, BATCH_SIZE, w_init_train)
 
         for nb in range(n_batches):
             # draw the starting point of the batch
@@ -120,7 +120,7 @@ def train_rl_algorithm(
             for i in range(nb_stocks):
                 list_pf_value_previous_fu.append(list())
 
-            for bs in range(batch_size):
+            for bs in range(BATCH_SIZE):
 
                 # load the different inputs from the previous loaded state
                 X_t = state[0].reshape([-1] + list(state[0].shape))
@@ -170,7 +170,7 @@ def train_rl_algorithm(
                 for i in range(nb_stocks):
                     list_pf_value_previous_fu[i].append(pf_value_t_fu[i])
 
-                if bs == batch_size - 1:
+                if bs == BATCH_SIZE - 1:
                     list_final_pf.append(pf_value_t)
                     list_final_pf_eq.append(pf_value_t_eq)
                     list_final_pf_s.append(pf_value_t_s)
@@ -182,7 +182,7 @@ def train_rl_algorithm(
             #                 print('start', i_start)
             #                 print('PF_start', round(pf_value_previous,0))
 
-            #             if bs==batch_size-1:
+            #             if bs==BATCH_SIZE-1:
             #                 print('PF_end', round(pf_value_t,0))
             #                 print('weight', W_t)
 
@@ -254,7 +254,7 @@ def _eval_perf(
     p_list_eval = [PF_INIT_TEST]
     w_list_eval = [w_init_test]
 
-    for k in range(total_steps_train, total_steps_train + total_steps_val - int(n / 2)):
+    for k in range(total_steps_train, total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2)):
         X_t = state_eval[0].reshape([-1] + list(state_eval[0].shape))
         W_previous = state_eval[1].reshape([-1] + list(state_eval[1].shape))
         pf_value_previous = state_eval[2]
