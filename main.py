@@ -17,8 +17,8 @@ from src.params import (
 )
 
 
-CRYPTO_PATH_DATA = "./np_data/inputCrypto.npy"
-STOCK_PATH_DATA = "./np_data/input.npy"
+CRYPTO_DATA_FP = "./np_data/inputCrypto.npy"
+STOCK_DATA_FP = "./np_data/input.npy"
 
 DEFAULT_TRADE_ENV_ARGS = {
     "path": None,
@@ -35,10 +35,10 @@ def main(
 ):  # pylint: disable=too-many-locals
 
     if crypto_data:
-        data_source_fp = CRYPTO_PATH_DATA
+        data_source_fp = CRYPTO_DATA_FP
 
     else:
-        data_source_fp = STOCK_PATH_DATA
+        data_source_fp = STOCK_DATA_FP
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
     trade_env_args["path"] = data_source_fp
