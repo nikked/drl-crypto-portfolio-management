@@ -20,10 +20,20 @@ from src.environment import TradeEnv
 from src.PVM import PVM
 
 
-def train_rl_algorithm(interactive_session: bool,
-                       env, env_eq, env_s, action_fu, env_fu, trade_env_args, w_eq, w_s, list_stock, total_steps_train,
-        total_steps_val,
-        ):
+def train_rl_algorithm(
+    interactive_session: bool,
+    env,
+    env_eq,
+    env_s,
+    action_fu,
+    env_fu,
+    trade_env_args,
+    w_eq,
+    w_s,
+    list_stock,
+    total_steps_train,
+    total_steps_val,
+):
 
     ############# TRAINING #####################
     ###########################################
@@ -57,20 +67,22 @@ def train_rl_algorithm(interactive_session: bool,
     for e in range(n_episodes):
         print("Start Episode", e)
         if e == 0:
-            _eval_perf("Before Training", actor,
-                       interactive_session, trade_env_args, list_stock, total_steps_train, total_steps_val)
+            _eval_perf(
+                "Before Training",
+                actor,
+                interactive_session,
+                trade_env_args,
+                list_stock,
+                total_steps_train,
+                total_steps_val,
+            )
         print("Episode:", e)
         # init the PVM with the training parameters
 
         # dict_train['w_init_train']
         w_init_train = np.array(np.array([1] + [0] * nb_stocks))
 
-        memory = PVM(
-            nb_stocks,
-            total_steps_train,
-            batch_size,
-            w_init_train,
-        )
+        memory = PVM(nb_stocks, total_steps_train, batch_size, w_init_train)
 
         for nb in range(n_batches):
             # draw the starting point of the batch
@@ -78,8 +90,7 @@ def train_rl_algorithm(interactive_session: bool,
 
             # reset the environment with the weight from PVM at the starting point
             # reset also with a portfolio value with initial portfolio value
-            state, done = env.reset(memory.get_W(
-                i_start), pf_init_train, t=i_start)
+            state, done = env.reset(memory.get_W(i_start), pf_init_train, t=i_start)
             state_eq, done_eq = env_eq.reset(w_eq, pf_init_train, t=i_start)
             state_s, done_s = env_s.reset(w_s, pf_init_train, t=i_start)
 
@@ -174,7 +185,15 @@ def train_rl_algorithm(interactive_session: bool,
             actor.train(
                 list_X_t, list_W_previous, list_pf_value_previous, list_dailyReturn_t
             )
-        _eval_perf(e, actor, interactive_session, trade_env_args, list_stock, total_steps_train, total_steps_val)
+        _eval_perf(
+            e,
+            actor,
+            interactive_session,
+            trade_env_args,
+            list_stock,
+            total_steps_train,
+            total_steps_val,
+        )
 
     return actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s
 
@@ -187,7 +206,15 @@ def _get_random_action(nb_stocks):
     return random_vec / np.sum(random_vec)
 
 
-def _eval_perf(e, actor, render_plots, trade_env_args, list_stock, total_steps_train, total_steps_val):
+def _eval_perf(
+    e,
+    actor,
+    render_plots,
+    trade_env_args,
+    list_stock,
+    total_steps_train,
+    total_steps_val,
+):
     """
     This function evaluates the performance of the different types of agents.
 
@@ -246,8 +273,7 @@ def _eval_perf(e, actor, render_plots, trade_env_args, list_stock, total_steps_t
     print("Min of test PF value:", round(np.min(p_list_eval)))
     print("Max of test PF value:", round(np.max(p_list_eval)))
     print("Mean of test PF value:", round(np.mean(p_list_eval)))
-    print("Max Draw Down of test PF value:",
-          round(_get_max_draw_down(p_list_eval)))
+    print("Max Draw Down of test PF value:", round(_get_max_draw_down(p_list_eval)))
     print("End of test weights:", w_list_eval[-1])
 
     if render_plots:
@@ -257,8 +283,7 @@ def _eval_perf(e, actor, render_plots, trade_env_args, list_stock, total_steps_t
         plt.show()
         plt.title("Portfolio weights (end of validation set) episode {}".format(e))
         plt.bar(np.arange(nb_stocks + 1), list_weight_end_val[-1])
-        plt.xticks(np.arange(nb_stocks + 1),
-                   ["Money"] + list_stock, rotation=45)
+        plt.xticks(np.arange(nb_stocks + 1), ["Money"] + list_stock, rotation=45)
         plt.show()
 
     names = ["Money"] + list_stock
@@ -266,8 +291,7 @@ def _eval_perf(e, actor, render_plots, trade_env_args, list_stock, total_steps_t
 
     if render_plots:
         for j in range(nb_stocks + 1):
-            plt.plot(w_list_eval[:, j],
-                     label="Weight Stock {}".format(names[j]))
+            plt.plot(w_list_eval[:, j], label="Weight Stock {}".format(names[j]))
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
         plt.show()
 

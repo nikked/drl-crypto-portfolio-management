@@ -10,7 +10,7 @@ from src.params import (
     kernel1_size,
     cash_bias_init,
     ratio_regul,
-    LEARNING_RATE
+    LEARNING_RATE,
 )
 
 OPTIMIZER = tf.train.AdamOptimizer(LEARNING_RATE)
@@ -132,10 +132,8 @@ class Policy(object):
             with tf.variable_scope("Reward"):
                 # computation of the reward
                 # please look at the chronological map to understand
-                constant_return = tf.constant(
-                    1 + self.interest_rate, shape=[1, 1])
-                cash_return = tf.tile(
-                    constant_return, tf.stack([shape_X_t, 1]))
+                constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
+                cash_return = tf.tile(constant_return, tf.stack([shape_X_t, 1]))
                 y_t = tf.concat([cash_return, self.dailyReturn_t], axis=1)
                 Vprime_t = self.action * self.pf_value_previous
                 Vprevious = self.W_previous * self.pf_value_previous
@@ -167,10 +165,8 @@ class Policy(object):
                 ) / self.pf_value_previous
 
             with tf.variable_scope("Reward_Equiweighted"):
-                constant_return = tf.constant(
-                    1 + self.interest_rate, shape=[1, 1])
-                cash_return = tf.tile(
-                    constant_return, tf.stack([shape_X_t, 1]))
+                constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
+                cash_return = tf.tile(constant_return, tf.stack([shape_X_t, 1]))
                 y_t = tf.concat([cash_return, self.dailyReturn_t], axis=1)
 
                 V_eq = w_eq * self.pf_value_previous

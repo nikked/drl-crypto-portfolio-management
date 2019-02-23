@@ -24,8 +24,7 @@ LEARNING_RATE = 9e-2
 
 namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
 namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-namesTech = ["FB", "AMZN", "MSFT", "AAPL",
-             "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
 namesCrypto = [
     "ETCBTC",
     "ETHBTC",
@@ -44,7 +43,6 @@ DATA_SOURCE = np.load(PATH_DATA)
 trading_period = DATA_SOURCE.shape[2]
 nb_feature_map = DATA_SOURCE.shape[0]
 nb_stocks = DATA_SOURCE.shape[1]
-
 
 
 # Dicts of the problem

@@ -11,13 +11,7 @@ class PVM(object):
     This is the memory stack called PVM in the paper
     """
 
-    def __init__(
-        self,
-        m,
-        total_steps,
-        batch_size,
-        w_init
-    ):
+    def __init__(self, m, total_steps, batch_size, w_init):
 
         # initialization of the memory
         # we have a total_step_times the initialization portfolio tensor

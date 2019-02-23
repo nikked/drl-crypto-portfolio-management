@@ -1,18 +1,23 @@
-from src.params import (
-    nb_stocks,
-    n,
-    pf_init_test,
-)
+from src.params import nb_stocks, n, pf_init_test
 
 import numpy as np
 
 
-def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, env_fu,
+def test_rl_algorithm(
+    actor,
+    state_fu,
+    done_fu,
+    env,
+    env_eq,
+    env_s,
+    action_fu,
+    env_fu,
     total_steps_train,
     total_steps_val,
     total_steps_test,
-    w_eq, w_s
-    ):
+    w_eq,
+    w_s,
+):
     #######TEST#######
 
     w_init_test = np.array(np.array([1] + [0] * nb_stocks))

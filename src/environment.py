@@ -6,7 +6,7 @@ import numpy as np
 from gym.envs.registration import register
 
 
-class TradeEnv():
+class TradeEnv:
 
     """
     This class is the trading environment (render) of our project. 
@@ -26,8 +26,15 @@ class TradeEnv():
     of the time span (train -> | time T | -> test)
     """
 
-    def __init__(self, path='./np_data/input.npy', window_length=50,
-                 portfolio_value=10000, trading_cost=0.25 / 100, interest_rate=0.02 / 250, train_size=0.7):
+    def __init__(
+        self,
+        path="./np_data/input.npy",
+        window_length=50,
+        portfolio_value=10000,
+        trading_cost=0.25 / 100,
+        interest_rate=0.02 / 250,
+        train_size=0.7,
+    ):
 
         # path to numpy data
         self.path = path
@@ -43,8 +50,7 @@ class TradeEnv():
         # number of stocks and features
         self.nb_stocks = self.data.shape[1]
         self.nb_features = self.data.shape[0]
-        self.end_train = int(
-            (self.data.shape[2] - self.window_length) * train_size)
+        self.end_train = int((self.data.shape[2] - self.window_length) * train_size)
 
         # init state and index
         self.index = None
@@ -63,7 +69,7 @@ class TradeEnv():
     def readTensor(self, X, t):
         # this is not the tensor of equation 18
         # need to batch normalize if you want this one
-        return X[:, :, t - self.window_length:t]
+        return X[:, :, t - self.window_length : t]
 
     def readUpdate(self, t):
         # return the return of each stock for the day t
@@ -78,8 +84,7 @@ class TradeEnv():
         This function restarts the environment with given initial weights and given value of portfolio
 
         """
-        self.state = (self.readTensor(
-            self.data, self.window_length), w_init, p_init)
+        self.state = (self.readTensor(self.data, self.window_length), w_init, p_init)
         self.index = self.window_length + t
         self.done = False
 
@@ -114,8 +119,9 @@ class TradeEnv():
         pf_alloc = pf_previous
 
         # Compute transaction cost
-        cost = pf_alloc * \
-            np.linalg.norm((w_alloc - w_previous), ord=1) * self.trading_cost
+        cost = (
+            pf_alloc * np.linalg.norm((w_alloc - w_previous), ord=1) * self.trading_cost
+        )
 
         # convert weight vector into value vector
         v_alloc = pf_alloc * w_alloc
