@@ -1,16 +1,3 @@
-# coding: utf-8
-
-# # Introduction
-
-# This notebook presents the main part of the project. It is decomposed in the following parts:
-# - Parameters setting
-# - Creation of the trading environment
-# - Set-up of the trading agent (actor)
-# - Set-up of the portfolio vector memory (PVM)
-# - Agent training
-# - Agent Evaluation
-# - Analysis
-
 import argparse
 import numpy as np
 
@@ -29,11 +16,6 @@ from src.params import (
     RATIO_VAL,
 )
 
-
-"""
-TODO:
-
-"""
 
 CRYPTO_PATH_DATA = "./np_data/inputCrypto.npy"
 STOCK_PATH_DATA = "./np_data/input.npy"
@@ -79,7 +61,7 @@ def main(
 
     data_type = data_source_fp.split("/")[2][5:].split(".")[0]
 
-    list_stock = _get_list_stock(data_type, nb_stocks)
+    asset_list = _get_asset_list(data_type, nb_stocks)
 
     # other environment Parameters
 
@@ -102,7 +84,7 @@ def main(
         trade_env_args,
         w_eq,
         w_s,
-        list_stock,
+        asset_list,
         total_steps_train,
         total_steps_val,
         nb_feature_map,
@@ -145,7 +127,7 @@ def main(
     )
 
 
-def _get_list_stock(data_type, nb_stocks):
+def _get_asset_list(data_type, nb_stocks):
 
     names_bio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
     names_utilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
@@ -176,17 +158,17 @@ def _get_list_stock(data_type, nb_stocks):
 
     # fix parameters of the network
     if data_type == "Utilities":
-        list_stock = names_utilities
+        asset_list = names_utilities
     elif data_type == "Bio":
-        list_stock = names_bio
+        asset_list = names_bio
     elif data_type == "Tech":
-        list_stock = names_tech
+        asset_list = names_tech
     elif data_type == "Crypto":
-        list_stock = names_crypto
+        asset_list = names_crypto
     else:
-        list_stock = [i for i in range(nb_stocks)]
+        asset_list = [i for i in range(nb_stocks)]
 
-    return list_stock
+    return asset_list
 
 
 def _get_train_environments(nb_stocks, trade_env_args):

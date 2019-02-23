@@ -29,7 +29,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     trade_env_args,
     w_eq,
     w_s,
-    list_stock,
+    asset_list,
     total_steps_train,
     total_steps_val,
     nb_feature_map,
@@ -81,7 +81,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 actor,
                 interactive_session,
                 trade_env_args,
-                list_stock,
+                asset_list,
                 total_steps_train,
                 total_steps_val,
                 nb_stocks,
@@ -200,7 +200,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             actor,
             interactive_session,
             trade_env_args,
-            list_stock,
+            asset_list,
             total_steps_train,
             total_steps_val,
             nb_stocks,
@@ -222,7 +222,7 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     actor,
     render_plots,
     trade_env_args,
-    list_stock,
+    asset_list,
     total_steps_train,
     total_steps_val,
     nb_stocks,
@@ -297,10 +297,10 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
             "Portfolio weights (end of validation set) episode {}".format(no_episode)
         )
         plt.bar(np.arange(nb_stocks + 1), list_weight_end_val[-1])
-        plt.xticks(np.arange(nb_stocks + 1), ["Money"] + list_stock, rotation=45)
+        plt.xticks(np.arange(nb_stocks + 1), ["Money"] + asset_list, rotation=45)
         plt.show()
 
-    names = ["Money"] + list_stock
+    names = ["Money"] + asset_list
     w_list_eval = np.array(w_list_eval)
 
     if render_plots:
