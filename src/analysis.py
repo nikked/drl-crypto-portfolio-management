@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from src.params import (
-    ratio_greedy,
+    RATIO_GREEDY,
     BATCH_SIZE,
     LEARNING_RATE,
-    n_episodes,
+    N_EPISODES,
     KERNEL1_SIZE,
     LENGTH_TENSOR,
-    n_batches,
-    ratio_regul,
+    N_BATCHES,
+    RATIO_REGUL,
 )
 
 
@@ -52,12 +52,12 @@ def analysis(
             data_type,
             BATCH_SIZE,
             LEARNING_RATE,
-            ratio_greedy,
-            n_episodes,
+            RATIO_GREEDY,
+            N_EPISODES,
             LENGTH_TENSOR,
             KERNEL1_SIZE,
-            n_batches,
-            ratio_regul,
+            N_BATCHES,
+            RATIO_REGUL,
         )
     )
     plt.plot(p_list, label="Agent Portfolio Value")

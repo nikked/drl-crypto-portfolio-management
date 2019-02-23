@@ -8,7 +8,7 @@ from src.params import (
     N_FILTER_2,
     KERNEL1_SIZE,
     CASH_BIAS_INIT,
-    ratio_regul,
+    RATIO_REGUL,
     LEARNING_RATE,
 )
 
@@ -199,7 +199,7 @@ class Policy(object):
                     self.adjested_reward = (
                         self.instantaneous_reward
                         - self.instantaneous_reward_eq
-                        - ratio_regul * self.max_weight
+                        - RATIO_REGUL * self.max_weight
                     )
 
         # objective function

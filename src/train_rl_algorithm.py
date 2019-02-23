@@ -7,11 +7,11 @@ from src.params import (
     LENGTH_TENSOR,
     TRADING_COST,
     INTEREST_RATE,
-    pf_init_train,
-    ratio_greedy,
+    PF_INITIAL_VALUE,
+    RATIO_GREEDY,
     BATCH_SIZE,
-    n_episodes,
-    n_batches,
+    N_EPISODES,
+    N_BATCHES,
     PF_INIT_TEST,
 )
 
@@ -73,7 +73,7 @@ def train_rl_algorithm(
         list_final_pf_fu.append(list())
 
     ###### Train #####
-    for e in range(n_episodes):
+    for e in range(N_EPISODES):
         print("Start Episode", e)
         if e == 0:
             _eval_perf(
@@ -94,19 +94,19 @@ def train_rl_algorithm(
 
         memory = PVM(nb_stocks, total_steps_train, BATCH_SIZE, w_init_train)
 
-        for nb in range(n_batches):
+        for nb in range(N_BATCHES):
             # draw the starting point of the batch
             i_start = memory.draw()
 
             # reset the environment with the weight from PVM at the starting point
             # reset also with a portfolio value with initial portfolio value
-            state, done = env.reset(memory.get_W(i_start), pf_init_train, t=i_start)
-            state_eq, done_eq = env_eq.reset(w_eq, pf_init_train, t=i_start)
-            state_s, done_s = env_s.reset(w_s, pf_init_train, t=i_start)
+            state, done = env.reset(memory.get_W(i_start), PF_INITIAL_VALUE, t=i_start)
+            state_eq, done_eq = env_eq.reset(w_eq, PF_INITIAL_VALUE, t=i_start)
+            state_s, done_s = env_s.reset(w_s, PF_INITIAL_VALUE, t=i_start)
 
             for i in range(nb_stocks):
                 state_fu[i], done_fu[i] = env_fu[i].reset(
-                    action_fu[i], pf_init_train, t=i_start
+                    action_fu[i], PF_INITIAL_VALUE, t=i_start
                 )
 
             list_X_t, list_W_previous, list_pf_value_previous, list_dailyReturn_t = (
@@ -127,7 +127,7 @@ def train_rl_algorithm(
                 W_previous = state[1].reshape([-1] + list(state[1].shape))
                 pf_value_previous = state[2]
 
-                if np.random.rand() < ratio_greedy:
+                if np.random.rand() < RATIO_GREEDY:
                     # print('go')
                     # computation of the action of the agent
                     action = actor.compute_W(X_t, W_previous)

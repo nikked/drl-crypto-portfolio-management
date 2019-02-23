@@ -22,7 +22,7 @@ from src.environment import TradeEnv
 
 from src.params import (
     LENGTH_TENSOR,
-    pf_init_train,
+    PF_INITIAL_VALUE,
     TRADING_COST,
     INTEREST_RATE,
     RATIO_TRAIN,
@@ -32,9 +32,6 @@ from src.params import (
 
 """
 TODO:
-- clean params.py
-    - datastuff out of params. data_type, data, trading_period, nb_feature_map, nb_stocks
-    - big important params like trading cost to own big param
 
 """
 
@@ -44,7 +41,7 @@ STOCK_PATH_DATA = "./np_data/input.npy"
 DEFAULT_TRADE_ENV_ARGS = {
     "path": None,
     "window_length": LENGTH_TENSOR,
-    "portfolio_value": pf_init_train,
+    "portfolio_value": PF_INITIAL_VALUE,
     "trading_cost": TRADING_COST,
     "interest_rate": INTEREST_RATE,
     "train_size": RATIO_TRAIN,
