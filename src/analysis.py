@@ -11,8 +11,6 @@ from src.params import (
     nb_stocks,
     n_batches,
     ratio_regul,
-    total_steps_train,
-    total_steps_val,
 )
 
 
@@ -25,7 +23,9 @@ def analysis(
         list_final_pf,
         list_final_pf_eq,
         list_final_pf_s,
-        input_data_type
+        input_data_type,
+total_steps_train,
+        total_steps_val,
 ):
 
     path = "individual_stocks_5yr/"

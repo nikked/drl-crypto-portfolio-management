@@ -21,7 +21,17 @@ from src.test_rl_algorithm import test_rl_algorithm
 from src.analysis import analysis
 from src.environment import TradeEnv
 
-from src.params import PATH_DATA, n, nb_stocks, pf_init_train, trading_cost, interest_rate, RATIO_TRAIN, BATCH_SIZE, total_steps_train, total_steps_val, total_steps_test
+from src.params import (
+    trading_period,
+    PATH_DATA,
+    n,
+    nb_stocks,
+    pf_init_train,
+    trading_cost,
+    interest_rate,
+    RATIO_TRAIN,
+    RATIO_VAL,
+    BATCH_SIZE)
 
 
 """
@@ -44,10 +54,23 @@ DEFAULT_TRADE_ENV_ARGS = {
 
 def main(interactive_session=False):
 
+    # HP of the problem
+    # Total number of steps for pre-training in the training set
+    total_steps_train = int(RATIO_TRAIN * trading_period)
+
+    # Total number of steps for pre-training in the validation set
+    total_steps_val = int(RATIO_VAL * trading_period)
+
+    # Total number of steps for the test
+    total_steps_test = trading_period - total_steps_train - total_steps_val
+
+    data_type = PATH_DATA.split("/")[2][5:].split(".")[0]
+
+    list_stock = _get_list_stock(data_type)
+
     # other environment Parameters
 
     w_eq = np.array(np.array([1 / (nb_stocks + 1)] * (nb_stocks + 1)))
-
     w_s = np.array(np.array([1] + [0.0] * nb_stocks))
 
     # Creation of the trading environment
@@ -55,7 +78,9 @@ def main(interactive_session=False):
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
-        interactive_session, env, env_eq, env_s, action_fu, env_fu, DEFAULT_TRADE_ENV_ARGS, w_eq, w_s)
+        interactive_session, env, env_eq, env_s, action_fu, env_fu, DEFAULT_TRADE_ENV_ARGS, w_eq, w_s, list_stock,
+        total_steps_train,
+        total_steps_val,)
 
     # Agent evaluation
     p_list, p_list_eq, p_list_fu, p_list_s, w_list = test_rl_algorithm(
@@ -66,7 +91,26 @@ def main(interactive_session=False):
     # Analysis
     analysis(p_list, p_list_eq, p_list_s, p_list_fu, w_list,
              list_final_pf, list_final_pf_eq, list_final_pf_s,
-             PATH_DATA)
+             PATH_DATA,
+             total_steps_train,
+        total_steps_val)
+
+
+def _get_list_stock(data_type):
+
+    # fix parameters of the network
+    if data_type == "Utilities":
+        list_stock = namesUtilities
+    elif data_type == "Bio":
+        list_stock = namesBio
+    elif data_type == "Tech":
+        list_stock = namesTech
+    elif data_type == "Crypto":
+        list_stock = namesCrypto
+    else:
+        list_stock = [i for i in range(nb_stocks)]
+
+    return list_stock
 
 
 def _get_train_environments():

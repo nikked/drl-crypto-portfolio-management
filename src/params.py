@@ -46,37 +46,6 @@ nb_feature_map = DATA_SOURCE.shape[0]
 nb_stocks = DATA_SOURCE.shape[1]
 
 
-data_type = PATH_DATA.split("/")[2][5:].split(".")[0]
-
-
-# HP of the problem
-# Total number of steps for pre-training in the training set
-total_steps_train = int(RATIO_TRAIN * trading_period)
-
-# Total number of steps for pre-training in the validation set
-total_steps_val = int(RATIO_VAL * trading_period)
-
-# Total number of steps for the test
-total_steps_test = trading_period - total_steps_train - total_steps_val
-
-
-# fix parameters of the network
-if data_type == "Utilities":
-    list_stock = namesUtilities
-elif data_type == "Bio":
-    list_stock = namesBio
-elif data_type == "Tech":
-    list_stock = namesTech
-elif data_type == "Crypto":
-    list_stock = namesCrypto
-else:
-    list_stock = [i for i in range(nb_stocks)]
-
-# Test Parameters
-
-# dict_test['w_init_test']
-w_init_test = np.array(np.array([1] + [0] * nb_stocks))
-
 
 # Dicts of the problem
 dict_hp_net = {"n_filter_1": 2, "n_filter_2": 20, "kernel1_size": (1, 3)}

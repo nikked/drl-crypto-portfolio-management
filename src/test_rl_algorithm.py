@@ -2,11 +2,9 @@ from src.params import (
     nb_stocks,
     n,
     pf_init_test,
-    w_init_test,
-    total_steps_train,
-    total_steps_val,
-    total_steps_test,
 )
+
+import numpy as np
 
 
 def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, env_fu,
@@ -16,6 +14,8 @@ def test_rl_algorithm(actor, state_fu, done_fu, env, env_eq, env_s, action_fu, e
     w_eq, w_s
     ):
     #######TEST#######
+
+    w_init_test = np.array(np.array([1] + [0] * nb_stocks))
 
     # initialization of the environment
     state, done = env.reset(w_init_test, pf_init_test, t=total_steps_train)
