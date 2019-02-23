@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 from src.params import (
     LENGTH_TENSOR,
-    trading_cost,
-    interest_rate,
+    TRADING_COST,
+    INTEREST_RATE,
     pf_init_train,
     ratio_greedy,
     BATCH_SIZE,
@@ -34,7 +34,7 @@ def train_rl_algorithm(
     total_steps_val,
     nb_feature_map,
     nb_stocks,
-    gpu_device
+    gpu_device,
 ):
 
     ############# TRAINING #####################
@@ -51,9 +51,9 @@ def train_rl_algorithm(
         sess,
         w_eq,
         nb_feature_map,
-        trading_cost=trading_cost,
-        interest_rate=interest_rate,
-        gpu_device=gpu_device
+        trading_cost=TRADING_COST,
+        interest_rate=INTEREST_RATE,
+        gpu_device=gpu_device,
     )  # policy initialization
 
     # initialize tensorflow graphs
@@ -254,7 +254,9 @@ def _eval_perf(
     p_list_eval = [PF_INIT_TEST]
     w_list_eval = [w_init_test]
 
-    for k in range(total_steps_train, total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2)):
+    for k in range(
+        total_steps_train, total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2)
+    ):
         X_t = state_eval[0].reshape([-1] + list(state_eval[0].shape))
         W_previous = state_eval[1].reshape([-1] + list(state_eval[1].shape))
         pf_value_previous = state_eval[2]

@@ -23,8 +23,8 @@ from src.environment import TradeEnv
 from src.params import (
     LENGTH_TENSOR,
     pf_init_train,
-    trading_cost,
-    interest_rate,
+    TRADING_COST,
+    INTEREST_RATE,
     RATIO_TRAIN,
     RATIO_VAL,
 )
@@ -45,8 +45,8 @@ DEFAULT_TRADE_ENV_ARGS = {
     "path": None,
     "window_length": LENGTH_TENSOR,
     "portfolio_value": pf_init_train,
-    "trading_cost": trading_cost,
-    "interest_rate": interest_rate,
+    "trading_cost": TRADING_COST,
+    "interest_rate": INTEREST_RATE,
     "train_size": RATIO_TRAIN,
 }
 
@@ -150,8 +150,7 @@ def _get_list_stock(data_type, nb_stocks):
 
     namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
     namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-    namesTech = ["FB", "AMZN", "MSFT", "AAPL",
-                 "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+    namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
     namesCrypto = [
         "ETCBTC",
         "ETHBTC",
@@ -237,7 +236,7 @@ if __name__ == "__main__":
         "--gpu_device",
         type=int,
         help="plot stuff and other interactive shit",
-        default=None
+        default=None,
     )
 
     ARGS = PARSER.parse_args()
@@ -245,5 +244,5 @@ if __name__ == "__main__":
     main(
         interactive_session=ARGS.interactive_session,
         crypto_data=ARGS.crypto_data,
-        gpu_device=ARGS.gpu_device
+        gpu_device=ARGS.gpu_device,
     )

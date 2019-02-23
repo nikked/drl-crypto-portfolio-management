@@ -20,10 +20,15 @@ N_FILTER_1 = 2
 N_FILTER_2 = 20
 KERNEL1_SIZE = (1, 3)
 
+# Finance parameters
+TRADING_COST = 0.25 / 100
+INTEREST_RATE = 0.02 / 250
+CASH_BIAS_INIT = 0.7
+
+
 namesBio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
 namesUtilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-namesTech = ["FB", "AMZN", "MSFT", "AAPL",
-             "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
+namesTech = ["FB", "AMZN", "MSFT", "AAPL", "T", "VZ", "CMCSA", "IBM", "CRM", "INTC"]
 namesCrypto = [
     "ETCBTC",
     "ETHBTC",
@@ -64,32 +69,23 @@ dict_test = {"pf_init_test": 10000, "w_init_test": "d"}
 
 # HP of the network
 
-kernel1_size = (1, 3)
-
 # Number of the columns (number of the trading periods) in each input
 # price matrix
 LENGTH_TENSOR = 10
 
-ratio_greedy = dict_hp_pb["ratio_greedy"]
+ratio_greedy = 0.8
 
-ratio_regul = dict_hp_pb["ratio_regul"]
+ratio_regul = 0.1
 
 # HP of the optimization
 
 
 # The L2 regularization coefficient applied to network training
-regularization = dict_hp_opt["regularization"]
+regularization = 1e-8
 
-
-# Finance parameters
-
-trading_cost = dict_fin["trading_cost"]
-interest_rate = dict_fin["interest_rate"]
-cash_bias_init = dict_fin["cash_bias_init"]
 
 # Training Parameters
 
-pf_init_train = dict_train["pf_init_train"]
-
-n_episodes = dict_train["n_episodes"]
-n_batches = dict_train["n_batches"]
+pf_init_train = 10000
+n_episodes = 2
+n_batches = 10

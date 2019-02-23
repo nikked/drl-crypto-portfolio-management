@@ -2,12 +2,12 @@ import tensorflow as tf
 import numpy as np
 
 from src.params import (
-    trading_cost,
-    interest_rate,
+    TRADING_COST,
+    INTEREST_RATE,
     N_FILTER_1,
     N_FILTER_2,
     KERNEL1_SIZE,
-    cash_bias_init,
+    CASH_BIAS_INIT,
     ratio_regul,
     LEARNING_RATE,
 )
@@ -31,11 +31,11 @@ class Policy(object):
         sess,
         w_eq,
         nb_feature_map,
-        trading_cost=trading_cost,
-        interest_rate=interest_rate,
+        trading_cost=TRADING_COST,
+        interest_rate=INTEREST_RATE,
         n_filter_1=N_FILTER_1,
         n_filter_2=N_FILTER_2,
-        gpu_device=None
+        gpu_device=None,
     ):
 
         # parameters
@@ -47,12 +47,12 @@ class Policy(object):
         self.m = m
 
         if gpu_device:
-            self.tf_device = '/device:GPU:{}'.format(gpu_device)
+            self.tf_device = "/device:GPU:{}".format(gpu_device)
 
         else:
-            self.tf_device = '/cpu:0'
+            self.tf_device = "/cpu:0"
 
-        print('Using tf device {}'.format(self.tf_device))
+        print("Using tf device {}".format(self.tf_device))
 
         with tf.device(self.tf_device):
             with tf.variable_scope("Inputs"):
@@ -64,8 +64,7 @@ class Policy(object):
                     tf.float32, [None, nb_feature_map, self.m, self.n]
                 )  # The Price tensor
                 # weights at the previous time step
-                self.W_previous = tf.placeholder(
-                    tf.float32, [None, self.m + 1])
+                self.W_previous = tf.placeholder(tf.float32, [None, self.m + 1])
                 # portfolio value at the previous time step
                 self.pf_value_previous = tf.placeholder(tf.float32, [None, 1])
                 # vector of Open(t+1)/Open(t)
@@ -79,7 +78,7 @@ class Policy(object):
                 bias = tf.get_variable(
                     "cash_bias",
                     shape=[1, 1, 1, 1],
-                    initializer=tf.constant_initializer(cash_bias_init),
+                    initializer=tf.constant_initializer(CASH_BIAS_INIT),
                 )
                 # shape of the tensor == batchsize
                 shape_X_t = tf.shape(self.X_t)[0]
@@ -132,8 +131,7 @@ class Policy(object):
 
                 with tf.variable_scope("Tensor4"):
                     # last feature map WITH cash bias
-                    self.tensor4 = tf.concat(
-                        [self.cash_bias, self.conv3], axis=2)
+                    self.tensor4 = tf.concat([self.cash_bias, self.conv3], axis=2)
                     # we squeeze to reduce and get the good dimension
                     self.squeezed_tensor4 = tf.squeeze(self.tensor4, [1, 3])
 
@@ -144,10 +142,8 @@ class Policy(object):
                 with tf.variable_scope("Reward"):
                     # computation of the reward
                     # please look at the chronological map to understand
-                    constant_return = tf.constant(
-                        1 + self.interest_rate, shape=[1, 1])
-                    cash_return = tf.tile(
-                        constant_return, tf.stack([shape_X_t, 1]))
+                    constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
+                    cash_return = tf.tile(constant_return, tf.stack([shape_X_t, 1]))
                     y_t = tf.concat([cash_return, self.dailyReturn_t], axis=1)
                     Vprime_t = self.action * self.pf_value_previous
                     Vprevious = self.W_previous * self.pf_value_previous
@@ -164,7 +160,9 @@ class Policy(object):
                     cost = tf.expand_dims(cost, 1)
 
                     zero = tf.constant(
-                        np.array([0.0] * m).reshape(1, m), shape=[1, m], dtype=tf.float32
+                        np.array([0.0] * m).reshape(1, m),
+                        shape=[1, m],
+                        dtype=tf.float32,
                     )
 
                     vec_zero = tf.tile(zero, tf.stack([shape_X_t, 1]))
@@ -179,10 +177,8 @@ class Policy(object):
                     ) / self.pf_value_previous
 
                 with tf.variable_scope("Reward_Equiweighted"):
-                    constant_return = tf.constant(
-                        1 + self.interest_rate, shape=[1, 1])
-                    cash_return = tf.tile(
-                        constant_return, tf.stack([shape_X_t, 1]))
+                    constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
+                    cash_return = tf.tile(constant_return, tf.stack([shape_X_t, 1]))
                     y_t = tf.concat([cash_return, self.dailyReturn_t], axis=1)
 
                     V_eq = w_eq * self.pf_value_previous
