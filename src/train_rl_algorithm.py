@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from src.Policy import Policy
+from src.policy import Policy
 import matplotlib.pyplot as plt
 
 from src.params import (
@@ -132,7 +132,7 @@ def train_rl_algorithm(
                 if np.random.rand() < RATIO_GREEDY:
                     # print('go')
                     # computation of the action of the agent
-                    action = actor.compute_W(X_t, W_previous)
+                    action = actor.compute_w(X_t, W_previous)
                 else:
                     action = _get_random_action(nb_stocks)
 
@@ -263,7 +263,7 @@ def _eval_perf(
         W_previous = state_eval[1].reshape([-1] + list(state_eval[1].shape))
         pf_value_previous = state_eval[2]
         # compute the action
-        action = actor.compute_W(X_t, W_previous)
+        action = actor.compute_w(X_t, W_previous)
         # step forward environment
         state_eval, reward_eval, done_eval = env_eval.step(action)
 

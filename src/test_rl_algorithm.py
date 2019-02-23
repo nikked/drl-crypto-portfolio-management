@@ -54,7 +54,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         w_previous = state[1].reshape([-1] + list(state[1].shape))
         pf_value_previous = state[2]
         # compute the action
-        action = actor.compute_W(x_current, w_previous)
+        action = actor.compute_w(x_current, w_previous)
         # step forward environment
         state, _, _ = env.step(action)
         state_eq, _, _ = env_eq.step(w_eq)

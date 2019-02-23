@@ -18,16 +18,16 @@ OPTIMIZER = tf.train.AdamOptimizer(LEARNING_RATE)
 # define neural net \pi_\phi(s) as a class
 
 
-class Policy(object):
+class Policy:  # pylint: disable=too-many-instance-attributes
     """
     This class is used to instanciate the policy network agent
 
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments, too-many-locals, too-many-statements
         self,
-        m,
-        n,
+        nb_stocks,
+        length_tensor,
         sess,
         w_eq,
         nb_feature_map,
@@ -43,8 +43,8 @@ class Policy(object):
         self.interest_rate = interest_rate
         self.n_filter_1 = n_filter_1
         self.n_filter_2 = n_filter_2
-        self.n = n
-        self.m = m
+        self.length_tensor = length_tensor
+        self.nb_stocks = nb_stocks
 
         if gpu_device:
             self.tf_device = "/device:GPU:{}".format(gpu_device)
@@ -60,15 +60,18 @@ class Policy(object):
                 # Placeholder
 
                 # tensor of the prices
-                self.X_t = tf.placeholder(
-                    tf.float32, [None, nb_feature_map, self.m, self.n]
+                self.x_current = tf.placeholder(
+                    tf.float32, [None, nb_feature_map,
+                                 self.nb_stocks, self.length_tensor]
                 )  # The Price tensor
                 # weights at the previous time step
-                self.W_previous = tf.placeholder(tf.float32, [None, self.m + 1])
+                self.w_previous = tf.placeholder(
+                    tf.float32, [None, self.nb_stocks + 1])
                 # portfolio value at the previous time step
                 self.pf_value_previous = tf.placeholder(tf.float32, [None, 1])
                 # vector of Open(t+1)/Open(t)
-                self.dailyReturn_t = tf.placeholder(tf.float32, [None, self.m])
+                self.daily_return_t = tf.placeholder(
+                    tf.float32, [None, self.nb_stocks])
 
                 # self.pf_value_previous_eq = tf.placeholder(tf.float32, [None, 1])
 
@@ -81,17 +84,18 @@ class Policy(object):
                     initializer=tf.constant_initializer(CASH_BIAS_INIT),
                 )
                 # shape of the tensor == batchsize
-                shape_X_t = tf.shape(self.X_t)[0]
+                shape_x_current = tf.shape(self.x_current)[0]
                 # trick to get a "tensor size" for the cash bias
-                self.cash_bias = tf.tile(bias, tf.stack([shape_X_t, 1, 1, 1]))
+                self.cash_bias = tf.tile(  # pylint: disable=no-member
+                    bias, tf.stack([shape_x_current, 1, 1, 1]))
                 # print(self.cash_bias.shape)
 
                 with tf.variable_scope("Conv1"):
-                    # first layer on the X_t tensor
+                    # first layer on the x_current tensor
                     # return a tensor of depth 2
                     self.conv1 = tf.layers.conv2d(
-                        inputs=tf.transpose(self.X_t, perm=[0, 3, 2, 1]),
-                        activation=tf.nn.relu,
+                        inputs=tf.transpose(self.x_current, perm=[0, 3, 2, 1]),
+                        activation=tf.nn.relu,  # pylint: disable=no-member
                         filters=self.n_filter_1,
                         strides=(1, 1),
                         kernel_size=KERNEL1_SIZE,
@@ -103,17 +107,17 @@ class Policy(object):
                     # feature maps
                     self.conv2 = tf.layers.conv2d(
                         inputs=self.conv1,
-                        activation=tf.nn.relu,
+                        activation=tf.nn.relu,  # pylint: disable=no-member
                         filters=self.n_filter_2,
-                        strides=(self.n, 1),
-                        kernel_size=(1, self.n),
+                        strides=(self.length_tensor, 1),
+                        kernel_size=(1, self.length_tensor),
                         padding="same",
                     )
 
                 with tf.variable_scope("Tensor3"):
                     # w from last periods
                     # trick to have good dimensions
-                    w_wo_c = self.W_previous[:, 1:]
+                    w_wo_c = self.w_previous[:, 1:]
                     w_wo_c = tf.expand_dims(w_wo_c, 1)
                     w_wo_c = tf.expand_dims(w_wo_c, -1)
                     self.tensor3 = tf.concat([self.conv2, w_wo_c], axis=3)
@@ -122,7 +126,7 @@ class Policy(object):
                     # last feature map WITHOUT cash bias
                     self.conv3 = tf.layers.conv2d(
                         inputs=self.conv2,
-                        activation=tf.nn.relu,
+                        activation=tf.nn.relu,  # pylint: disable=no-member
                         filters=1,
                         strides=(self.n_filter_2 + 1, 1),
                         kernel_size=(1, 1),
@@ -131,7 +135,8 @@ class Policy(object):
 
                 with tf.variable_scope("Tensor4"):
                     # last feature map WITH cash bias
-                    self.tensor4 = tf.concat([self.cash_bias, self.conv3], axis=2)
+                    self.tensor4 = tf.concat(
+                        [self.cash_bias, self.conv3], axis=2)
                     # we squeeze to reduce and get the good dimension
                     self.squeezed_tensor4 = tf.squeeze(self.tensor4, [1, 3])
 
@@ -142,52 +147,57 @@ class Policy(object):
                 with tf.variable_scope("Reward"):
                     # computation of the reward
                     # please look at the chronological map to understand
-                    constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
-                    cash_return = tf.tile(constant_return, tf.stack([shape_X_t, 1]))
-                    y_t = tf.concat([cash_return, self.dailyReturn_t], axis=1)
-                    Vprime_t = self.action * self.pf_value_previous
-                    Vprevious = self.W_previous * self.pf_value_previous
+                    constant_return = tf.constant(
+                        1 + self.interest_rate, shape=[1, 1])
+                    cash_return = tf.tile(  # pylint: disable=no-member
+                        constant_return, tf.stack([shape_x_current, 1]))
+                    y_t = tf.concat([cash_return, self.daily_return_t], axis=1)
+                    v_prime_t = self.action * self.pf_value_previous
+                    v_previous = self.w_previous * self.pf_value_previous
 
                     # this is just a trick to get the good shape for cost
                     constant = tf.constant(1.0, shape=[1])
 
                     cost = (
                         self.trading_cost
-                        * tf.norm(Vprime_t - Vprevious, ord=1, axis=1)
+                        * tf.norm(v_prime_t - v_previous, ord=1, axis=1)
                         * constant
                     )
 
                     cost = tf.expand_dims(cost, 1)
 
                     zero = tf.constant(
-                        np.array([0.0] * m).reshape(1, m),
-                        shape=[1, m],
+                        np.array([0.0] * self.nb_stocks).reshape(1,
+                                                                 self.nb_stocks),
+                        shape=[1, self.nb_stocks],
                         dtype=tf.float32,
                     )
 
-                    vec_zero = tf.tile(zero, tf.stack([shape_X_t, 1]))
+                    vec_zero = tf.tile(zero, tf.stack([shape_x_current, 1])) # pylint: disable=no-member
                     vec_cost = tf.concat([cost, vec_zero], axis=1)
 
-                    Vsecond_t = Vprime_t - vec_cost
+                    v_second_t = v_prime_t - vec_cost
 
-                    V_t = tf.multiply(Vsecond_t, y_t)
-                    self.portfolioValue = tf.norm(V_t, ord=1)
+                    v_t = tf.multiply(v_second_t, y_t)
+                    self.portfolio_value = tf.norm(v_t, ord=1)
                     self.instantaneous_reward = (
-                        self.portfolioValue - self.pf_value_previous
+                        self.portfolio_value - self.pf_value_previous
                     ) / self.pf_value_previous
 
                 with tf.variable_scope("Reward_Equiweighted"):
-                    constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
-                    cash_return = tf.tile(constant_return, tf.stack([shape_X_t, 1]))
-                    y_t = tf.concat([cash_return, self.dailyReturn_t], axis=1)
+                    constant_return = tf.constant(
+                        1 + self.interest_rate, shape=[1, 1])
+                    cash_return = tf.tile( # pylint: disable=no-member
+                        constant_return, tf.stack([shape_x_current, 1]))
+                    y_t = tf.concat([cash_return, self.daily_return_t], axis=1)
 
-                    V_eq = w_eq * self.pf_value_previous
-                    V_eq_second = tf.multiply(V_eq, y_t)
+                    v_eq = w_eq * self.pf_value_previous
+                    v_eq_second = tf.multiply(v_eq, y_t)
 
-                    self.portfolioValue_eq = tf.norm(V_eq_second, ord=1)
+                    self.portfolio_value_eq = tf.norm(v_eq_second, ord=1)
 
                     self.instantaneous_reward_eq = (
-                        self.portfolioValue_eq - self.pf_value_previous
+                        self.portfolio_value_eq - self.pf_value_previous
                     ) / self.pf_value_previous
 
                 with tf.variable_scope("Max_weight"):
@@ -212,10 +222,10 @@ class Policy(object):
         self.optimizer = OPTIMIZER
         self.sess = sess
 
-    def compute_W(self, X_t_, W_previous_):
+    def compute_w(self, x_current, w_previous):
         """
         This function returns the action the agent takes
-        given the input tensor and the W_previous
+        given the input tensor and the w_previous
 
         It is a vector of weight
 
@@ -223,10 +233,11 @@ class Policy(object):
         with tf.device(self.tf_device):
             return self.sess.run(
                 tf.squeeze(self.action),
-                feed_dict={self.X_t: X_t_, self.W_previous: W_previous_},
+                feed_dict={self.x_current: x_current,
+                           self.w_previous: w_previous},
             )
 
-    def train(self, X_t_, W_previous_, pf_value_previous_, dailyReturn_t_):
+    def train(self, x_current, w_previous, pf_value_previous, daily_return_t):
         """
         This function trains the neural network
         maximizing the reward
@@ -236,9 +247,9 @@ class Policy(object):
             self.sess.run(
                 self.train_op,
                 feed_dict={
-                    self.X_t: X_t_,
-                    self.W_previous: W_previous_,
-                    self.pf_value_previous: pf_value_previous_,
-                    self.dailyReturn_t: dailyReturn_t_,
+                    self.x_current: x_current,
+                    self.w_previous: w_previous,
+                    self.pf_value_previous: pf_value_previous,
+                    self.daily_return_t: daily_return_t,
                 },
             )
