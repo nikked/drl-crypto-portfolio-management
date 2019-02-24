@@ -17,7 +17,6 @@ from src.params import (
     RATIO_VAL,
     TEST_TRAIN_PARAMS,
     WINDOW_LENGTH,
-    N_EPISODES,
 )
 
 from data_pipelines import data_pipe
@@ -49,12 +48,14 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         f"\nTraining for {cli_options['n_episodes']} episodes.\nTraining {cli_options['n_batches']} batches."
     )
     trade_envs, asset_list, trading_periods, step_counts = _initialize_trade_envs(
+        window_length=cli_options["window_length"],
         no_of_assets=cli_options["no_of_assets"],
         max_no_of_training_periods=cli_options["max_no_of_training_periods"],
     )
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
+        cli_options["window_length"],
         cli_options["n_episodes"],
         cli_options["n_batches"],
         cli_options["interactive_session"],
@@ -67,7 +68,7 @@ def main(**cli_options):  # pylint: disable=too-many-locals
 
     # Agent evaluation
     p_list, p_list_eq, p_list_fu, p_list_s, w_list = test_rl_algorithm(
-        actor, state_fu, done_fu, trade_envs, step_counts
+        cli_options["window_length"], actor, state_fu, done_fu, trade_envs, step_counts
     )
 
     end_time = time.time()
@@ -79,6 +80,7 @@ def main(**cli_options):  # pylint: disable=too-many-locals
     if cli_options["plot_analysis"]:
 
         analysis(
+            cli_options["window_length"],
             p_list,
             p_list_eq,
             p_list_s,
@@ -92,13 +94,16 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         )
 
 
-def _initialize_trade_envs(no_of_assets=3, max_no_of_training_periods=10000):
+def _initialize_trade_envs(
+    window_length=10, no_of_assets=3, max_no_of_training_periods=10000
+):
     dataset, asset_names = data_pipe.main(
         count_of_stocks=no_of_assets, max_count_of_periods=max_no_of_training_periods
     )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
     trade_env_args["data"] = dataset
+    trade_env_args["window_length"] = window_length
 
     trading_periods = dataset.shape[2]
 
@@ -224,6 +229,9 @@ if __name__ == "__main__":
         default=2,
     )
     PARSER.add_argument(
+        "-wl", "--window_length", type=int, help="Choose window length", default=10
+    )
+    PARSER.add_argument(
         "-tp",
         "--max_no_of_training_periods",
         type=int,
@@ -253,4 +261,5 @@ if __name__ == "__main__":
         plot_analysis=ARGS.plot_analysis,
         n_episodes=ARGS.no_of_episodes,
         n_batches=ARGS.no_of_batches,
+        window_length=ARGS.window_length,
     )

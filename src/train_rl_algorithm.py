@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 from src.params import (  # pylint: disable=ungrouped-imports
-    WINDOW_LENGTH,
     TRADING_COST,
     INTEREST_RATE,
     PF_INITIAL_VALUE,
@@ -20,6 +19,7 @@ from src.pvm import PVM
 
 
 def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals, too-many-branches, too-many-statements
+    window_length,
     n_episodes,
     n_batches,
     interactive_session: bool,
@@ -59,7 +59,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     # initialize networks
     actor = Policy(
         no_of_assets,
-        WINDOW_LENGTH,
+        window_length,
         sess,
         weights_equal,
         nb_feature_map,
@@ -90,6 +90,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         print("\nStart Episode", n_episode)
         if n_episode == 0:
             _eval_perf(
+                window_length,
                 "Before Training",
                 actor,
                 interactive_session,
@@ -219,6 +220,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 list_x_t, list_w_previous, list_pf_value_previous, list_daily_return_t
             )
         _eval_perf(
+            window_length,
             n_episode,
             actor,
             interactive_session,
@@ -241,6 +243,7 @@ def _get_random_action(no_of_assets):
 
 
 def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
+    window_length,
     n_episode,
     actor,
     render_plots,
@@ -280,7 +283,7 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     for _ in tqdm(
         range(
             total_steps_train,
-            total_steps_train + total_steps_val - int(WINDOW_LENGTH / 2),
+            total_steps_train + total_steps_val - int(window_length / 2),
         )
     ):
         x_t = state_eval[0].reshape([-1] + list(state_eval[0].shape))

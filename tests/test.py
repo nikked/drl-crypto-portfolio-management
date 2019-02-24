@@ -9,10 +9,13 @@ class TestTrainTestAnalyse(unittest.TestCase):
             "crypto_data": False,
             "gpu_device": None,
             "interactive_session": False,
-            "max_no_of_training_periods": 100,
+            "max_no_of_training_periods": 10000,
             "no_of_assets": 2,
             "plot_analysis": False,
             "verbose": False,
+            "n_batches": 1,
+            "n_episodes": 1,
+            "window_length": 500,
         }
 
     def test_train_completes_fully(self):

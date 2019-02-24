@@ -27,7 +27,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
     def __init__(  # pylint: disable=too-many-arguments, too-many-locals, too-many-statements
         self,
         nb_stocks,
-        WINDOW_LENGTH,
+        window_length,
         sess,
         w_eq,
         nb_feature_map,
@@ -43,7 +43,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
         self.interest_rate = interest_rate
         self.n_filter_1 = n_filter_1
         self.n_filter_2 = n_filter_2
-        self.WINDOW_LENGTH = WINDOW_LENGTH
+        self.window_length = window_length
         self.nb_stocks = nb_stocks
 
         if gpu_device:
@@ -62,7 +62,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                 # tensor of the prices
                 self.x_current = tf.placeholder(
                     tf.float32,
-                    [None, nb_feature_map, self.nb_stocks, self.WINDOW_LENGTH],
+                    [None, nb_feature_map, self.nb_stocks, self.window_length],
                 )  # The Price tensor
                 # weights at the previous time step
                 self.w_previous = tf.placeholder(tf.float32, [None, self.nb_stocks + 1])
@@ -108,8 +108,8 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                         inputs=self.conv1,
                         activation=tf.nn.relu,  # pylint: disable=no-member
                         filters=self.n_filter_2,
-                        strides=(self.WINDOW_LENGTH, 1),
-                        kernel_size=(1, self.WINDOW_LENGTH),
+                        strides=(self.window_length, 1),
+                        kernel_size=(1, self.window_length),
                         padding="same",
                     )
 
