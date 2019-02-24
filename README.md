@@ -11,12 +11,21 @@ This repo exposes two CLIs:
 
 To get started, please run a CLI with the `-h` flat. E.g.: `python fetch_data_from_external_source.py -h` to get a list of acceptable flags.
 
+## Content
+
+* `src` dir holds the models, environments etc. for the actual training
+* `data` dir holds the datasets used (`.csv` files etc.)
+* `data_pipelines` contains the scripts used to interact with external data APIs
+* `tests` contains the unittests for this project
+
 
 ## Git precommit hooks
 Make sure you are using the same git hooks as defined in .githooks!
 
 Please run:
 `git config core.hooksPath .githooks`
+
+
 `chmod -R  744 .githooks`
 
 This ensures that certain test procedures are ran before a commit is allowed
@@ -35,6 +44,7 @@ Since this is my first work related to deep reinforcement learning, I was strong
 * feature: a small test dataset to run through full pipeline
     * can be run with unittests to rapidly check scenarios
 * refactor train_test_analyse.py
+* write docstrings to each function and refactor further
 * write a small unit test that is run on a precommit hook
 * improve requirements.txt : decide an specific env that the code is ran on
 * add coverage to git hook
