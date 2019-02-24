@@ -28,10 +28,10 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     nb_stocks,
 ):
 
-    path = "/data/individual_stocks_5yr/"
-    times = pd.read_csv(path + "A_data.csv").date
-    test_start_day = total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2) + 10
-    times = list(times[test_start_day:])
+    # path = "/data/individual_stocks_5yr/"
+    # times = pd.read_csv(path + "A_data.csv").date
+    # test_start_day = total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2) + 10
+    # times = list(times[test_start_day:])
 
     data_type = input_data_type.split("/")[2][5:].split(".")[0]
     names_bio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
@@ -101,3 +101,4 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     plt.show()
 
     plt.plot((np.array(list_final_pf) - np.array(list_final_pf_eq)))
+
