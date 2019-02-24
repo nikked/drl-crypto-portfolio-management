@@ -31,42 +31,20 @@ DEFAULT_TRADE_ENV_ARGS = {
 }
 
 
-def main(
-    interactive_session=False, crypto_data=False, gpu_device=None, verbose=True
-):  # pylint: disable=too-many-locals
+def main(**cli_options):  # pylint: disable=too-many-locals
 
     start_time = time.time()
 
-    if crypto_data:
-        data_source_fp = CRYPTO_DATA_FP
+    data_source_fp = _get_data_source(cli_options)
+    trade_env_args = _get_trade_env_args(data_source_fp)
 
-    else:
-        data_source_fp = STOCK_DATA_FP
+    nb_stocks, asset_list, nb_feature_map, trading_period = _get_data_features(
+        data_source_fp
+    )
 
-    trade_env_args = DEFAULT_TRADE_ENV_ARGS
-    trade_env_args["path"] = data_source_fp
-
-    data_source = np.load(data_source_fp)
-    nb_stocks = data_source.shape[1]
-
-    nb_feature_map = data_source.shape[0]
-    trading_period = data_source.shape[2]
-
-    # HP of the problem
-    # Total number of steps for pre-training in the training set
-    total_steps_train = int(RATIO_TRAIN * trading_period)
-
-    # Total number of steps for pre-training in the validation set
-    total_steps_val = int(RATIO_VAL * trading_period)
-
-    # Total number of steps for the test
-    total_steps_test = trading_period - total_steps_train - total_steps_val
-
-    data_type = data_source_fp.split("/")[2][5:].split(".")[0]
-
-    asset_list = _get_asset_list(data_type, nb_stocks)
-
-    # other environment Parameters
+    total_steps_train, total_steps_val, total_steps_test = _get_train_val_test_steps(
+        trading_period
+    )
 
     w_eq = np.array(np.array([1 / (nb_stocks + 1)] * (nb_stocks + 1)))
     w_s = np.array(np.array([1] + [0.0] * nb_stocks))
@@ -78,7 +56,7 @@ def main(
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
-        interactive_session,
+        cli_options["interactive_session"],
         env,
         env_eq,
         env_s,
@@ -92,8 +70,8 @@ def main(
         total_steps_val,
         nb_feature_map,
         nb_stocks,
-        gpu_device,
-        verbose,
+        cli_options["gpu_device"],
+        cli_options["verbose"],
     )
 
     # Agent evaluation
@@ -135,6 +113,48 @@ def main(
 
     print("\nTraining completed")
     print(f"Process took {train_time_secs} seconds")
+
+
+def _get_data_source(cli_options):
+    if cli_options["crypto_data"]:
+        data_source_fp = CRYPTO_DATA_FP
+
+    else:
+        data_source_fp = STOCK_DATA_FP
+
+    return data_source_fp
+
+
+def _get_trade_env_args(data_source_fp):
+    trade_env_args = DEFAULT_TRADE_ENV_ARGS
+    trade_env_args["path"] = data_source_fp
+
+    return trade_env_args
+
+
+def _get_data_features(data_source_fp):
+    data_source = np.load(data_source_fp)
+    nb_stocks = data_source.shape[1]
+    data_type = data_source_fp.split("/")[2][5:].split(".")[0]
+    nb_feature_map = data_source.shape[0]
+    trading_period = data_source.shape[2]
+
+    asset_list = _get_asset_list(data_type, nb_stocks)
+
+    return nb_stocks, asset_list, nb_feature_map, trading_period
+
+
+def _get_train_val_test_steps(trading_period):
+    # Total number of steps for pre-training in the training set
+    total_steps_train = int(RATIO_TRAIN * trading_period)
+
+    # Total number of steps for pre-training in the validation set
+    total_steps_val = int(RATIO_VAL * trading_period)
+
+    # Total number of steps for the test
+    total_steps_test = trading_period - total_steps_train - total_steps_val
+
+    return total_steps_train, total_steps_val, total_steps_test
 
 
 def _get_asset_list(data_type, nb_stocks):
