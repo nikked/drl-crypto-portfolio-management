@@ -7,6 +7,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     window_length, actor, state_fu, done_fu, trade_envs, set_step_counts
 ):
 
+    print("\nTesting algorithm performance with test set")
     no_of_assets = len(state_fu)
 
     total_steps_train = set_step_counts["train"]
@@ -82,8 +83,8 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
         # dailyReturn_t = x_next[-1, :, -1]
         if k % 20 == 0:
-            print("current portfolio value", round(pf_value_previous, 0))
-            print("weights", w_previous)
+            print("Ptf value: ", round(pf_value_previous, 0))
+            print("Ptf weights: ", w_previous[0])
         p_list.append(pf_value_t)
         w_list.append(w_current)
 

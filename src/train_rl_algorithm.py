@@ -87,7 +87,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
     ###### Train #####
     for n_episode in range(n_episodes):  # pylint: disable= too-many-nested-blocks
-        print("\nStart Episode", n_episode)
+        print("\nStarting reinforcement learning episode", n_episode)
         if n_episode == 0:
             _eval_perf(
                 window_length,
@@ -201,14 +201,13 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                         list_final_pf_fu[i].append(pf_value_t_fu[i])
 
                         if print_verbose:
-                            # printing
                             if batch_item == 0:
                                 print("start", i_start)
                                 print("PF_start", round(pf_value_previous, 0))
 
                             if batch_item == BATCH_SIZE - 1:
-                                print("PF_end", round(pf_value_t, 0))
-                                print("weight", w_t)
+                                print("Ptf value: ", round(pf_value_t, 0))
+                                print("Ptf weights: ", w_t)
 
             list_x_t = np.array(list_x_t)
             list_w_previous = np.array(list_w_previous)
@@ -298,9 +297,6 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
         w_t_eval = state_eval[1]
         pf_value_t_eval = state_eval[2]
 
-        # daily_return_t = x_next[-1, :, -1]
-        # print('current portfolio value', round(pf_value_previous,0))
-        # print('weights', w_previous)
         p_list_eval.append(pf_value_t_eval)
         w_list_eval.append(w_t_eval)
 
@@ -312,12 +308,14 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
 
     list_pf_dd_training.append(_get_max_draw_down(p_list_eval))
 
+    print("\nPerformance report:")
     print("End of test PF value:", round(p_list_eval[-1]))
     print("Min of test PF value:", round(np.min(p_list_eval)))
     print("Max of test PF value:", round(np.max(p_list_eval)))
     print("Mean of test PF value:", round(np.mean(p_list_eval)))
     print("Max Draw Down of test PF value:", round(_get_max_draw_down(p_list_eval)))
     print("End of test weights:", w_list_eval[-1])
+    print("\n")
 
     if render_plots:
         plt.title("Portfolio evolution (validation set) episode {}".format(n_episode))

@@ -15,7 +15,7 @@ class TestTrainTestAnalyse(unittest.TestCase):
             "verbose": False,
             "n_batches": 1,
             "n_episodes": 1,
-            "window_length": 500,
+            "window_length": 400,
         }
 
     def test_train_completes_fully(self):

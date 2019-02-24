@@ -40,5 +40,3 @@ REGULARIZATION = 1e-8  # not used ATM
 PF_INITIAL_VALUE = 10000
 N_EPISODES = 2
 N_BATCHES = 10
-
-TEST_TRAIN_PARAMS = {"WINDOW_LENGTH": 500, "n_episodes": 1, "n_batches": 1}
