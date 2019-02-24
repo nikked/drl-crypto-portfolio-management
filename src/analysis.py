@@ -1,5 +1,6 @@
 import numpy as np
-import pandas as pd
+
+# import pandas as pd
 import matplotlib.pyplot as plt
 from src.params import (
     RATIO_GREEDY,
@@ -23,8 +24,8 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     list_final_pf_eq,
     list_final_pf_s,
     input_data_type,
-    total_steps_train,
-    total_steps_val,
+    total_steps_train,  # pylint: disable=unused-argument
+    total_steps_val,  # pylint: disable=unused-argument
     nb_stocks,
 ):
 
@@ -101,4 +102,3 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     plt.show()
 
     plt.plot((np.array(list_final_pf) - np.array(list_final_pf_eq)))
-

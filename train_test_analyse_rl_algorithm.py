@@ -1,6 +1,7 @@
+import time
 import argparse
-import numpy as np
 
+import numpy as np
 
 from src.train_rl_algorithm import train_rl_algorithm
 from src.test_rl_algorithm import test_rl_algorithm
@@ -33,6 +34,8 @@ DEFAULT_TRADE_ENV_ARGS = {
 def main(
     interactive_session=False, crypto_data=False, gpu_device=None, verbose=True
 ):  # pylint: disable=too-many-locals
+
+    start_time = time.time()
 
     if crypto_data:
         data_source_fp = CRYPTO_DATA_FP
@@ -126,6 +129,12 @@ def main(
         total_steps_val,
         nb_stocks,
     )
+
+    end_time = time.time()
+    train_time_secs = round(end_time - start_time, 1)
+
+    print("\nTraining completed")
+    print(f"Process took {train_time_secs} seconds")
 
 
 def _get_asset_list(data_type, nb_stocks):
