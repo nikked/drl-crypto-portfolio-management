@@ -41,29 +41,27 @@ def main(**cli_options):  # pylint: disable=too-many-locals
 
     start_time = time.time()
 
-    trade_env_args, asset_list, trading_periods = _get_data_for_trade_envs(
-        max_no_of_assets=cli_options["no_of_assets"],
+    # Creation of the trading environment
+    trade_envs, asset_list, trading_periods = _initialize_trade_envs(
+        no_of_assets=cli_options["no_of_assets"],
         max_no_of_training_periods=cli_options["max_no_of_training_periods"],
     )
 
-    set_step_counts = _get_train_val_test_steps(trading_periods)
-
-    # Creation of the trading environment
-    trade_envs = _get_train_environments(cli_options["no_of_assets"], trade_env_args)
+    step_counts = _get_train_val_test_steps(trading_periods)
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
         cli_options["interactive_session"],
         trade_envs,
         asset_list,
-        set_step_counts,
+        step_counts,
         cli_options["gpu_device"],
         cli_options["verbose"],
     )
 
     # Agent evaluation
     p_list, p_list_eq, p_list_fu, p_list_s, w_list = test_rl_algorithm(
-        actor, state_fu, done_fu, trade_envs, set_step_counts
+        actor, state_fu, done_fu, trade_envs, step_counts
     )
 
     end_time = time.time()
@@ -88,10 +86,9 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         )
 
 
-def _get_data_for_trade_envs(max_no_of_assets=3, max_no_of_training_periods=10000):
+def _initialize_trade_envs(no_of_assets=3, max_no_of_training_periods=10000):
     dataset, asset_names = data_pipe.main(
-        count_of_stocks=max_no_of_assets,
-        max_count_of_periods=max_no_of_training_periods,
+        count_of_stocks=no_of_assets, max_count_of_periods=max_no_of_training_periods
     )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
@@ -102,7 +99,9 @@ def _get_data_for_trade_envs(max_no_of_assets=3, max_no_of_training_periods=1000
     print("\nTrading periods: {}".format(dataset.shape[2]))
     print(asset_names)
 
-    return trade_env_args, asset_names, trading_periods
+    train_envs = _get_train_environments(no_of_assets, trade_env_args)
+
+    return train_envs, asset_names, trading_periods
 
 
 def _get_train_val_test_steps(trading_period):
@@ -115,16 +114,16 @@ def _get_train_val_test_steps(trading_period):
     # Total number of steps for the test
     total_steps_test = trading_period - total_steps_train - total_steps_val
 
-    set_step_counts = {
+    step_counts = {
         "train": total_steps_train,
         "test": total_steps_test,
         "validation": total_steps_val,
     }
 
-    return set_step_counts
+    return step_counts
 
 
-def _get_train_environments(nb_stocks, trade_env_args):
+def _get_train_environments(no_of_assets, trade_env_args):
 
     # environment for trading of the agent
     # this is the agent trading environment (policy network agent)
@@ -145,8 +144,8 @@ def _get_train_environments(nb_stocks, trade_env_args):
     action_fu = list()
     env_fu = list()
 
-    for i in range(nb_stocks):
-        action = np.array([0] * (i + 1) + [1] + [0] * (nb_stocks - (i + 1)))
+    for i in range(no_of_assets):
+        action = np.array([0] * (i + 1) + [1] + [0] * (no_of_assets - (i + 1)))
         action_fu.append(action)
 
         env_fu_i = TradeEnv(**trade_env_args)

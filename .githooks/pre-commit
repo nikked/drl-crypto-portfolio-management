@@ -1,10 +1,6 @@
 #!/bin/bash
 
 
-# the -e option ensures that the commit will be aborted immediately if
-# PyLint or Black fail (= return a non-zero exit status)
-set -e
-
 
 # Firstly check if any files have been staged for commit
 stagedFiles=`git diff --staged  --name-only`
@@ -32,7 +28,7 @@ printf "*********************\n"
 printf "PYTHON TESTS"
 printf '\nRunning tests\n'
 
-pipenv run python -m unittest discover . > /dev/null
+python -m unittest discover . > /dev/null
 if [ $? -ne 0 ]; then
     echo 'Tests failed. Aborting commit'
     exit 1
@@ -40,6 +36,12 @@ fi
 
 
 coverage report -m --omit="*/lib/*"
+
+
+# the -e option ensures that the commit will be aborted immediately if
+# PyLint or Black fail (= return a non-zero exit status)
+set -e
+
 
 
 printf "*********************\n"
