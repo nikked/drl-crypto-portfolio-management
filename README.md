@@ -6,7 +6,7 @@
 * refactor main.py
 * write a small unit test that is run on a precommit hook
 * improve requirements.txt : decide an specific env that the code is ran on
-
+* add coverage to git hook
 
 ### Git precommit hooks
 Make sure you are using the same git hooks as defined in .githooks!
