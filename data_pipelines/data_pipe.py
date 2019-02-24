@@ -20,7 +20,7 @@ import pandas as pd
 
 
 def main():
-    data_dir = "/individual_stocks_5yr/"
+    data_dir = "./data/individual_stocks_5yr/"
     directory = os.getcwd() + data_dir  # path to the files
     files_tags = os.listdir(directory)  # these are the differents pdf files
 
@@ -94,7 +94,7 @@ def main():
 
     # # Save
 
-    np.save("./np_data/input.npy", X)
+    np.save("./data/np_data/input.npy", X)
 
 
 if __name__ == "__main__":

@@ -79,7 +79,7 @@ done
 
 printf "\nPre-commit hook completed successfully"
 
-printf "Thank You for writing clean code!"
+printf "\nThank You for writing clean code!"
 printf "\n\n"
 
 exit 0

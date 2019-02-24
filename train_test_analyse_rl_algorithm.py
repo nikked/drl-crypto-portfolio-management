@@ -17,8 +17,8 @@ from src.params import (
 )
 
 
-CRYPTO_DATA_FP = "./np_data/inputCrypto.npy"
-STOCK_DATA_FP = "./np_data/input.npy"
+CRYPTO_DATA_FP = "./data/np_data/inputCrypto.npy"
+STOCK_DATA_FP = "./data/np_data/input.npy"
 
 DEFAULT_TRADE_ENV_ARGS = {
     "path": None,

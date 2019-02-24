@@ -20,7 +20,7 @@ from tqdm import tqdm
 
 
 def main():
-    data_dir = "/poloniex_data/"
+    data_dir = "./data/poloniex_data/"
     directory = os.getcwd() + data_dir  # path to the files
     files_tags = os.listdir(directory)  # these are the differents pdf files
 
@@ -97,7 +97,7 @@ def main():
     # - 10: Number of stocks
     # - 17030: Number of data points
 
-    np.save("./np_data/inputCrypto.npy", X)
+    np.save("./data/np_data/inputCrypto.npy", X)
 
 
 if __name__ == "__main__":

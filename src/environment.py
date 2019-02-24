@@ -24,7 +24,7 @@ class TradeEnv:  # pylint: disable=too-many-instance-attributes
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        path="./np_data/input.npy",
+        path="./data/np_data/input.npy",
         window_length=50,
         portfolio_value=10000,
         trading_cost=0.25 / 100,
