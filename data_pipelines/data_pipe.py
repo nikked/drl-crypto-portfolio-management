@@ -9,61 +9,80 @@ The columns correspond to:
 - Open(t)/Open(t-1)
 
 We don't need to normalize the data since it's already of ratio of 2 prices closed to one.
+
+The shape corresponds to:
+- 4: Number of features
+- 5: Number of stocks we want to study
+- 17030: Number of data points
 """
 
 import os
-from pprint import pprint
 
 from tqdm import tqdm
 
 import numpy as np
 import pandas as pd
 
+PREFERRED_STOCK_INDECES = [3, 7, 12, 37, 42]
+DATA_DIR = "/data/individual_stocks_5yr/"
+OUT_PATH = "./data/np_data/input.npy"
 
-def main():  # pylint: disable=too-many-locals
 
-    # This data dir contains dailly stock returns of companies
-    data_dir = "/data/individual_stocks_5yr/"
-    directory = os.getcwd() + data_dir  # path to the files
-    files_tags = os.listdir(directory)
+def main(count_of_stocks=5, save=False):
+
+    all_valid_stocks = _get_valid_stock_filepaths()
+
+    kept_stock_rl = []
+
+    for idx in range(count_of_stocks):
+        stock_index = PREFERRED_STOCK_INDECES[idx]
+        kept_stock_rl.append(all_valid_stocks[stock_index])
+
+    stocks_tensor = _make_stocks_tensor(kept_stock_rl)
+
+    if save:
+        print("Saving stocks numpy tensor to path: {}".format(OUT_PATH))
+        np.save(OUT_PATH, stocks_tensor)
+
+    return stocks_tensor
+
+
+def _get_valid_stock_filepaths():
+
+    # This data dir contains daily stock returns of companies
+    directory = os.path.join(os.getcwd() + DATA_DIR)  # path to the files
+    stock_filepaths = os.listdir(directory)
 
     # this is here because hidden files are also shown in the list.
-    for file in files_tags:
+    for file in stock_filepaths:
         if file[0] == ".":
-            files_tags.remove(file)
+            stock_filepaths.remove(file)
 
-    stock_name = [file.split("_")[0] for file in files_tags]
-    stocks = [file for file in files_tags]
+    stock_filepaths = [file for file in stock_filepaths]
 
-    print("There are {} different stocks.".format(len(stock_name)))
+    print("In total there are {} different stocks.".format(len(stock_filepaths)))
 
-    kept_stocks = list()
-    not_kept_stocks = list()
+    valid_stocks = list()
+    not_valid_stocks = list()
 
     # Ignore stocks that do not have exactly 1259 trading days of history
-    for stock in tqdm(stocks):
+    for stock in tqdm(stock_filepaths):
         if not stock.endswith("csv"):
             continue
-        stock_df = pd.read_csv(os.getcwd() + data_dir + stock)
+        stock_df = pd.read_csv(os.getcwd() + DATA_DIR + stock)
 
         if len(stock_df) != 1259:
 
-            not_kept_stocks.append(stock)
+            not_valid_stocks.append(stock)
         else:
-            kept_stocks.append(stock)
+            valid_stocks.append(stock)
 
-    pprint(stock_df.head())
+    print("Found {} valid stocks".format(len(valid_stocks)))
 
-    print(not_kept_stocks)
-    print(kept_stocks)
+    return valid_stocks
 
-    kept_stock_rl = [
-        kept_stocks[3],
-        kept_stocks[7],
-        kept_stocks[12],
-        kept_stocks[37],
-        kept_stocks[42],
-    ]
+
+def _make_stocks_tensor(kept_stock_rl):
 
     list_open = list()
     list_close = list()
@@ -71,7 +90,7 @@ def main():  # pylint: disable=too-many-locals
     list_low = list()
 
     for kept_stock in tqdm(kept_stock_rl):
-        data = pd.read_csv(os.getcwd() + data_dir + kept_stock).fillna("bfill").copy()
+        data = pd.read_csv(os.getcwd() + DATA_DIR + kept_stock).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
         list_open.append(data.open.values)
         list_close.append(data.close.values)
@@ -96,14 +115,7 @@ def main():  # pylint: disable=too-many-locals
         axes=(0, 2, 1),
     )
 
-    # The shape corresponds to:
-    # - 4: Number of features
-    # - 5: Number of stocks we want to study
-    # - 17030: Number of data points
-
-    # # Save
-
-    np.save("./data/np_data/input.npy", stocks_tensor)
+    return stocks_tensor
 
 
 if __name__ == "__main__":
