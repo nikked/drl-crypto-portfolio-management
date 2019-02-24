@@ -39,6 +39,8 @@ if [ $? -ne 0 ]; then
 fi
 
 
+coverage report -m --omit="*/lib/*"
+
 
 printf "*********************\n"
 printf "BLACK - PYTHON CODE FORMATTER"
@@ -58,25 +60,16 @@ printf "\nBlack passed successfully\n\n"
 
 
 printf "*********************\n"
-printf "PYLINT - LINTER\n"
-printf "If any errors occur, commit will be terminated\n"
-printf "Running pylint for src\n"
-pylint src
-printf "\nsrc passed successfully\n\n"
 
-printf "Running pylint for Data pipeline\n"
-pylint fetch_data_from_external_source
-printf "\nData pipeline passed successfully\n\n"
-
-printf "Running pylint for Deep reinforcement training process\n"
-pylint train_test_analyse_rl_algorithm
-printf "\nTraining process passed successfully\n\n"
-
-
-printf "Running pylint for Data pipelines\n"
-pylint data_pipelines
-printf "\nData pipelines passed successfully\n\n"
-
+for i in $(git diff --staged  --name-only)
+do
+    if [ ${i: -3} == ".py" ]
+    then
+        printf "\nRunning Pylint on python file: "
+        echo $i
+        pylint $i || printf "\n\nCould not run Pylint for file: $i. \nThis is normal if the file was deleted in the commit.\n"
+    fi
+done
 
 printf "*********************\n"
 printf "GREAT SUCCESS. \nTests, Mypy, Pylint and Black succesful\n"
