@@ -18,3 +18,4 @@ mturk_metrics*.pdf
 **/temp_charts/**
 .DS_Store
 local_data/
+*.ipynb.swp

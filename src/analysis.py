@@ -81,8 +81,6 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
     plt.show()
 
-    # In[ ]:
-
     names = ["Money"] + list_stock
     w_list = np.array(w_list)
     for j in range(nb_stocks + 1):
@@ -91,11 +89,7 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
     plt.show()
 
-    # In[ ]:
-
     plt.plot(np.array(p_list) - np.array(p_list_eq))
-
-    # In[ ]:
 
     index1 = 0
     index2 = -1
@@ -105,7 +99,5 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     plt.plot(list_final_pf_s[index1:index2], label="Secured Portfolio Value")
     plt.legend()
     plt.show()
-
-    # In[ ]:
 
     plt.plot((np.array(list_final_pf) - np.array(list_final_pf_eq)))
