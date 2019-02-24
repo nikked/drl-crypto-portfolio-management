@@ -12,6 +12,7 @@ We don't need to normalize the data since it's already of ratio of 2 prices clos
 """
 
 import os
+from pprint import pprint
 
 from tqdm import tqdm
 
@@ -19,33 +20,42 @@ import numpy as np
 import pandas as pd
 
 
-def main():
+def main():  # pylint: disable=too-many-locals
+
+    # This data dir contains dailly stock returns of companies
     data_dir = "/data/individual_stocks_5yr/"
     directory = os.getcwd() + data_dir  # path to the files
-    files_tags = os.listdir(directory)  # these are the differents pdf files
+    files_tags = os.listdir(directory)
 
     # this is here because hidden files are also shown in the list.
     for file in files_tags:
         if file[0] == ".":
             files_tags.remove(file)
+
     stock_name = [file.split("_")[0] for file in files_tags]
     stocks = [file for file in files_tags]
-    print(len(stock_name) == len(stocks))
+
     print("There are {} different stocks.".format(len(stock_name)))
 
     kept_stocks = list()
     not_kept_stocks = list()
 
-    for s in tqdm(stocks):
-        if not s.endswith("csv"):
+    # Ignore stocks that do not have exactly 1259 trading days of history
+    for stock in tqdm(stocks):
+        if not stock.endswith("csv"):
             continue
-        df = pd.read_csv(os.getcwd() + data_dir + s)
+        stock_df = pd.read_csv(os.getcwd() + data_dir + stock)
 
-        if len(df) != 1259:
+        if len(stock_df) != 1259:
 
-            not_kept_stocks.append(s)
+            not_kept_stocks.append(stock)
         else:
-            kept_stocks.append(s)
+            kept_stocks.append(stock)
+
+    pprint(stock_df.head())
+
+    print(not_kept_stocks)
+    print(kept_stocks)
 
     kept_stock_rl = [
         kept_stocks[3],
@@ -60,8 +70,8 @@ def main():
     list_high = list()
     list_low = list()
 
-    for s in tqdm(kept_stock_rl):
-        data = pd.read_csv(os.getcwd() + data_dir + s).fillna("bfill").copy()
+    for kept_stock in tqdm(kept_stock_rl):
+        data = pd.read_csv(os.getcwd() + data_dir + kept_stock).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
         list_open.append(data.open.values)
         list_close.append(data.close.values)
@@ -74,7 +84,7 @@ def main():
     array_high = np.transpose(np.array(list_high))[:-1]
     array_low = np.transpose(np.array(list_low))[:-1]
 
-    X = np.transpose(
+    stocks_tensor = np.transpose(
         np.array(
             [
                 array_close / array_open,
@@ -85,7 +95,6 @@ def main():
         ),
         axes=(0, 2, 1),
     )
-    X.shape
 
     # The shape corresponds to:
     # - 4: Number of features
@@ -94,7 +103,7 @@ def main():
 
     # # Save
 
-    np.save("./data/np_data/input.npy", X)
+    np.save("./data/np_data/input.npy", stocks_tensor)
 
 
 if __name__ == "__main__":

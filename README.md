@@ -9,8 +9,7 @@ This repo exposes two CLIs:
 * `fetch_data_from_external_source.py`: This CLI is used to download data to your local from various sources.
 * `train_test_analyse_rl_algorithm.py`: This CLI controls the main workhorse of this repo. The actual training process and its validation.
 
-To get started, please run a CLI with the `-h` flat. E.g.: `python fetch_data_from_external_source.py -h` to get a list of acceptable flags.
-
+To get started, please run a CLI with the `-h` flag. E.g.: `python fetch_data_from_external_source.py -h` to get a list of acceptable flags.
 ## Content
 
 * `src` dir holds the models, environments etc. for the actual training

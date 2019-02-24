@@ -61,6 +61,11 @@ pylint train_test_analyse_rl_algorithm
 printf "\nTraining process passed successfully\n\n"
 
 
+printf "Running pylint for Data pipelines\n"
+pylint data_pipelines
+printf "\nData pipelines passed successfully\n\n"
+
+
 printf "*********************\n"
 printf "GREAT SUCCESS. \nTests, Mypy, Pylint and Black succesful\n"
 printf "Running git add again for all changed files to ensure the formatted versions are committed\n"

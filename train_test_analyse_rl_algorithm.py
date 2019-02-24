@@ -46,8 +46,8 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         trading_period
     )
 
-    w_eq = np.array(np.array([1 / (nb_stocks + 1)] * (nb_stocks + 1)))
-    w_s = np.array(np.array([1] + [0.0] * nb_stocks))
+    weights_equal = np.array(np.array([1 / (nb_stocks + 1)] * (nb_stocks + 1)))
+    weights_single = np.array(np.array([1] + [0.0] * nb_stocks))
 
     # Creation of the trading environment
     env, env_eq, env_s, action_fu, env_fu = _get_train_environments(
@@ -63,8 +63,8 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         action_fu,
         env_fu,
         trade_env_args,
-        w_eq,
-        w_s,
+        weights_equal,
+        weights_single,
         asset_list,
         total_steps_train,
         total_steps_val,
@@ -87,8 +87,8 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         total_steps_train,
         total_steps_val,
         total_steps_test,
-        w_eq,
-        w_s,
+        weights_equal,
+        weights_single,
         nb_stocks,
     )
 

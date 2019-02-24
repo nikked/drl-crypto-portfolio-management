@@ -27,8 +27,8 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     action_fu,
     env_fu,
     trade_env_args,
-    w_eq,
-    w_s,
+    weights_equal,
+    weights_single,
     asset_list,
     total_steps_train,
     total_steps_val,
@@ -50,7 +50,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         nb_stocks,
         LENGTH_TENSOR,
         sess,
-        w_eq,
+        weights_equal,
         nb_feature_map,
         trading_cost=TRADING_COST,
         interest_rate=INTEREST_RATE,
@@ -102,8 +102,8 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             # reset the environment with the weight from PVM at the starting point
             # reset also with a portfolio value with initial portfolio value
             state, _ = env.reset(memory.get_w(i_start), PF_INITIAL_VALUE, index=i_start)
-            state_eq, _ = env_eq.reset(w_eq, PF_INITIAL_VALUE, index=i_start)
-            state_s, _ = env_s.reset(w_s, PF_INITIAL_VALUE, index=i_start)
+            state_eq, _ = env_eq.reset(weights_equal, PF_INITIAL_VALUE, index=i_start)
+            state_s, _ = env_s.reset(weights_single, PF_INITIAL_VALUE, index=i_start)
 
             for i in range(nb_stocks):
                 state_fu[i], done_fu[i] = env_fu[i].reset(
@@ -138,8 +138,8 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 # given the state and the action, call the environment to go one
                 # time step later
                 state, _, _ = env.step(action)
-                state_eq, _, _ = env_eq.step(w_eq)
-                state_s, _, _ = env_s.step(w_s)
+                state_eq, _, _ = env_eq.step(weights_equal)
+                state_s, _, _ = env_s.step(weights_single)
 
                 for i in range(nb_stocks):
                     state_fu[i], _, done_fu[i] = env_fu[i].step(action_fu[i])
