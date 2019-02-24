@@ -20,7 +20,7 @@ import pandas as pd
 
 
 def main():
-    data_dir = "./data/individual_stocks_5yr/"
+    data_dir = "/data/individual_stocks_5yr/"
     directory = os.getcwd() + data_dir  # path to the files
     files_tags = os.listdir(directory)  # these are the differents pdf files
 

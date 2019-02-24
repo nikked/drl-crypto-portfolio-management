@@ -28,7 +28,7 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     nb_stocks,
 ):
 
-    path = "individual_stocks_5yr/"
+    path = "/data/individual_stocks_5yr/"
     times = pd.read_csv(path + "A_data.csv").date
     test_start_day = total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2) + 10
     times = list(times[test_start_day:])
