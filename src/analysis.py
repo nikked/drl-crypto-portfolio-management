@@ -24,11 +24,10 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     list_final_pf_eq,
     list_final_pf_s,
     input_data_type,
-    total_steps_train,  # pylint: disable=unused-argument
-    total_steps_val,  # pylint: disable=unused-argument
-    nb_stocks,
     asset_list,
 ):
+
+    no_of_asset = len(asset_list)
 
     plt.title(
         "Portfolio Value (Test Set) {}: {}, {}, {}, {}, {}, {}, {}, {}".format(
@@ -46,7 +45,7 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
     plt.plot(p_list, label="Agent Portfolio Value")
     plt.plot(p_list_eq, label="Equi-weighted Portfolio Value")
     plt.plot(p_list_s, label="Secured Portfolio Value")
-    for i in range(nb_stocks):
+    for i in range(no_of_asset):
         plt.plot(
             p_list_fu[i], label="Full Stock {} Portfolio Value".format(asset_list[i])
         )
@@ -55,7 +54,7 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
 
     names = ["Money"] + asset_list
     w_list = np.array(w_list)
-    for j in range(nb_stocks + 1):
+    for j in range(no_of_asset + 1):
         plt.plot(w_list[:, j], label="Weight Stock {}".format(names[j]))
         plt.title("Weight evolution during testing")
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)

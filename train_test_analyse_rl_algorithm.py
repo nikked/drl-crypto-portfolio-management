@@ -1,5 +1,6 @@
 import time
 import argparse
+from pprint import pprint
 
 import numpy as np
 
@@ -36,59 +37,33 @@ DEFAULT_TRADE_ENV_ARGS = {
 
 def main(**cli_options):  # pylint: disable=too-many-locals
 
-    no_of_assets = cli_options["no_of_assets"]
+    pprint(cli_options)
 
     start_time = time.time()
 
-    trade_env_args, asset_list, data_features = _get_data_for_trade_envs(
-        max_no_of_assets=no_of_assets,
+    trade_env_args, asset_list, trading_periods = _get_data_for_trade_envs(
+        max_no_of_assets=cli_options["no_of_assets"],
         max_no_of_training_periods=cli_options["max_no_of_training_periods"],
     )
 
-    nb_feature_map = data_features["nb_feature_map"]
-    trading_period = data_features["trading_period"]
-
-    total_steps_train, total_steps_val, total_steps_test = _get_train_val_test_steps(
-        trading_period
-    )
+    set_step_counts = _get_train_val_test_steps(trading_periods)
 
     # Creation of the trading environment
-    env, env_eq, env_s, action_fu, env_fu = _get_train_environments(
-        no_of_assets, trade_env_args
-    )
+    trade_envs = _get_train_environments(cli_options["no_of_assets"], trade_env_args)
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
         cli_options["interactive_session"],
-        env,
-        env_eq,
-        env_s,
-        action_fu,
-        env_fu,
-        trade_env_args,
+        trade_envs,
         asset_list,
-        total_steps_train,
-        total_steps_val,
-        nb_feature_map,
-        no_of_assets,
+        set_step_counts,
         cli_options["gpu_device"],
         cli_options["verbose"],
     )
 
     # Agent evaluation
     p_list, p_list_eq, p_list_fu, p_list_s, w_list = test_rl_algorithm(
-        actor,
-        state_fu,
-        done_fu,
-        env,
-        env_eq,
-        env_s,
-        action_fu,
-        env_fu,
-        total_steps_train,
-        total_steps_val,
-        total_steps_test,
-        no_of_assets,
+        actor, state_fu, done_fu, trade_envs, set_step_counts
     )
 
     end_time = time.time()
@@ -109,9 +84,6 @@ def main(**cli_options):  # pylint: disable=too-many-locals
             list_final_pf_eq,
             list_final_pf_s,
             "stocks",
-            total_steps_train,
-            total_steps_val,
-            no_of_assets,
             asset_list,
         )
 
@@ -125,17 +97,12 @@ def _get_data_for_trade_envs(max_no_of_assets=3, max_no_of_training_periods=1000
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
     trade_env_args["data"] = dataset
 
-    data_features = {
-        "nb_stocks": dataset.shape[1],
-        "nb_feature_map": dataset.shape[0],
-        "trading_period": dataset.shape[2],
-    }
-
+    trading_periods = dataset.shape[2]
     print("\nStarting training for {} assets".format(len(asset_names)))
     print("\nTrading periods: {}".format(dataset.shape[2]))
     print(asset_names)
 
-    return trade_env_args, asset_names, data_features
+    return trade_env_args, asset_names, trading_periods
 
 
 def _get_train_val_test_steps(trading_period):
@@ -148,7 +115,13 @@ def _get_train_val_test_steps(trading_period):
     # Total number of steps for the test
     total_steps_test = trading_period - total_steps_train - total_steps_val
 
-    return total_steps_train, total_steps_val, total_steps_test
+    set_step_counts = {
+        "train": total_steps_train,
+        "test": total_steps_test,
+        "validation": total_steps_val,
+    }
+
+    return set_step_counts
 
 
 def _get_train_environments(nb_stocks, trade_env_args):
@@ -181,13 +154,15 @@ def _get_train_environments(nb_stocks, trade_env_args):
         env_fu.append(env_fu_i)
 
     trade_envs = {
-        "policy_network"
-        "equal_weighted"
-        "only_cash"
-
+        "policy_network": env,
+        "equal_weighted": env_eq,
+        "only_cash": env_s,
+        "full_on_one_stocks": env_fu,
+        "action_fu": action_fu,
+        "args": trade_env_args,
     }
 
-    return env, env_eq, env_s, action_fu, env_fu
+    return trade_envs
 
 
 if __name__ == "__main__":

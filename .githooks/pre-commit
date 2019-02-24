@@ -23,8 +23,20 @@ fi
 
 printf "\n\nUses a custom git hook for verifying the integrity of your commit."
 printf "\nThe pre-hook will run :\n"
-printf "\n1. Black - Code formatter"
-printf "\n2. Pylint - Linter\n\n"
+printf "\n1. Unit tests"
+printf "\n2. Black - Code formatter"
+printf "\n3. Pylint - Linter\n\n"
+
+
+printf "*********************\n"
+printf "PYTHON TESTS"
+printf '\nRunning tests\n'
+
+pipenv run python -m unittest discover . > /dev/null
+if [ $? -ne 0 ]; then
+    echo 'Tests failed. Aborting commit'
+    exit 1
+fi
 
 
 

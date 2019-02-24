@@ -4,19 +4,20 @@ from src.params import PF_INIT_TEST, LENGTH_TENSOR
 
 
 def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
-    actor,
-    state_fu,
-    done_fu,
-    env,
-    env_eq,
-    env_s,
-    action_fu,
-    env_fu,
-    total_steps_train,
-    total_steps_val,
-    total_steps_test,
-    no_of_assets,
+    actor, state_fu, done_fu, trade_envs, set_step_counts
 ):
+
+    no_of_assets = len(state_fu)
+
+    total_steps_train = set_step_counts["train"]
+    total_steps_val = set_step_counts["validation"]
+    total_steps_test = set_step_counts["test"]
+
+    env_policy_network = trade_envs["policy_network"]
+    env_equal_weighted = trade_envs["equal_weighted"]
+    env_only_cash = trade_envs["only_cash"]
+    env_full_on_one_stocks = trade_envs["full_on_one_stocks"]
+    action_fu = trade_envs["action_fu"]
 
     weights_equal = np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1)))
     weights_single = np.array(np.array([1] + [0.0] * no_of_assets))
@@ -24,13 +25,19 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     w_init_test = np.array(np.array([1] + [0] * no_of_assets))
 
     # initialization of the environment
-    state, _ = env.reset(w_init_test, PF_INIT_TEST, index=total_steps_train)
+    state, _ = env_policy_network.reset(
+        w_init_test, PF_INIT_TEST, index=total_steps_train
+    )
 
-    state_eq, _ = env_eq.reset(weights_equal, PF_INIT_TEST, index=total_steps_train)
-    state_s, _ = env_s.reset(weights_single, PF_INIT_TEST, index=total_steps_train)
+    state_eq, _ = env_equal_weighted.reset(
+        weights_equal, PF_INIT_TEST, index=total_steps_train
+    )
+    state_s, _ = env_only_cash.reset(
+        weights_single, PF_INIT_TEST, index=total_steps_train
+    )
 
     for i in range(no_of_assets):
-        state_fu[i], done_fu[i] = env_fu[i].reset(
+        state_fu[i], done_fu[i] = env_full_on_one_stocks[i].reset(
             action_fu[i], PF_INIT_TEST, index=total_steps_train
         )
 
@@ -57,12 +64,12 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         # compute the action
         action = actor.compute_w(x_current, w_previous)
         # step forward environment
-        state, _, _ = env.step(action)
-        state_eq, _, _ = env_eq.step(weights_equal)
-        state_s, _, _ = env_s.step(weights_single)
+        state, _, _ = env_policy_network.step(action)
+        state_eq, _, _ = env_equal_weighted.step(weights_equal)
+        state_s, _, _ = env_only_cash.step(weights_single)
 
         for i in range(no_of_assets):
-            state_fu[i], _, done_fu[i] = env_fu[i].step(action_fu[i])
+            state_fu[i], _, done_fu[i] = env_full_on_one_stocks[i].step(action_fu[i])
 
         # x_next = state[0]
         w_current = state[1]
