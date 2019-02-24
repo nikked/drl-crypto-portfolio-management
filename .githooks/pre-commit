@@ -49,15 +49,18 @@ printf "\nBlack passed successfully\n\n"
 
 printf "*********************\n"
 printf "PYLINT - LINTER\n"
+printf "If any errors occur, commit will be terminated\n"
 printf "Running pylint for src\n"
-printf "If any errors occur, commit will be terminated\n"
 pylint src
-printf "\nPylint passed successfully\n\n"
+printf "\nsrc passed successfully\n\n"
 
-printf "Running pylint for main\n"
-printf "If any errors occur, commit will be terminated\n"
-pylint main.py
-printf "\nPylint passed successfully\n\n"
+printf "Running pylint for Data pipeline\n"
+pylint fetch_data_from_external_source
+printf "\nData pipeline passed successfully\n\n"
+
+printf "Running pylint for Deep reinforcement training process\n"
+pylint train_test_analyse_rl_algorithm
+printf "\nTraining process passed successfully\n\n"
 
 
 printf "*********************\n"
