@@ -6,16 +6,12 @@ env/**
 *.sublime-project
 *.sublime-workspace
 *.egg-info
-**/credentials_personal.py
 *.pyc
 mongo_shell.sh
 .venv/
 **/node_modules/**
 **/.cache/**
 **/dist/**
-auto-pipeline-logs/*
-mturk_metrics*.pdf
-**/temp_charts/**
 .DS_Store
 local_data/
 *.ipynb.swp
