@@ -5,6 +5,7 @@
     * can be run with unittests to rapidly check scenarios
 * refactor main.py
 * write a small unit test that is run on a precommit hook
+* improve requirements.txt : decide an specific env that the code is ran on
 
 
 ### Git precommit hooks
