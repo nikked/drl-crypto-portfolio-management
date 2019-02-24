@@ -42,12 +42,10 @@ def main(**cli_options):  # pylint: disable=too-many-locals
     start_time = time.time()
 
     # Creation of the trading environment
-    trade_envs, asset_list, trading_periods = _initialize_trade_envs(
+    trade_envs, asset_list, trading_periods, step_counts = _initialize_trade_envs(
         no_of_assets=cli_options["no_of_assets"],
         max_no_of_training_periods=cli_options["max_no_of_training_periods"],
     )
-
-    step_counts = _get_train_val_test_steps(trading_periods)
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
@@ -101,7 +99,9 @@ def _initialize_trade_envs(no_of_assets=3, max_no_of_training_periods=10000):
 
     train_envs = _get_train_environments(no_of_assets, trade_env_args)
 
-    return train_envs, asset_names, trading_periods
+    step_counts = _get_train_val_test_steps(trading_periods)
+
+    return train_envs, asset_names, trading_periods, step_counts
 
 
 def _get_train_val_test_steps(trading_period):
