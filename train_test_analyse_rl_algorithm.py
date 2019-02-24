@@ -41,7 +41,8 @@ def main(**cli_options):  # pylint: disable=too-many-locals
     start_time = time.time()
 
     trade_env_args, asset_list, data_features = _get_data_for_trade_envs(
-        max_no_of_assets=no_of_assets
+        max_no_of_assets=no_of_assets,
+        max_no_of_training_periods=cli_options["max_no_of_training_periods"],
     )
 
     nb_feature_map = data_features["nb_feature_map"]
@@ -50,9 +51,6 @@ def main(**cli_options):  # pylint: disable=too-many-locals
     total_steps_train, total_steps_val, total_steps_test = _get_train_val_test_steps(
         trading_period
     )
-
-    weights_equal = np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1)))
-    weights_single = np.array(np.array([1] + [0.0] * no_of_assets))
 
     # Creation of the trading environment
     env, env_eq, env_s, action_fu, env_fu = _get_train_environments(
@@ -68,8 +66,6 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         action_fu,
         env_fu,
         trade_env_args,
-        weights_equal,
-        weights_single,
         asset_list,
         total_steps_train,
         total_steps_val,
@@ -92,26 +88,7 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         total_steps_train,
         total_steps_val,
         total_steps_test,
-        weights_equal,
-        weights_single,
         no_of_assets,
-    )
-
-    # Analysis
-    analysis(
-        p_list,
-        p_list_eq,
-        p_list_s,
-        p_list_fu,
-        w_list,
-        list_final_pf,
-        list_final_pf_eq,
-        list_final_pf_s,
-        "stocks",
-        total_steps_train,
-        total_steps_val,
-        no_of_assets,
-        asset_list,
     )
 
     end_time = time.time()
@@ -120,11 +97,30 @@ def main(**cli_options):  # pylint: disable=too-many-locals
     print("\nTraining completed")
     print(f"Process took {train_time_secs} seconds")
 
+    if cli_options["plot_analysis"]:
 
-def _get_data_for_trade_envs(max_no_of_assets=3):
+        analysis(
+            p_list,
+            p_list_eq,
+            p_list_s,
+            p_list_fu,
+            w_list,
+            list_final_pf,
+            list_final_pf_eq,
+            list_final_pf_s,
+            "stocks",
+            total_steps_train,
+            total_steps_val,
+            no_of_assets,
+            asset_list,
+        )
+
+
+def _get_data_for_trade_envs(max_no_of_assets=3, max_no_of_training_periods=10000):
     dataset, asset_names = data_pipe.main(
         count_of_stocks=max_no_of_assets,
-        max_count_of_periods=100)
+        max_count_of_periods=max_no_of_training_periods,
+    )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
     trade_env_args["data"] = dataset
@@ -136,6 +132,7 @@ def _get_data_for_trade_envs(max_no_of_assets=3):
     }
 
     print("\nStarting training for {} assets".format(len(asset_names)))
+    print("\nTrading periods: {}".format(dataset.shape[2]))
     print(asset_names)
 
     return trade_env_args, asset_names, data_features
@@ -161,14 +158,13 @@ def _get_train_environments(nb_stocks, trade_env_args):
 
     env = TradeEnv(**trade_env_args)
 
-    # environment for equiweighted
-    # this environment is set up for an agent who only plays an equiweithed
+    # environment for equally weighted
+    # this environment is set up for an agent who only plays an equally weithed
     # portfolio (baseline)
     env_eq = TradeEnv(**trade_env_args)
 
     # environment secured (only money)
-    # this environment is set up for an agentwho plays secure, keeps its money
-
+    # this environment is set up for an agent who plays secure, keeps its money
     env_s = TradeEnv(**trade_env_args)
 
     # full on one stock environment
@@ -184,12 +180,26 @@ def _get_train_environments(nb_stocks, trade_env_args):
 
         env_fu.append(env_fu_i)
 
+    trade_envs = {
+        "policy_network"
+        "equal_weighted"
+        "only_cash"
+
+    }
+
     return env, env_eq, env_s, action_fu, env_fu
 
 
 if __name__ == "__main__":
     PARSER = argparse.ArgumentParser()
 
+    PARSER.add_argument(
+        "-a",
+        "--plot_analysis",
+        action="store_true",
+        help="Plot aftermath analysis",
+        default=False,
+    )
     PARSER.add_argument(
         "-i",
         "--interactive_session",
@@ -217,6 +227,13 @@ if __name__ == "__main__":
         default=5,
     )
     PARSER.add_argument(
+        "-tp",
+        "--max_no_of_training_periods",
+        type=int,
+        help="Set upper limit for training periods",
+        default=10000,
+    )
+    PARSER.add_argument(
         "-v",
         "--verbose",
         help="Print train vectors",
@@ -235,4 +252,6 @@ if __name__ == "__main__":
         gpu_device=ARGS.gpu_device,
         verbose=ARGS.verbose,
         no_of_assets=ARGS.no_of_assets,
+        max_no_of_training_periods=ARGS.max_no_of_training_periods,
+        plot_analysis=ARGS.plot_analysis,
     )

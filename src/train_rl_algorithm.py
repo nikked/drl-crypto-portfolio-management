@@ -27,19 +27,21 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     action_fu,
     env_fu,
     trade_env_args,
-    weights_equal,
-    weights_single,
     asset_list,
     total_steps_train,
     total_steps_val,
     nb_feature_map,
-    nb_stocks,
+    no_of_assets,
     gpu_device,
     print_verbose,
 ):
 
     ############# TRAINING #####################
     ###########################################
+
+    weights_equal = np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1)))
+    weights_single = np.array(np.array([1] + [0.0] * no_of_assets))
+
     tf.reset_default_graph()
 
     # sess
@@ -47,7 +49,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
     # initialize networks
     actor = Policy(
-        nb_stocks,
+        no_of_assets,
         LENGTH_TENSOR,
         sess,
         weights_equal,
@@ -65,12 +67,12 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     list_final_pf_s = list()
 
     list_final_pf_fu = list()
-    state_fu = [0] * nb_stocks
-    done_fu = [0] * nb_stocks
+    state_fu = [0] * no_of_assets
+    done_fu = [0] * no_of_assets
 
-    pf_value_t_fu = [0] * nb_stocks
+    pf_value_t_fu = [0] * no_of_assets
 
-    for i in range(nb_stocks):
+    for i in range(no_of_assets):
         list_final_pf_fu.append(list())
 
     ###### Train #####
@@ -85,13 +87,13 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 asset_list,
                 total_steps_train,
                 total_steps_val,
-                nb_stocks,
+                no_of_assets,
             )
         print("Episode:", no_episode)
         # init the PVM with the training parameters
 
         # dict_train['w_init_train']
-        w_init_train = np.array(np.array([1] + [0] * nb_stocks))
+        w_init_train = np.array(np.array([1] + [0] * no_of_assets))
 
         memory = PVM(total_steps_train, BATCH_SIZE, w_init_train)
 
@@ -105,7 +107,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             state_eq, _ = env_eq.reset(weights_equal, PF_INITIAL_VALUE, index=i_start)
             state_s, _ = env_s.reset(weights_single, PF_INITIAL_VALUE, index=i_start)
 
-            for i in range(nb_stocks):
+            for i in range(no_of_assets):
                 state_fu[i], done_fu[i] = env_fu[i].reset(
                     action_fu[i], PF_INITIAL_VALUE, index=i_start
                 )
@@ -118,7 +120,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             )
             list_pf_value_previous_eq, list_pf_value_previous_s = [], []
             list_pf_value_previous_fu = list()
-            for i in range(nb_stocks):
+            for i in range(no_of_assets):
                 list_pf_value_previous_fu.append(list())
 
             for batch_item in range(BATCH_SIZE):
@@ -133,7 +135,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                     # computation of the action of the agent
                     action = actor.compute_w(x_t, w_previous)
                 else:
-                    action = _get_random_action(nb_stocks)
+                    action = _get_random_action(no_of_assets)
 
                 # given the state and the action, call the environment to go one
                 # time step later
@@ -141,7 +143,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 state_eq, _, _ = env_eq.step(weights_equal)
                 state_s, _, _ = env_s.step(weights_single)
 
-                for i in range(nb_stocks):
+                for i in range(no_of_assets):
                     state_fu[i], _, done_fu[i] = env_fu[i].step(action_fu[i])
 
                 # get the new state
@@ -152,7 +154,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 pf_value_t_eq = state_eq[2]
                 pf_value_t_s = state_s[2]
 
-                for i in range(nb_stocks):
+                for i in range(no_of_assets):
                     pf_value_t_fu[i] = state_fu[i][2]
 
                 # let us compute the returns
@@ -168,14 +170,14 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 list_pf_value_previous_eq.append(pf_value_t_eq)
                 list_pf_value_previous_s.append(pf_value_t_s)
 
-                for i in range(nb_stocks):
+                for i in range(no_of_assets):
                     list_pf_value_previous_fu[i].append(pf_value_t_fu[i])
 
                 if batch_item == BATCH_SIZE - 1:
                     list_final_pf.append(pf_value_t)
                     list_final_pf_eq.append(pf_value_t_eq)
                     list_final_pf_s.append(pf_value_t_s)
-                    for i in range(nb_stocks):
+                    for i in range(no_of_assets):
                         list_final_pf_fu[i].append(pf_value_t_fu[i])
 
                         if print_verbose:
@@ -205,7 +207,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             asset_list,
             total_steps_train,
             total_steps_val,
-            nb_stocks,
+            no_of_assets,
         )
 
     return actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s
@@ -214,8 +216,8 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 # random action function
 
 
-def _get_random_action(nb_stocks):
-    random_vec = np.random.rand(nb_stocks + 1)
+def _get_random_action(no_of_assets):
+    random_vec = np.random.rand(no_of_assets + 1)
     return random_vec / np.sum(random_vec)
 
 
@@ -227,7 +229,7 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     asset_list,
     total_steps_train,
     total_steps_val,
-    nb_stocks,
+    no_of_assets,
 ):
     """
     This function evaluates the performance of the different types of agents.
@@ -245,7 +247,7 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     # environment for trading of the agent
     env_eval = TradeEnv(**trade_env_args)
 
-    w_init_test = np.array(np.array([1] + [0] * nb_stocks))
+    w_init_test = np.array(np.array([1] + [0] * no_of_assets))
 
     # initialization of the environment
     state_eval, _ = env_eval.reset(w_init_test, PF_INIT_TEST, index=total_steps_train)
@@ -298,15 +300,15 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
         plt.title(
             "Portfolio weights (end of validation set) episode {}".format(no_episode)
         )
-        plt.bar(np.arange(nb_stocks + 1), list_weight_end_val[-1])
-        plt.xticks(np.arange(nb_stocks + 1), ["Money"] + asset_list, rotation=45)
+        plt.bar(np.arange(no_of_assets + 1), list_weight_end_val[-1])
+        plt.xticks(np.arange(no_of_assets + 1), ["Money"] + asset_list, rotation=45)
         plt.show()
 
     names = ["Money"] + asset_list
     w_list_eval = np.array(w_list_eval)
 
     if render_plots:
-        for j in range(nb_stocks + 1):
+        for j in range(no_of_assets + 1):
             plt.plot(w_list_eval[:, j], label="Weight Stock {}".format(names[j]))
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
         plt.show()

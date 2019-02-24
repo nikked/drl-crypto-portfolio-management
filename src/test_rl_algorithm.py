@@ -15,12 +15,13 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     total_steps_train,
     total_steps_val,
     total_steps_test,
-    weights_equal,
-    weights_single,
-    nb_stocks,
+    no_of_assets,
 ):
 
-    w_init_test = np.array(np.array([1] + [0] * nb_stocks))
+    weights_equal = np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1)))
+    weights_single = np.array(np.array([1] + [0.0] * no_of_assets))
+
+    w_init_test = np.array(np.array([1] + [0] * no_of_assets))
 
     # initialization of the environment
     state, _ = env.reset(w_init_test, PF_INIT_TEST, index=total_steps_train)
@@ -28,7 +29,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     state_eq, _ = env_eq.reset(weights_equal, PF_INIT_TEST, index=total_steps_train)
     state_s, _ = env_s.reset(weights_single, PF_INIT_TEST, index=total_steps_train)
 
-    for i in range(nb_stocks):
+    for i in range(no_of_assets):
         state_fu[i], done_fu[i] = env_fu[i].reset(
             action_fu[i], PF_INIT_TEST, index=total_steps_train
         )
@@ -41,10 +42,10 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     p_list_s = [PF_INIT_TEST]
 
     p_list_fu = list()
-    for i in range(nb_stocks):
+    for i in range(no_of_assets):
         p_list_fu.append([PF_INIT_TEST])
 
-    pf_value_t_fu = [0] * nb_stocks
+    pf_value_t_fu = [0] * no_of_assets
 
     for k in range(
         total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2),
@@ -60,7 +61,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         state_eq, _, _ = env_eq.step(weights_equal)
         state_s, _, _ = env_s.step(weights_single)
 
-        for i in range(nb_stocks):
+        for i in range(no_of_assets):
             state_fu[i], _, done_fu[i] = env_fu[i].step(action_fu[i])
 
         # x_next = state[0]
@@ -69,7 +70,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
         pf_value_t_eq = state_eq[2]
         pf_value_t_s = state_s[2]
-        for i in range(nb_stocks):
+        for i in range(no_of_assets):
             pf_value_t_fu[i] = state_fu[i][2]
 
         # dailyReturn_t = x_next[-1, :, -1]
@@ -81,7 +82,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
         p_list_eq.append(pf_value_t_eq)
         p_list_s.append(pf_value_t_s)
-        for i in range(nb_stocks):
+        for i in range(no_of_assets):
             p_list_fu[i].append(pf_value_t_fu[i])
 
         # here to breack the loop/not in original code
