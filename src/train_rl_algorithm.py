@@ -35,6 +35,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     nb_feature_map,
     nb_stocks,
     gpu_device,
+    print_verbose,
 ):
 
     ############# TRAINING #####################
@@ -73,7 +74,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         list_final_pf_fu.append(list())
 
     ###### Train #####
-    for no_episode in range(N_EPISODES):
+    for no_episode in range(N_EPISODES):  # pylint: disable= too-many-nested-blocks
         print("Start Episode", no_episode)
         if no_episode == 0:
             _eval_perf(
@@ -177,14 +178,15 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                     for i in range(nb_stocks):
                         list_final_pf_fu[i].append(pf_value_t_fu[i])
 
-            #             #printing
-            #             if batch_item==0:
-            #                 print('start', i_start)
-            #                 print('PF_start', round(pf_value_previous,0))
+                        if print_verbose:
+                            # printing
+                            if batch_item == 0:
+                                print("start", i_start)
+                                print("PF_start", round(pf_value_previous, 0))
 
-            #             if batch_item==BATCH_SIZE-1:
-            #                 print('PF_end', round(pf_value_t,0))
-            #                 print('weight', w_t)
+                            if batch_item == BATCH_SIZE - 1:
+                                print("PF_end", round(pf_value_t, 0))
+                                print("weight", w_t)
 
             list_x_t = np.array(list_x_t)
             list_w_previous = np.array(list_w_previous)

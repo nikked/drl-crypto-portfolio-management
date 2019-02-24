@@ -31,7 +31,7 @@ DEFAULT_TRADE_ENV_ARGS = {
 
 
 def main(
-    interactive_session=False, crypto_data=False, gpu_device=None
+    interactive_session=False, crypto_data=False, gpu_device=None, verbose=True
 ):  # pylint: disable=too-many-locals
 
     if crypto_data:
@@ -90,6 +90,7 @@ def main(
         nb_feature_map,
         nb_stocks,
         gpu_device,
+        verbose,
     )
 
     # Agent evaluation
@@ -211,7 +212,7 @@ if __name__ == "__main__":
         "-i",
         "--interactive_session",
         action="store_true",
-        help="plot stuff and other interactive shit",
+        help="Plot interactively with matplotlib",
         default=False,
     )
 
@@ -219,22 +220,29 @@ if __name__ == "__main__":
         "-c",
         "--crypto_data",
         action="store_true",
-        help="plot stuff and other interactive shit",
+        help="Use cryptocurrency data",
         default=False,
     )
 
     PARSER.add_argument(
-        "-g",
-        "--gpu_device",
-        type=int,
-        help="plot stuff and other interactive shit",
-        default=None,
+        "-g", "--gpu_device", type=int, help="Choose GPU device number", default=None
+    )
+    PARSER.add_argument(
+        "-v",
+        "--verbose",
+        help="Print train vectors",
+        default=False,
+        action="store_true",
     )
 
     ARGS = PARSER.parse_args()
+
+    if ARGS.verbose:
+        print("\nVerbose session. Alot of vectors will be printed below.\n")
 
     main(
         interactive_session=ARGS.interactive_session,
         crypto_data=ARGS.crypto_data,
         gpu_device=ARGS.gpu_device,
+        verbose=ARGS.verbose,
     )
