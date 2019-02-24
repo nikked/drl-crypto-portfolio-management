@@ -1,7 +1,5 @@
 #!/bin/bash
 
-workon p36
-
 
 # the -e option ensures that the commit will be aborted immediately if
 # PyLint or Black fail (= return a non-zero exit status)
