@@ -8,7 +8,7 @@ from src.params import (
     LEARNING_RATE,
     N_EPISODES,
     KERNEL1_SIZE,
-    LENGTH_TENSOR,
+    WINDOW_LENGTH,
     N_BATCHES,
     RATIO_REGUL,
 )
@@ -36,7 +36,7 @@ def analysis(  # pylint: disable= too-many-arguments, too-many-locals
             LEARNING_RATE,
             RATIO_GREEDY,
             N_EPISODES,
-            LENGTH_TENSOR,
+            WINDOW_LENGTH,
             KERNEL1_SIZE,
             N_BATCHES,
             RATIO_REGUL,

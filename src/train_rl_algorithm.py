@@ -2,15 +2,15 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tqdm import tqdm
+
 from src.params import (  # pylint: disable=ungrouped-imports
-    LENGTH_TENSOR,
+    WINDOW_LENGTH,
     TRADING_COST,
     INTEREST_RATE,
     PF_INITIAL_VALUE,
     RATIO_GREEDY,
     BATCH_SIZE,
-    N_EPISODES,
-    N_BATCHES,
     PF_INIT_TEST,
 )
 
@@ -20,6 +20,8 @@ from src.pvm import PVM
 
 
 def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals, too-many-branches, too-many-statements
+    n_episodes,
+    n_batches,
     interactive_session: bool,
     trade_envs,
     asset_list,
@@ -27,6 +29,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     gpu_device,
     print_verbose,
 ):
+    print("\nStarting to train deep reinforcement learning algorithm...")
 
     no_of_assets = len(asset_list)
 
@@ -56,7 +59,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     # initialize networks
     actor = Policy(
         no_of_assets,
-        LENGTH_TENSOR,
+        WINDOW_LENGTH,
         sess,
         weights_equal,
         nb_feature_map,
@@ -66,6 +69,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     )  # policy initialization
 
     # initialize tensorflow graphs
+    print("\nInitializing tensorflow graphs")
     sess.run(tf.global_variables_initializer())
 
     list_final_pf = list()
@@ -82,9 +86,9 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         list_final_pf_fu.append(list())
 
     ###### Train #####
-    for no_episode in range(N_EPISODES):  # pylint: disable= too-many-nested-blocks
-        print("Start Episode", no_episode)
-        if no_episode == 0:
+    for n_episode in range(n_episodes):  # pylint: disable= too-many-nested-blocks
+        print("\nStart Episode", n_episode)
+        if n_episode == 0:
             _eval_perf(
                 "Before Training",
                 actor,
@@ -95,7 +99,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 total_steps_val,
                 no_of_assets,
             )
-        print("Episode:", no_episode)
+        print("Episode:", n_episode)
         # init the PVM with the training parameters
 
         # dict_train['w_init_train']
@@ -103,7 +107,8 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
         memory = PVM(total_steps_train, BATCH_SIZE, w_init_train)
 
-        for _ in range(N_BATCHES):
+        for _ in tqdm(range(n_batches)):
+            print("\n")
             # draw the starting point of the batch
             i_start = memory.draw()
 
@@ -214,7 +219,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 list_x_t, list_w_previous, list_pf_value_previous, list_daily_return_t
             )
         _eval_perf(
-            no_episode,
+            n_episode,
             actor,
             interactive_session,
             trade_env_args,
@@ -236,7 +241,7 @@ def _get_random_action(no_of_assets):
 
 
 def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
-    no_episode,
+    n_episode,
     actor,
     render_plots,
     trade_env_args,
@@ -250,6 +255,8 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
 
 
     """
+
+    print("\nEvaluating agent performance")
     list_weight_end_val = list()
     list_pf_end_training = list()
     list_pf_min_training = list()
@@ -270,8 +277,11 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     p_list_eval = [PF_INIT_TEST]
     w_list_eval = [w_init_test]
 
-    for _ in range(
-        total_steps_train, total_steps_train + total_steps_val - int(LENGTH_TENSOR / 2)
+    for _ in tqdm(
+        range(
+            total_steps_train,
+            total_steps_train + total_steps_val - int(WINDOW_LENGTH / 2),
+        )
     ):
         x_t = state_eval[0].reshape([-1] + list(state_eval[0].shape))
         w_previous = state_eval[1].reshape([-1] + list(state_eval[1].shape))
@@ -307,12 +317,12 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     print("End of test weights:", w_list_eval[-1])
 
     if render_plots:
-        plt.title("Portfolio evolution (validation set) episode {}".format(no_episode))
+        plt.title("Portfolio evolution (validation set) episode {}".format(n_episode))
         plt.plot(p_list_eval, label="Agent Portfolio Value")
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
         plt.show()
         plt.title(
-            "Portfolio weights (end of validation set) episode {}".format(no_episode)
+            "Portfolio weights (end of validation set) episode {}".format(n_episode)
         )
         plt.bar(np.arange(no_of_assets + 1), list_weight_end_val[-1])
         plt.xticks(np.arange(no_of_assets + 1), ["Money"] + asset_list, rotation=45)

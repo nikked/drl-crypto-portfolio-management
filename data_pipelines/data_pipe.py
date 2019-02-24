@@ -63,13 +63,14 @@ def _get_valid_stock_filepaths():
 
     stock_filepaths = [file for file in stock_filepaths]
 
-    print("In total there are {} different stocks.".format(len(stock_filepaths)))
+    # print("In total there are {} different stocks.".format(len(stock_filepaths)))
 
     valid_stocks = list()
     not_valid_stocks = list()
 
     # Ignore stocks that do not have exactly 1259 trading days of history
-    for stock in tqdm(stock_filepaths):
+    # for stock in tqdm(stock_filepaths):
+    for stock in stock_filepaths:
         if not stock.endswith("csv"):
             continue
         stock_df = pd.read_csv(os.getcwd() + DATA_DIR + stock)
@@ -80,7 +81,7 @@ def _get_valid_stock_filepaths():
         else:
             valid_stocks.append(stock)
 
-    print("Found {} valid stocks".format(len(valid_stocks)))
+    # print("Found {} valid assets".format(len(valid_stocks)))
 
     return valid_stocks
 
@@ -92,7 +93,7 @@ def _make_stocks_tensor(kept_stock_rl, max_count_of_periods):
     list_high = list()
     list_low = list()
 
-    for kept_stock in tqdm(kept_stock_rl):
+    for kept_stock in kept_stock_rl:
         data = pd.read_csv(os.getcwd() + DATA_DIR + kept_stock).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
         list_open.append(data.open.values[:max_count_of_periods])

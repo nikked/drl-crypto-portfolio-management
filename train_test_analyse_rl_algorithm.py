@@ -10,12 +10,14 @@ from src.analysis import analysis
 from src.environment import TradeEnv
 
 from src.params import (
-    LENGTH_TENSOR,
     PF_INITIAL_VALUE,
     TRADING_COST,
     INTEREST_RATE,
     RATIO_TRAIN,
     RATIO_VAL,
+    TEST_TRAIN_PARAMS,
+    WINDOW_LENGTH,
+    N_EPISODES,
 )
 
 from data_pipelines import data_pipe
@@ -26,7 +28,7 @@ from data_pipelines import data_pipe
 
 DEFAULT_TRADE_ENV_ARGS = {
     "path": None,
-    "window_length": LENGTH_TENSOR,
+    "window_length": WINDOW_LENGTH,
     "portfolio_value": PF_INITIAL_VALUE,
     "trading_cost": TRADING_COST,
     "interest_rate": INTEREST_RATE,
@@ -37,11 +39,15 @@ DEFAULT_TRADE_ENV_ARGS = {
 
 def main(**cli_options):  # pylint: disable=too-many-locals
 
+    print("\nStarting training process with the following options:")
     pprint(cli_options)
 
     start_time = time.time()
 
     # Creation of the trading environment
+    print(
+        f"\nTraining for {cli_options['n_episodes']} episodes.\nTraining {cli_options['n_batches']} batches."
+    )
     trade_envs, asset_list, trading_periods, step_counts = _initialize_trade_envs(
         no_of_assets=cli_options["no_of_assets"],
         max_no_of_training_periods=cli_options["max_no_of_training_periods"],
@@ -49,6 +55,8 @@ def main(**cli_options):  # pylint: disable=too-many-locals
 
     # Agent training
     actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
+        cli_options["n_episodes"],
+        cli_options["n_batches"],
         cli_options["interactive_session"],
         trade_envs,
         asset_list,
@@ -93,8 +101,9 @@ def _initialize_trade_envs(no_of_assets=3, max_no_of_training_periods=10000):
     trade_env_args["data"] = dataset
 
     trading_periods = dataset.shape[2]
-    print("\nStarting training for {} assets".format(len(asset_names)))
-    print("\nTrading periods: {}".format(dataset.shape[2]))
+
+    print("Trading periods: {}".format(dataset.shape[2]))
+    print("Starting training for {} assets".format(len(asset_names)))
     print(asset_names)
 
     train_envs = _get_train_environments(no_of_assets, trade_env_args)
@@ -102,25 +111,6 @@ def _initialize_trade_envs(no_of_assets=3, max_no_of_training_periods=10000):
     step_counts = _get_train_val_test_steps(trading_periods)
 
     return train_envs, asset_names, trading_periods, step_counts
-
-
-def _get_train_val_test_steps(trading_period):
-    # Total number of steps for pre-training in the training set
-    total_steps_train = int(RATIO_TRAIN * trading_period)
-
-    # Total number of steps for pre-training in the validation set
-    total_steps_val = int(RATIO_VAL * trading_period)
-
-    # Total number of steps for the test
-    total_steps_test = trading_period - total_steps_train - total_steps_val
-
-    step_counts = {
-        "train": total_steps_train,
-        "test": total_steps_test,
-        "validation": total_steps_val,
-    }
-
-    return step_counts
 
 
 def _get_train_environments(no_of_assets, trade_env_args):
@@ -164,6 +154,25 @@ def _get_train_environments(no_of_assets, trade_env_args):
     return trade_envs
 
 
+def _get_train_val_test_steps(trading_period):
+    # Total number of steps for pre-training in the training set
+    total_steps_train = int(RATIO_TRAIN * trading_period)
+
+    # Total number of steps for pre-training in the validation set
+    total_steps_val = int(RATIO_VAL * trading_period)
+
+    # Total number of steps for the test
+    total_steps_test = trading_period - total_steps_train - total_steps_val
+
+    step_counts = {
+        "train": total_steps_train,
+        "test": total_steps_test,
+        "validation": total_steps_val,
+    }
+
+    return step_counts
+
+
 if __name__ == "__main__":
     PARSER = argparse.ArgumentParser()
 
@@ -201,6 +210,20 @@ if __name__ == "__main__":
         default=5,
     )
     PARSER.add_argument(
+        "-nb",
+        "--no_of_batches",
+        type=int,
+        help="Choose how many batches are trained",
+        default=10,
+    )
+    PARSER.add_argument(
+        "-ne",
+        "--no_of_episodes",
+        type=int,
+        help="Choose how many episodes are trained",
+        default=2,
+    )
+    PARSER.add_argument(
         "-tp",
         "--max_no_of_training_periods",
         type=int,
@@ -228,4 +251,6 @@ if __name__ == "__main__":
         no_of_assets=ARGS.no_of_assets,
         max_no_of_training_periods=ARGS.max_no_of_training_periods,
         plot_analysis=ARGS.plot_analysis,
+        n_episodes=ARGS.no_of_episodes,
+        n_batches=ARGS.no_of_batches,
     )

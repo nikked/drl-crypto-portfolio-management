@@ -27,7 +27,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
     def __init__(  # pylint: disable=too-many-arguments, too-many-locals, too-many-statements
         self,
         nb_stocks,
-        length_tensor,
+        WINDOW_LENGTH,
         sess,
         w_eq,
         nb_feature_map,
@@ -43,7 +43,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
         self.interest_rate = interest_rate
         self.n_filter_1 = n_filter_1
         self.n_filter_2 = n_filter_2
-        self.length_tensor = length_tensor
+        self.WINDOW_LENGTH = WINDOW_LENGTH
         self.nb_stocks = nb_stocks
 
         if gpu_device:
@@ -52,7 +52,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
         else:
             self.tf_device = "/cpu:0"
 
-        print("Using tf device {}".format(self.tf_device))
+        print("\nUsing tf device {}".format(self.tf_device))
 
         with tf.device(self.tf_device):
             with tf.variable_scope("Inputs"):
@@ -62,7 +62,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                 # tensor of the prices
                 self.x_current = tf.placeholder(
                     tf.float32,
-                    [None, nb_feature_map, self.nb_stocks, self.length_tensor],
+                    [None, nb_feature_map, self.nb_stocks, self.WINDOW_LENGTH],
                 )  # The Price tensor
                 # weights at the previous time step
                 self.w_previous = tf.placeholder(tf.float32, [None, self.nb_stocks + 1])
@@ -108,8 +108,8 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                         inputs=self.conv1,
                         activation=tf.nn.relu,  # pylint: disable=no-member
                         filters=self.n_filter_2,
-                        strides=(self.length_tensor, 1),
-                        kernel_size=(1, self.length_tensor),
+                        strides=(self.WINDOW_LENGTH, 1),
+                        kernel_size=(1, self.WINDOW_LENGTH),
                         padding="same",
                     )
 
