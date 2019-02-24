@@ -30,12 +30,13 @@ class TradeEnv:  # pylint: disable=too-many-instance-attributes
         trading_cost=0.25 / 100,
         interest_rate=0.02 / 250,
         train_size=0.7,
+        data=None,
     ):
 
         # path to numpy data
         self.path = path
         # load the whole data
-        self.data = np.load(self.path)
+        self.data = data
 
         # parameters
         self.portfolio_value = portfolio_value

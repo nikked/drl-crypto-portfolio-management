@@ -28,23 +28,26 @@ DATA_DIR = "/data/individual_stocks_5yr/"
 OUT_PATH = "./data/np_data/input.npy"
 
 
-def main(count_of_stocks=5, save=False):
+def main(count_of_stocks=5, max_count_of_periods=10000, save=False):
 
     all_valid_stocks = _get_valid_stock_filepaths()
 
-    kept_stock_rl = []
+    chosen_stock_filepaths = []
 
     for idx in range(count_of_stocks):
         stock_index = PREFERRED_STOCK_INDECES[idx]
-        kept_stock_rl.append(all_valid_stocks[stock_index])
+        chosen_stock_filepaths.append(all_valid_stocks[stock_index])
 
-    stocks_tensor = _make_stocks_tensor(kept_stock_rl)
+    stocks_tensor = _make_stocks_tensor(chosen_stock_filepaths, max_count_of_periods)
+    chosen_stock_names = [
+        stock_fp.replace("_data.csv", "") for stock_fp in chosen_stock_filepaths
+    ]
 
     if save:
         print("Saving stocks numpy tensor to path: {}".format(OUT_PATH))
         np.save(OUT_PATH, stocks_tensor)
 
-    return stocks_tensor
+    return stocks_tensor, chosen_stock_names
 
 
 def _get_valid_stock_filepaths():
@@ -82,7 +85,7 @@ def _get_valid_stock_filepaths():
     return valid_stocks
 
 
-def _make_stocks_tensor(kept_stock_rl):
+def _make_stocks_tensor(kept_stock_rl, max_count_of_periods):
 
     list_open = list()
     list_close = list()
@@ -92,10 +95,10 @@ def _make_stocks_tensor(kept_stock_rl):
     for kept_stock in tqdm(kept_stock_rl):
         data = pd.read_csv(os.getcwd() + DATA_DIR + kept_stock).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
-        list_open.append(data.open.values)
-        list_close.append(data.close.values)
-        list_high.append(data.high.values)
-        list_low.append(data.low.values)
+        list_open.append(data.open.values[:max_count_of_periods])
+        list_close.append(data.close.values[:max_count_of_periods])
+        list_high.append(data.high.values[:max_count_of_periods])
+        list_low.append(data.low.values[:max_count_of_periods])
 
     array_open = np.transpose(np.array(list_open))[:-1]
     array_open_of_the_day = np.transpose(np.array(list_open))[1:]

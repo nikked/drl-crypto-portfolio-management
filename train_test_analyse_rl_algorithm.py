@@ -17,9 +17,11 @@ from src.params import (
     RATIO_VAL,
 )
 
+from data_pipelines import data_pipe
 
-CRYPTO_DATA_FP = "./data/np_data/inputCrypto.npy"
-STOCK_DATA_FP = "./data/np_data/input.npy"
+
+# CRYPTO_DATA_FP = "./data/np_data/inputCrypto.npy"
+# STOCK_DATA_FP = "./data/np_data/input.npy"
 
 DEFAULT_TRADE_ENV_ARGS = {
     "path": None,
@@ -28,30 +30,33 @@ DEFAULT_TRADE_ENV_ARGS = {
     "trading_cost": TRADING_COST,
     "interest_rate": INTEREST_RATE,
     "train_size": RATIO_TRAIN,
+    "data": None,
 }
 
 
 def main(**cli_options):  # pylint: disable=too-many-locals
 
+    no_of_assets = cli_options["no_of_assets"]
+
     start_time = time.time()
 
-    data_source_fp = _get_data_source(cli_options)
-    trade_env_args = _get_trade_env_args(data_source_fp)
-
-    nb_stocks, asset_list, nb_feature_map, trading_period = _get_data_features(
-        data_source_fp
+    trade_env_args, asset_list, data_features = _get_data_for_trade_envs(
+        max_no_of_assets=no_of_assets
     )
+
+    nb_feature_map = data_features["nb_feature_map"]
+    trading_period = data_features["trading_period"]
 
     total_steps_train, total_steps_val, total_steps_test = _get_train_val_test_steps(
         trading_period
     )
 
-    weights_equal = np.array(np.array([1 / (nb_stocks + 1)] * (nb_stocks + 1)))
-    weights_single = np.array(np.array([1] + [0.0] * nb_stocks))
+    weights_equal = np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1)))
+    weights_single = np.array(np.array([1] + [0.0] * no_of_assets))
 
     # Creation of the trading environment
     env, env_eq, env_s, action_fu, env_fu = _get_train_environments(
-        nb_stocks, trade_env_args
+        no_of_assets, trade_env_args
     )
 
     # Agent training
@@ -69,7 +74,7 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         total_steps_train,
         total_steps_val,
         nb_feature_map,
-        nb_stocks,
+        no_of_assets,
         cli_options["gpu_device"],
         cli_options["verbose"],
     )
@@ -89,7 +94,7 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         total_steps_test,
         weights_equal,
         weights_single,
-        nb_stocks,
+        no_of_assets,
     )
 
     # Analysis
@@ -102,10 +107,11 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         list_final_pf,
         list_final_pf_eq,
         list_final_pf_s,
-        data_source_fp,
+        "stocks",
         total_steps_train,
         total_steps_val,
-        nb_stocks,
+        no_of_assets,
+        asset_list,
     )
 
     end_time = time.time()
@@ -115,33 +121,24 @@ def main(**cli_options):  # pylint: disable=too-many-locals
     print(f"Process took {train_time_secs} seconds")
 
 
-def _get_data_source(cli_options):
-    if cli_options["crypto_data"]:
-        data_source_fp = CRYPTO_DATA_FP
+def _get_data_for_trade_envs(max_no_of_assets=3):
+    dataset, asset_names = data_pipe.main(
+        count_of_stocks=max_no_of_assets,
+        max_count_of_periods=100)
 
-    else:
-        data_source_fp = STOCK_DATA_FP
-
-    return data_source_fp
-
-
-def _get_trade_env_args(data_source_fp):
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
-    trade_env_args["path"] = data_source_fp
+    trade_env_args["data"] = dataset
 
-    return trade_env_args
+    data_features = {
+        "nb_stocks": dataset.shape[1],
+        "nb_feature_map": dataset.shape[0],
+        "trading_period": dataset.shape[2],
+    }
 
+    print("\nStarting training for {} assets".format(len(asset_names)))
+    print(asset_names)
 
-def _get_data_features(data_source_fp):
-    data_source = np.load(data_source_fp)
-    nb_stocks = data_source.shape[1]
-    data_type = data_source_fp.split("/")[2][5:].split(".")[0]
-    nb_feature_map = data_source.shape[0]
-    trading_period = data_source.shape[2]
-
-    asset_list = _get_asset_list(data_type, nb_stocks)
-
-    return nb_stocks, asset_list, nb_feature_map, trading_period
+    return trade_env_args, asset_names, data_features
 
 
 def _get_train_val_test_steps(trading_period):
@@ -155,50 +152,6 @@ def _get_train_val_test_steps(trading_period):
     total_steps_test = trading_period - total_steps_train - total_steps_val
 
     return total_steps_train, total_steps_val, total_steps_test
-
-
-def _get_asset_list(data_type, nb_stocks):
-
-    names_bio = ["JNJ", "PFE", "AMGN", "MDT", "CELG", "LLY"]
-    names_utilities = ["XOM", "CVX", "MRK", "SLB", "MMM"]
-    names_tech = [
-        "FB",
-        "AMZN",
-        "MSFT",
-        "AAPL",
-        "T",
-        "VZ",
-        "CMCSA",
-        "IBM",
-        "CRM",
-        "INTC",
-    ]
-    names_crypto = [
-        "ETCBTC",
-        "ETHBTC",
-        "DOGEBTC",
-        "ETHUSDT",
-        "BTCUSDT",
-        "XRPBTC",
-        "DASHBTC",
-        "XMRBTC",
-        "LTCBTC",
-        "ETCETH",
-    ]
-
-    # fix parameters of the network
-    if data_type == "Utilities":
-        asset_list = names_utilities
-    elif data_type == "Bio":
-        asset_list = names_bio
-    elif data_type == "Tech":
-        asset_list = names_tech
-    elif data_type == "Crypto":
-        asset_list = names_crypto
-    else:
-        asset_list = [i for i in range(nb_stocks)]
-
-    return asset_list
 
 
 def _get_train_environments(nb_stocks, trade_env_args):
@@ -257,6 +210,13 @@ if __name__ == "__main__":
         "-g", "--gpu_device", type=int, help="Choose GPU device number", default=None
     )
     PARSER.add_argument(
+        "-n",
+        "--no_of_assets",
+        type=int,
+        help="Choose how many assets are trained",
+        default=5,
+    )
+    PARSER.add_argument(
         "-v",
         "--verbose",
         help="Print train vectors",
@@ -274,4 +234,5 @@ if __name__ == "__main__":
         crypto_data=ARGS.crypto_data,
         gpu_device=ARGS.gpu_device,
         verbose=ARGS.verbose,
+        no_of_assets=ARGS.no_of_assets,
     )
