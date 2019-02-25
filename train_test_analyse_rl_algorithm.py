@@ -250,16 +250,16 @@ if __name__ == "__main__":
         print("\nStarting rapid test run...")
         main(
             interactive_session=False,
-            crypto_data=False,
+            crypto_data=True,
             gpu_device=None,
             verbose=False,
             no_of_assets=2,
-            max_no_of_training_periods=1258,
+            max_no_of_training_periods=200,
             plot_results=False,
             n_episodes=1,
             n_batches=1,
-            window_length=500,
-            batch_size=50,
+            window_length=77,
+            batch_size=1,
             portfolio_value=10000,
         )
 
