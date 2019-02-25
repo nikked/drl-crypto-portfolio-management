@@ -11,7 +11,7 @@ class TestTrainTestAnalyse(unittest.TestCase):
             "interactive_session": False,
             "max_no_of_training_periods": 10000,
             "no_of_assets": 2,
-            "plot_analysis": False,
+            "plot_results": False,
             "verbose": False,
             "n_batches": 1,
             "n_episodes": 1,

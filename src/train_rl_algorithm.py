@@ -87,7 +87,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
     ###### Train #####
     for n_episode in range(n_episodes):  # pylint: disable= too-many-nested-blocks
-        print("\nStarting reinforcement learning episode", n_episode)
+        print("\nStarting reinforcement learning episode", n_episode + 1)
         if n_episode == 0:
             _eval_perf(
                 window_length,
@@ -100,7 +100,6 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 total_steps_val,
                 no_of_assets,
             )
-        print("Episode:", n_episode)
         # init the PVM with the training parameters
 
         # dict_train['w_init_train']
@@ -108,8 +107,11 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
         memory = PVM(total_steps_train, BATCH_SIZE, w_init_train)
 
-        for _ in tqdm(range(n_batches)):
-            print("\n")
+        for idx in range(n_batches):
+
+            if print_verbose:
+                print("\nTraining batch: {}/{}".format(idx + 1, n_batches))
+
             # draw the starting point of the batch
             i_start = memory.draw()
 
@@ -200,14 +202,14 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                     for i in range(no_of_assets):
                         list_final_pf_fu[i].append(pf_value_t_fu[i])
 
-                        if print_verbose:
-                            if batch_item == 0:
-                                print("start", i_start)
-                                print("PF_start", round(pf_value_previous, 0))
+                    if print_verbose:
+                        if batch_item == 0:
+                            print("start", i_start)
+                            print("PF_start", round(pf_value_previous, 0))
 
-                            if batch_item == BATCH_SIZE - 1:
-                                print("Ptf value: ", round(pf_value_t, 0))
-                                print("Ptf weights: ", w_t)
+                        if batch_item == BATCH_SIZE - 1:
+                            print("Ptf value: ", round(pf_value_t, 0))
+                            print("Ptf weights: ", w_t)
 
             list_x_t = np.array(list_x_t)
             list_w_previous = np.array(list_w_previous)

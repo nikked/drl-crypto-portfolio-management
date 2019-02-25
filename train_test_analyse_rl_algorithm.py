@@ -6,7 +6,7 @@ import numpy as np
 
 from src.train_rl_algorithm import train_rl_algorithm
 from src.test_rl_algorithm import test_rl_algorithm
-from src.analysis import analysis
+from src import plot_training_results
 from src.environment import TradeEnv
 
 from src.params import (
@@ -74,10 +74,10 @@ def main(**cli_options):  # pylint: disable=too-many-locals
     print("\nTraining completed")
     print(f"Process took {train_time_secs} seconds")
 
-    if cli_options["plot_analysis"]:
-
-        analysis(
+    if cli_options["plot_results"]:
+        plot_training_results(
             cli_options["window_length"],
+            cli_options["n_batches"],
             p_list,
             p_list_eq,
             p_list_s,
@@ -179,8 +179,8 @@ if __name__ == "__main__":
     PARSER = argparse.ArgumentParser()
 
     PARSER.add_argument(
-        "-a",
-        "--plot_analysis",
+        "-pr",
+        "--plot_results",
         action="store_true",
         help="Plot aftermath analysis",
         default=False,
@@ -242,21 +242,39 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
     )
+    PARSER.add_argument(
+        "-t", "--test_mode", help="Quick testrun", default=False, action="store_true"
+    )
 
     ARGS = PARSER.parse_args()
 
     if ARGS.verbose:
         print("\nVerbose session. Alot of vectors will be printed below.\n")
 
-    main(
-        interactive_session=ARGS.interactive_session,
-        crypto_data=ARGS.crypto_data,
-        gpu_device=ARGS.gpu_device,
-        verbose=ARGS.verbose,
-        no_of_assets=ARGS.no_of_assets,
-        max_no_of_training_periods=ARGS.max_no_of_training_periods,
-        plot_analysis=ARGS.plot_analysis,
-        n_episodes=ARGS.no_of_episodes,
-        n_batches=ARGS.no_of_batches,
-        window_length=ARGS.window_length,
-    )
+    if ARGS.test_mode:
+        main(
+            interactive_session=False,
+            crypto_data=False,
+            gpu_device=None,
+            verbose=False,
+            no_of_assets=2,
+            max_no_of_training_periods=10000,
+            plot_results=False,
+            n_episodes=1,
+            n_batches=1,
+            window_length=400,
+        )
+
+    else:
+        main(
+            interactive_session=ARGS.interactive_session,
+            crypto_data=ARGS.crypto_data,
+            gpu_device=ARGS.gpu_device,
+            verbose=ARGS.verbose,
+            no_of_assets=ARGS.no_of_assets,
+            max_no_of_training_periods=ARGS.max_no_of_training_periods,
+            plot_results=ARGS.plot_results,
+            n_episodes=ARGS.no_of_episodes,
+            n_batches=ARGS.no_of_batches,
+            window_length=ARGS.window_length,
+        )
