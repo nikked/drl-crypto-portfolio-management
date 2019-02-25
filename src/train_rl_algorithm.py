@@ -7,7 +7,6 @@ from tqdm import tqdm
 from src.params import (  # pylint: disable=ungrouped-imports
     TRADING_COST,
     INTEREST_RATE,
-    PF_INITIAL_VALUE,
     RATIO_GREEDY,
     PF_INIT_TEST,
 )
@@ -113,18 +112,18 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             # reset the environment with the weight from PVM at the starting point
             # reset also with a portfolio value with initial portfolio value
             state, _ = env_policy_network.reset(
-                memory.get_w(i_start), PF_INITIAL_VALUE, index=i_start
+                memory.get_w(i_start), train_options["portfolio_value"], index=i_start
             )
             state_eq, _ = env_equal_weighted.reset(
-                weights_equal, PF_INITIAL_VALUE, index=i_start
+                weights_equal, train_options["portfolio_value"], index=i_start
             )
             state_s, _ = env_only_cash.reset(
-                weights_single, PF_INITIAL_VALUE, index=i_start
+                weights_single, train_options["portfolio_value"], index=i_start
             )
 
             for i in range(no_of_assets):
                 state_fu[i], done_fu[i] = env_full_on_one_stocks[i].reset(
-                    action_fu[i], PF_INITIAL_VALUE, index=i_start
+                    action_fu[i], train_options["portfolio_value"], index=i_start
                 )
 
             list_x_t, list_w_previous, list_pf_value_previous, list_daily_return_t = (

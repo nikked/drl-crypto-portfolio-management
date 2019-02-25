@@ -32,29 +32,25 @@ DEFAULT_TRADE_ENV_ARGS = {
 }
 
 
-def main(**train_options):
+def main(**train_configs):
 
     print("\nStarting training process with the following options:")
-    pprint(train_options)
+    pprint(train_configs)
 
     start_time = time.time()
 
     # Creation of the trading environment
     print("\n")
-    trade_envs, asset_list, step_counts = _initialize_trade_envs(
-        window_length=train_options["window_length"],
-        no_of_assets=train_options["no_of_assets"],
-        max_no_of_training_periods=train_options["max_no_of_training_periods"],
-    )
+    trade_envs, asset_list, step_counts = _initialize_trade_envs(train_configs)
 
     # Agent training
     actor, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
-        train_options, trade_envs, asset_list, step_counts
+        train_configs, trade_envs, asset_list, step_counts
     )
 
     # Agent evaluation
     test_performance_lists = test_rl_algorithm(
-        train_options, actor, state_fu, done_fu, trade_envs, step_counts
+        train_configs, actor, state_fu, done_fu, trade_envs, step_counts
     )
 
     end_time = time.time()
@@ -63,9 +59,9 @@ def main(**train_options):
     print("\nTraining completed")
     print(f"Process took {train_time_secs} seconds")
 
-    if train_options["plot_results"]:
+    if train_configs["plot_results"]:
         plot_training_results(
-            train_options,
+            train_configs,
             test_performance_lists,
             train_performance_lists,
             "stocks",
@@ -73,26 +69,24 @@ def main(**train_options):
         )
 
 
-def _initialize_trade_envs(
-    window_length=10, no_of_assets=3, max_no_of_training_periods=10000
-):
+def _initialize_trade_envs(train_configs):
     dataset, asset_names = data_pipe.main(
-        count_of_stocks=no_of_assets, max_count_of_periods=max_no_of_training_periods
+        count_of_stocks=train_configs["no_of_assets"],
+        max_count_of_periods=train_configs["max_no_of_training_periods"],
     )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
     trade_env_args["data"] = dataset
-    trade_env_args["window_length"] = window_length
+    trade_env_args["window_length"] = train_configs["window_length"]
 
     trading_periods = dataset.shape[2]
-
     print("Trading periods: {}".format(dataset.shape[2]))
+    step_counts = _get_train_val_test_steps(trading_periods)
+
     print("Starting training for {} assets".format(len(asset_names)))
     print(asset_names)
 
-    train_envs = _get_train_environments(no_of_assets, trade_env_args)
-
-    step_counts = _get_train_val_test_steps(trading_periods)
+    train_envs = _get_train_environments(train_configs["no_of_assets"], trade_env_args)
 
     return train_envs, asset_names, step_counts
 
@@ -187,7 +181,7 @@ if __name__ == "__main__":
         "-g", "--gpu_device", type=int, help="Choose GPU device number", default=None
     )
     PARSER.add_argument(
-        "-n",
+        "-na",
         "--no_of_assets",
         type=int,
         help="Choose how many assets are trained",
@@ -221,6 +215,13 @@ if __name__ == "__main__":
         default=10000,
     )
     PARSER.add_argument(
+        "-pv",
+        "--portfolio_initial_value",
+        type=int,
+        help="Initial cash invested in portfolio",
+        default=10000,
+    )
+    PARSER.add_argument(
         "-v",
         "--verbose",
         help="Print train vectors",
@@ -249,6 +250,7 @@ if __name__ == "__main__":
             n_batches=1,
             window_length=400,
             batch_size=50,
+            portfolio_value=10000,
         )
 
     else:
@@ -264,4 +266,5 @@ if __name__ == "__main__":
             n_batches=ARGS.no_of_batches,
             window_length=ARGS.window_length,
             batch_size=ARGS.batch_size,
+            portfolio_value=ARGS.portfolio_value,
         )

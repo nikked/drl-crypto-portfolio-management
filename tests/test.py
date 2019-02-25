@@ -17,6 +17,7 @@ class TestTrainTestAnalyse(unittest.TestCase):
             "n_episodes": 1,
             "window_length": 400,
             "batch_size": 50,
+            "portfolio_value": 10000,
         }
 
     def test_train_completes_fully(self):

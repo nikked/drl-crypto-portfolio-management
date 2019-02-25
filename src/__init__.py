@@ -2,14 +2,7 @@ import numpy as np
 
 # import pandas as pd
 import matplotlib.pyplot as plt
-from src.params import (
-    RATIO_GREEDY,
-    BATCH_SIZE,
-    LEARNING_RATE,
-    N_EPISODES,
-    KERNEL1_SIZE,
-    RATIO_REGUL,
-)
+from src.params import RATIO_GREEDY, LEARNING_RATE, KERNEL1_SIZE, RATIO_REGUL
 
 
 def plot_training_results(  # pylint: disable= too-many-arguments, too-many-locals
@@ -35,10 +28,10 @@ def plot_training_results(  # pylint: disable= too-many-arguments, too-many-loca
     plt.title(
         "Portfolio Value (Test Set) {}: {}, {}, {}, {}, {}, {}, {}, {}".format(
             input_data_type,
-            BATCH_SIZE,
+            train_options["batch_size"],
             LEARNING_RATE,
             RATIO_GREEDY,
-            N_EPISODES,
+            train_options["n_episodes"],
             train_options["window_length"],
             KERNEL1_SIZE,
             train_options["n_batches"],
