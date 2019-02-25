@@ -27,7 +27,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
     def __init__(  # pylint: disable=too-many-arguments, too-many-locals, too-many-statements
         self,
         nb_stocks,
-        window_length,
+        train_options,
         sess,
         w_eq,
         nb_feature_map,
@@ -35,7 +35,6 @@ class Policy:  # pylint: disable=too-many-instance-attributes
         interest_rate=INTEREST_RATE,
         n_filter_1=N_FILTER_1,
         n_filter_2=N_FILTER_2,
-        gpu_device=None,
     ):
 
         # parameters
@@ -43,11 +42,11 @@ class Policy:  # pylint: disable=too-many-instance-attributes
         self.interest_rate = interest_rate
         self.n_filter_1 = n_filter_1
         self.n_filter_2 = n_filter_2
-        self.window_length = window_length
+        self.window_length = train_options["window_length"]
         self.nb_stocks = nb_stocks
 
-        if gpu_device:
-            self.tf_device = "/device:GPU:{}".format(gpu_device)
+        if train_options["gpu_device"]:
+            self.tf_device = "/device:GPU:{}".format(train_options["gpu_device"])
 
         else:
             self.tf_device = "/cpu:0"

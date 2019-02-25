@@ -4,7 +4,7 @@ from src.params import PF_INIT_TEST
 
 
 def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
-    window_length, actor, state_fu, done_fu, trade_envs, set_step_counts
+    train_options, actor, state_fu, done_fu, trade_envs, set_step_counts
 ):
 
     print("\nTesting algorithm performance with test set")
@@ -56,8 +56,11 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     pf_value_t_fu = [0] * no_of_assets
 
     for k in range(
-        total_steps_train + total_steps_val - int(window_length / 2),
-        total_steps_train + total_steps_val + total_steps_test - window_length,
+        total_steps_train + total_steps_val - int(train_options["window_length"] / 2),
+        total_steps_train
+        + total_steps_val
+        + total_steps_test
+        - train_options["window_length"],
     ):
         x_current = state[0].reshape([-1] + list(state[0].shape))
         w_previous = state[1].reshape([-1] + list(state[1].shape))
@@ -94,7 +97,13 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
             p_list_fu[i].append(pf_value_t_fu[i])
 
         # here to breack the loop/not in original code
-        if k == total_steps_train + total_steps_val - int(window_length / 2) + 100:
+        if (
+            k
+            == total_steps_train
+            + total_steps_val
+            - int(train_options["window_length"] / 2)
+            + 100
+        ):
             break
 
     test_performance_lists = {

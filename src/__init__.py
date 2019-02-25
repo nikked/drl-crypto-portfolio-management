@@ -13,8 +13,7 @@ from src.params import (
 
 
 def plot_training_results(  # pylint: disable= too-many-arguments, too-many-locals
-    window_length,
-    n_batches,
+    train_options,
     test_performance_lists,
     train_performance_lists,
     input_data_type,
@@ -40,9 +39,9 @@ def plot_training_results(  # pylint: disable= too-many-arguments, too-many-loca
             LEARNING_RATE,
             RATIO_GREEDY,
             N_EPISODES,
-            window_length,
+            train_options["window_length"],
             KERNEL1_SIZE,
-            n_batches,
+            train_options["n_batches"],
             RATIO_REGUL,
         )
     )

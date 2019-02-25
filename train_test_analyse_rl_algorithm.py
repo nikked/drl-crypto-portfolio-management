@@ -32,38 +32,29 @@ DEFAULT_TRADE_ENV_ARGS = {
 }
 
 
-def main(**cli_options):
+def main(**train_options):
 
     print("\nStarting training process with the following options:")
-    pprint(cli_options)
+    pprint(train_options)
 
     start_time = time.time()
 
     # Creation of the trading environment
     print("\n")
     trade_envs, asset_list, step_counts = _initialize_trade_envs(
-        window_length=cli_options["window_length"],
-        no_of_assets=cli_options["no_of_assets"],
-        max_no_of_training_periods=cli_options["max_no_of_training_periods"],
+        window_length=train_options["window_length"],
+        no_of_assets=train_options["no_of_assets"],
+        max_no_of_training_periods=train_options["max_no_of_training_periods"],
     )
 
     # Agent training
     actor, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
-        cli_options["window_length"],
-        cli_options["n_episodes"],
-        cli_options["n_batches"],
-        cli_options["batch_size"],
-        cli_options["interactive_session"],
-        trade_envs,
-        asset_list,
-        step_counts,
-        cli_options["gpu_device"],
-        cli_options["verbose"],
+        train_options, trade_envs, asset_list, step_counts
     )
 
     # Agent evaluation
     test_performance_lists = test_rl_algorithm(
-        cli_options["window_length"], actor, state_fu, done_fu, trade_envs, step_counts
+        train_options, actor, state_fu, done_fu, trade_envs, step_counts
     )
 
     end_time = time.time()
@@ -72,10 +63,9 @@ def main(**cli_options):
     print("\nTraining completed")
     print(f"Process took {train_time_secs} seconds")
 
-    if cli_options["plot_results"]:
+    if train_options["plot_results"]:
         plot_training_results(
-            cli_options["window_length"],
-            cli_options["n_batches"],
+            train_options,
             test_performance_lists,
             train_performance_lists,
             "stocks",

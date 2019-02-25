@@ -18,16 +18,7 @@ from src.pvm import PVM
 
 
 def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals, too-many-branches, too-many-statements
-    window_length,
-    n_episodes,
-    n_batches,
-    batch_size,
-    interactive_session: bool,
-    trade_envs,
-    asset_list,
-    set_step_counts,
-    gpu_device,
-    print_verbose,
+    train_options, trade_envs, asset_list, set_step_counts
 ):
     print("\nStarting to train deep reinforcement learning algorithm...")
 
@@ -59,13 +50,12 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     # initialize networks
     actor = Policy(
         no_of_assets,
-        window_length,
+        train_options,
         sess,
         weights_equal,
         nb_feature_map,
         trading_cost=TRADING_COST,
         interest_rate=INTEREST_RATE,
-        gpu_device=gpu_device,
     )  # policy initialization
 
     # initialize tensorflow graphs
@@ -86,14 +76,15 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         list_final_pf_fu.append(list())
 
     ###### Train #####
-    for n_episode in range(n_episodes):  # pylint: disable= too-many-nested-blocks
+    for n_episode in range(
+        train_options["n_episodes"]
+    ):  # pylint: disable= too-many-nested-blocks
         print("\nStarting reinforcement learning episode", n_episode + 1)
         if n_episode == 0:
             _eval_perf(
-                window_length,
+                train_options,
                 "Before Training",
                 actor,
-                interactive_session,
                 trade_env_args,
                 asset_list,
                 total_steps_train,
@@ -105,12 +96,16 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         # dict_train['w_init_train']
         w_init_train = np.array(np.array([1] + [0] * no_of_assets))
 
-        memory = PVM(total_steps_train, batch_size, w_init_train)
+        memory = PVM(total_steps_train, train_options["batch_size"], w_init_train)
 
-        for idx in range(n_batches):
+        for idx in range(train_options["n_batches"]):
 
-            if print_verbose:
-                print("\nTraining batch: {}/{}".format(idx + 1, n_batches))
+            if train_options["verbose"]:
+                print(
+                    "\nTraining batch: {}/{}".format(
+                        idx + 1, train_options["n_batches"]
+                    )
+                )
 
             # draw the starting point of the batch
             i_start = memory.draw()
@@ -143,7 +138,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             for i in range(no_of_assets):
                 list_pf_value_previous_fu.append(list())
 
-            for batch_item in range(batch_size):
+            for batch_item in range(train_options["batch_size"]):
 
                 # load the different inputs from the previous loaded state
                 x_t = state[0].reshape([-1] + list(state[0].shape))
@@ -195,19 +190,19 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 for i in range(no_of_assets):
                     list_pf_value_previous_fu[i].append(pf_value_t_fu[i])
 
-                if batch_item == batch_size - 1:
+                if batch_item == train_options["batch_size"] - 1:
                     list_final_pf.append(pf_value_t)
                     list_final_pf_eq.append(pf_value_t_eq)
                     list_final_pf_s.append(pf_value_t_s)
                     for i in range(no_of_assets):
                         list_final_pf_fu[i].append(pf_value_t_fu[i])
 
-                    if print_verbose:
+                    if train_options["verbose"]:
                         if batch_item == 0:
                             print("start", i_start)
                             print("PF_start", round(pf_value_previous, 0))
 
-                        if batch_item == batch_size - 1:
+                        if batch_item == train_options["batch_size"] - 1:
                             print("Ptf value: ", round(pf_value_t, 0))
                             print("Ptf weights: ", w_t)
 
@@ -221,10 +216,9 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 list_x_t, list_w_previous, list_pf_value_previous, list_daily_return_t
             )
         _eval_perf(
-            window_length,
+            train_options,
             n_episode,
             actor,
-            interactive_session,
             trade_env_args,
             asset_list,
             total_steps_train,
@@ -250,10 +244,9 @@ def _get_random_action(no_of_assets):
 
 
 def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
-    window_length,
+    train_options,
     n_episode,
     actor,
-    render_plots,
     trade_env_args,
     asset_list,
     total_steps_train,
@@ -290,7 +283,9 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     for _ in tqdm(
         range(
             total_steps_train,
-            total_steps_train + total_steps_val - int(window_length / 2),
+            total_steps_train
+            + total_steps_val
+            - int(train_options["window_length"] / 2),
         )
     ):
         x_t = state_eval[0].reshape([-1] + list(state_eval[0].shape))
@@ -325,7 +320,7 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     print("End of test weights:", w_list_eval[-1])
     print("\n")
 
-    if render_plots:
+    if train_options["interactive_session"]:
         plt.title("Portfolio evolution (validation set) episode {}".format(n_episode))
         plt.plot(p_list_eval, label="Agent Portfolio Value")
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
@@ -340,7 +335,7 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     names = ["Money"] + asset_list
     w_list_eval = np.array(w_list_eval)
 
-    if render_plots:
+    if train_options["interactive_session"]:
         for j in range(no_of_assets + 1):
             plt.plot(w_list_eval[:, j], label="Weight Stock {}".format(names[j]))
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
