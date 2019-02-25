@@ -34,11 +34,11 @@ RATIO_VAL = 0.2
 
 
 # not imported
-N_EPISODES = 2
+# N_EPISODES = 2
 
-N_BATCHES = 10
-# Size of mini-batch during training
-BATCH_SIZE = 50
+# N_BATCHES = 10
+# # Size of mini-batch during training
+# BATCH_SIZE = 50
 
-# The L2 regularization coefficient applied to network training
-REGULARIZATION = 1e-8  # not used ATM
+# # The L2 regularization coefficient applied to network training
+# REGULARIZATION = 1e-8  # not used ATM
