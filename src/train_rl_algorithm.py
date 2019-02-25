@@ -8,7 +8,6 @@ from src.params import (  # pylint: disable=ungrouped-imports
     TRADING_COST,
     INTEREST_RATE,
     RATIO_GREEDY,
-    PF_INIT_TEST,
 )
 
 from src.policy import Policy
@@ -273,10 +272,12 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     w_init_test = np.array(np.array([1] + [0] * no_of_assets))
 
     # initialization of the environment
-    state_eval, _ = env_eval.reset(w_init_test, PF_INIT_TEST, index=total_steps_train)
+    state_eval, _ = env_eval.reset(
+        w_init_test, train_options["portfolio_value"], index=total_steps_train
+    )
 
     # first element of the weight and portfolio value
-    p_list_eval = [PF_INIT_TEST]
+    p_list_eval = [train_options["portfolio_value"]]
     w_list_eval = [w_init_test]
 
     for _ in tqdm(

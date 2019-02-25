@@ -1,7 +1,5 @@
 import numpy as np
 
-from src.params import PF_INIT_TEST
-
 
 def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     train_options, actor, state_fu, done_fu, trade_envs, set_step_counts
@@ -27,31 +25,31 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
     # initialization of the environment
     state, _ = env_policy_network.reset(
-        w_init_test, PF_INIT_TEST, index=total_steps_train
+        w_init_test, train_options["portfolio_value"], index=total_steps_train
     )
 
     state_eq, _ = env_equal_weighted.reset(
-        weights_equal, PF_INIT_TEST, index=total_steps_train
+        weights_equal, train_options["portfolio_value"], index=total_steps_train
     )
     state_s, _ = env_only_cash.reset(
-        weights_single, PF_INIT_TEST, index=total_steps_train
+        weights_single, train_options["portfolio_value"], index=total_steps_train
     )
 
     for i in range(no_of_assets):
         state_fu[i], done_fu[i] = env_full_on_one_stocks[i].reset(
-            action_fu[i], PF_INIT_TEST, index=total_steps_train
+            action_fu[i], train_options["portfolio_value"], index=total_steps_train
         )
 
     # first element of the weight and portfolio value
-    p_list = [PF_INIT_TEST]
+    p_list = [train_options["portfolio_value"]]
     w_list = [w_init_test]
 
-    p_list_eq = [PF_INIT_TEST]
-    p_list_s = [PF_INIT_TEST]
+    p_list_eq = [train_options["portfolio_value"]]
+    p_list_s = [train_options["portfolio_value"]]
 
     p_list_fu = list()
     for i in range(no_of_assets):
-        p_list_fu.append([PF_INIT_TEST])
+        p_list_fu.append([train_options["portfolio_value"]])
 
     pf_value_t_fu = [0] * no_of_assets
 

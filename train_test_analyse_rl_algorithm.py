@@ -238,6 +238,8 @@ if __name__ == "__main__":
         print("\nVerbose session. Alot of vectors will be printed below.\n")
 
     if ARGS.test_mode:
+
+        print("\nStarting rapid test run...")
         main(
             interactive_session=False,
             crypto_data=False,
@@ -248,7 +250,7 @@ if __name__ == "__main__":
             plot_results=False,
             n_episodes=1,
             n_batches=1,
-            window_length=400,
+            window_length=500,
             batch_size=50,
             portfolio_value=10000,
         )
