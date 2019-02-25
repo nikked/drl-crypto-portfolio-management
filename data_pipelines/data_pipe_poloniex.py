@@ -23,21 +23,17 @@ from pprint import pprint
 import pandas as pd
 import numpy as np
 
+DATA_DIR = "/data/poloniex_data/"
+
 
 def main(no_of_cryptos=5, max_count_of_periods=10000, save=False):
-    data_dir = "/data/poloniex_data/"
-    directory = os.getcwd() + data_dir  # path to the files
+    directory = os.getcwd() + DATA_DIR  # path to the files
     files_tags = os.listdir(directory)  # these are the differents pdf files
 
     # this is here because hidden files are also shown in the list.
     for file in files_tags:
         if file[0] == "." or file == "f":
             files_tags.remove(file)
-
-    crypto_names = [file.split(".")[0] for file in files_tags]
-    cryptos = [file for file in files_tags]
-    # print("There are {} different currencies.".format(len(crypto_names)))
-    # pprint(crypto_names)
 
     # We want roughly 1 year of data. So, we drop the data with less than
     # 17000 rows.
@@ -60,22 +56,38 @@ def main(no_of_cryptos=5, max_count_of_periods=10000, save=False):
     len_cryptos = list()
 
     for idx, kept_crypto in enumerate(kept_cryptos):
-        crypto_df = pd.read_csv("." + data_dir + kept_crypto)
+        crypto_df = pd.read_csv("." + DATA_DIR + kept_crypto)
         len_cryptos.append(len(crypto_df))
 
     min_len = np.min(len_cryptos)
 
+    crypto_tensor = _make_crypto_tensor(
+        kept_cryptos, no_of_cryptos, min_len, max_count_of_periods
+    )
+
+    if save:
+        np.save("./data/np_data/inputCrypto.npy", crypto_tensor)
+
+    print("Returning dataset")
+    print(asset_list)
+    pprint(crypto_tensor.shape)
+    print()
+
+    return crypto_tensor, asset_list
+
+
+def _make_crypto_tensor(kept_cryptos, no_of_cryptos, min_len, max_count_of_periods):
     list_open = list()
     list_close = list()
     list_high = list()
     list_low = list()
 
-    for crypto in kept_cryptos:
+    for idx, crypto in enumerate(kept_cryptos):
 
         if idx >= no_of_cryptos:
             break
 
-        data = pd.read_csv(os.getcwd() + data_dir + crypto).fillna("bfill").copy()
+        data = pd.read_csv(os.getcwd() + DATA_DIR + crypto).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
         data = data.tail(min_len)
         list_open.append(data.open.values[:max_count_of_periods])
@@ -102,15 +114,7 @@ def main(no_of_cryptos=5, max_count_of_periods=10000, save=False):
         axes=(0, 2, 1),
     )
 
-    if save:
-        np.save("./data/np_data/inputCrypto.npy", crypto_tensor)
-
-    print("Returning dataset")
-    print(asset_list)
-    pprint(crypto_tensor.shape)
-    print()
-
-    return crypto_tensor, asset_list
+    return crypto_tensor
 
 
 if __name__ == "__main__":
