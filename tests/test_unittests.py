@@ -6,7 +6,7 @@ import train_test_analyse_rl_algorithm
 class TestTrainTestAnalyse(unittest.TestCase):
     def setUp(self):
         self.cli_options = {
-            "crypto_data": False,
+            "stock_data": False,
             "gpu_device": None,
             "interactive_session": False,
             "max_no_of_training_periods": 1000,
@@ -20,18 +20,15 @@ class TestTrainTestAnalyse(unittest.TestCase):
             "portfolio_value": 10000,
         }
 
-    def test_stock_train_completes_fully(self):
-
+    def test_crypto_train_completes_fully(self):
         train_test_analyse_rl_algorithm.main(**self.cli_options)
-
         self.assertEqual(True, True)
 
-    def test_crypto_train_completes_fully(self):
+    def test_stock_train_completes_fully(self):
+        stock_options = self.cli_options
+        stock_options["stock_data"] = True
 
-        crypto_options = self.cli_options
-        crypto_options["crypto_data"] = True
-
-        train_test_analyse_rl_algorithm.main(**crypto_options)
+        train_test_analyse_rl_algorithm.main(**stock_options)
 
         self.assertEqual(True, True)
 

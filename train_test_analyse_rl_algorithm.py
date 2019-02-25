@@ -71,15 +71,15 @@ def main(**train_configs):
 
 def _initialize_trade_envs(train_configs):
 
-    if train_configs["crypto_data"]:
-        dataset, asset_names = data_pipe_poloniex.main(
-            no_of_cryptos=train_configs["no_of_assets"],
+    if train_configs["stock_data"]:
+        dataset, asset_names = data_pipe.main(
+            no_of_stocks=train_configs["no_of_assets"],
             max_count_of_periods=train_configs["max_no_of_training_periods"],
         )
 
     else:
-        dataset, asset_names = data_pipe.main(
-            no_of_stocks=train_configs["no_of_assets"],
+        dataset, asset_names = data_pipe_poloniex.main(
+            no_of_cryptos=train_configs["no_of_assets"],
             max_count_of_periods=train_configs["max_no_of_training_periods"],
         )
 
@@ -178,8 +178,8 @@ if __name__ == "__main__":
     )
 
     PARSER.add_argument(
-        "-c",
-        "--crypto_data",
+        "-sd",
+        "--stock_data",
         action="store_true",
         help="Use cryptocurrency data",
         default=False,
@@ -250,7 +250,7 @@ if __name__ == "__main__":
         print("\nStarting rapid test run...")
         main(
             interactive_session=False,
-            crypto_data=True,
+            stock_data=False,
             gpu_device=None,
             verbose=False,
             no_of_assets=2,
@@ -266,7 +266,7 @@ if __name__ == "__main__":
     else:
         main(
             interactive_session=ARGS.interactive_session,
-            crypto_data=ARGS.crypto_data,
+            stock_data=ARGS.stock_data,
             gpu_device=ARGS.gpu_device,
             verbose=ARGS.verbose,
             no_of_assets=ARGS.no_of_assets,
