@@ -232,7 +232,13 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             no_of_assets,
         )
 
-    return actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s
+    train_performance_lists = {
+        "policy_network": list_final_pf,
+        "equal_weighted": list_final_pf_eq,
+        "single_asset": list_final_pf,
+    }
+
+    return actor, state_fu, done_fu, train_performance_lists
 
 
 # random action function

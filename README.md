@@ -42,3 +42,5 @@ Since this is my first work related to deep reinforcement learning, I was strong
 ## TODO
 * write docstrings to each function and refactor further
 * improve requirements.txt : decide an specific env that the code is ran on
+* add tensorboard
+* add support for cryptos

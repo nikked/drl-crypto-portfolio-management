@@ -15,17 +15,21 @@ from src.params import (
 def plot_training_results(  # pylint: disable= too-many-arguments, too-many-locals
     window_length,
     n_batches,
-    p_list,
-    p_list_eq,
-    p_list_s,
-    p_list_fu,
-    w_list,
-    list_final_pf,
-    list_final_pf_eq,
-    list_final_pf_s,
+    test_performance_lists,
+    train_performance_lists,
     input_data_type,
     asset_list,
 ):
+
+    p_list = (test_performance_lists["p_list"],)
+    p_list_eq = (test_performance_lists["p_list_eq"],)
+    p_list_s = (test_performance_lists["p_list_s"],)
+    p_list_fu = (test_performance_lists["p_list_fu"],)
+    w_list = (test_performance_lists["w_list"],)
+
+    policy_network = train_performance_lists["policy_network"]
+    equal_weighted = train_performance_lists["equal_weighted"]
+    single_asset = train_performance_lists["single_asset"]
 
     no_of_asset = len(asset_list)
 
@@ -65,10 +69,10 @@ def plot_training_results(  # pylint: disable= too-many-arguments, too-many-loca
     index1 = 0
     index2 = -1
 
-    plt.plot(list_final_pf[index1:index2], label="Agent Portfolio Value")
-    plt.plot(list_final_pf_eq[index1:index2], label="Baseline Portfolio Value")
-    plt.plot(list_final_pf_s[index1:index2], label="Secured Portfolio Value")
+    plt.plot(policy_network[index1:index2], label="Agent Portfolio Value")
+    plt.plot(equal_weighted[index1:index2], label="Baseline Portfolio Value")
+    plt.plot(single_asset[index1:index2], label="Secured Portfolio Value")
     plt.legend()
     plt.show()
 
-    plt.plot((np.array(list_final_pf) - np.array(list_final_pf_eq)))
+    plt.plot((np.array(policy_network) - np.array(equal_weighted)))

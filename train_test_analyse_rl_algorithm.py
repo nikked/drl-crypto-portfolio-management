@@ -48,7 +48,7 @@ def main(**cli_options):  # pylint: disable=too-many-locals
     )
 
     # Agent training
-    actor, state_fu, done_fu, list_final_pf, list_final_pf_eq, list_final_pf_s = train_rl_algorithm(
+    actor, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
         cli_options["window_length"],
         cli_options["n_episodes"],
         cli_options["n_batches"],
@@ -62,7 +62,7 @@ def main(**cli_options):  # pylint: disable=too-many-locals
     )
 
     # Agent evaluation
-    p_list, p_list_eq, p_list_fu, p_list_s, w_list = test_rl_algorithm(
+    test_performance_lists = test_rl_algorithm(
         cli_options["window_length"], actor, state_fu, done_fu, trade_envs, step_counts
     )
 
@@ -76,14 +76,8 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         plot_training_results(
             cli_options["window_length"],
             cli_options["n_batches"],
-            p_list,
-            p_list_eq,
-            p_list_s,
-            p_list_fu,
-            w_list,
-            list_final_pf,
-            list_final_pf_eq,
-            list_final_pf_s,
+            test_performance_lists,
+            train_performance_lists,
             "stocks",
             asset_list,
         )
