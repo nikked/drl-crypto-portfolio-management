@@ -213,14 +213,14 @@ if __name__ == "__main__":
         default=2,
     )
     PARSER.add_argument(
-        "-wl", "--window_length", type=int, help="Choose window length", default=10
+        "-wl", "--window_length", type=int, help="Choose window length", default=40
     )
     PARSER.add_argument(
         "-tp",
         "--max_no_of_training_periods",
         type=int,
         help="Set upper limit for training periods",
-        default=10000,
+        default=1000,
     )
     PARSER.add_argument(
         "-pv",

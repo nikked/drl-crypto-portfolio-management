@@ -35,48 +35,38 @@ def main(no_of_cryptos=5, max_count_of_periods=10000, save=False):
         if file[0] == "." or file == "f":
             files_tags.remove(file)
 
-    # We want roughly 1 year of data. So, we drop the data with less than
-    # 17000 rows.
+    cryptos_dict = {
+        "ETC": "ETCBTC.csv",
+        "ETH": "ETHBTC.csv",
+        "DOGE": "DOGEBTC.csv",
+        "XRP": "XRPBTC.csv",
+        "DASH": "DASHBTC.csv",
+        "XMR": "XMRBTC.csv",
+        "LTC": "LTCBTC.csv",
+    }
+    chosen_cryptos = ["ETH", "XMR", "XRP", "LTC", "DASH", "DOGE", "ETC"][:no_of_cryptos]
 
-    kept_cryptos = [
-        "ETCBTC.csv",
-        "ETHBTC.csv",
-        "DOGEBTC.csv",
-        # "ETHUSDT.csv",
-        # "BTCUSDT.csv",
-        "XRPBTC.csv",
-        "DASHBTC.csv",
-        "XMRBTC.csv",
-        "LTCBTC.csv",
-        # "ETCETH.csv",
-    ][:no_of_cryptos]
+    chosen_crypto_fps = []
 
-    asset_list = ["ETC", "ETH", "DOGE", "XRP", "DASH", "XMR", "LTC"][:no_of_cryptos]
-
-    len_cryptos = list()
-
-    for idx, kept_crypto in enumerate(kept_cryptos):
-        crypto_df = pd.read_csv("." + DATA_DIR + kept_crypto)
-        len_cryptos.append(len(crypto_df))
-
-    min_len = np.min(len_cryptos)
+    for crypto in chosen_cryptos:
+        chosen_crypto_fps.append(cryptos_dict[crypto])
 
     crypto_tensor = _make_crypto_tensor(
-        kept_cryptos, no_of_cryptos, min_len, max_count_of_periods
+        chosen_crypto_fps, no_of_cryptos, max_count_of_periods
     )
 
     if save:
         np.save("./data/np_data/inputCrypto.npy", crypto_tensor)
 
     print("Returning dataset")
-    print(asset_list)
+    print(chosen_cryptos)
     pprint(crypto_tensor.shape)
     print()
 
-    return crypto_tensor, asset_list
+    return crypto_tensor, chosen_cryptos
 
 
-def _make_crypto_tensor(kept_cryptos, no_of_cryptos, min_len, max_count_of_periods):
+def _make_crypto_tensor(kept_cryptos, no_of_cryptos, max_count_of_periods):
     list_open = list()
     list_close = list()
     list_high = list()
@@ -89,7 +79,6 @@ def _make_crypto_tensor(kept_cryptos, no_of_cryptos, min_len, max_count_of_perio
 
         data = pd.read_csv(os.getcwd() + DATA_DIR + crypto).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
-        data = data.tail(min_len)
         list_open.append(data.open.values[:max_count_of_periods])
         list_close.append(data.close.values[:max_count_of_periods])
         list_high.append(data.high.values[:max_count_of_periods])
