@@ -97,4 +97,12 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         if k == total_steps_train + total_steps_val - int(window_length / 2) + 100:
             break
 
-    return p_list, p_list_eq, p_list_fu, p_list_s, w_list
+    test_performance_lists = {
+        "p_list": p_list,
+        "p_list_eq": p_list_eq,
+        "p_list_fu": p_list_fu,
+        "p_list_s": p_list_s,
+        "w_list": w_list,
+    }
+
+    return test_performance_lists

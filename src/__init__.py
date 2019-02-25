@@ -21,11 +21,11 @@ def plot_training_results(  # pylint: disable= too-many-arguments, too-many-loca
     asset_list,
 ):
 
-    p_list = (test_performance_lists["p_list"],)
-    p_list_eq = (test_performance_lists["p_list_eq"],)
-    p_list_s = (test_performance_lists["p_list_s"],)
-    p_list_fu = (test_performance_lists["p_list_fu"],)
-    w_list = (test_performance_lists["w_list"],)
+    p_list = test_performance_lists["p_list"]
+    p_list_eq = test_performance_lists["p_list_eq"]
+    p_list_s = test_performance_lists["p_list_s"]
+    p_list_fu = test_performance_lists["p_list_fu"]
+    w_list = test_performance_lists["w_list"]
 
     policy_network = train_performance_lists["policy_network"]
     equal_weighted = train_performance_lists["equal_weighted"]

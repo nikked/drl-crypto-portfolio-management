@@ -32,7 +32,7 @@ DEFAULT_TRADE_ENV_ARGS = {
 }
 
 
-def main(**cli_options):  # pylint: disable=too-many-locals
+def main(**cli_options):
 
     print("\nStarting training process with the following options:")
     pprint(cli_options)
