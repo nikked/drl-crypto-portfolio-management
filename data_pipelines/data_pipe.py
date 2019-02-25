@@ -17,8 +17,7 @@ The shape corresponds to:
 """
 
 import os
-
-from tqdm import tqdm
+from pprint import pprint
 
 import numpy as np
 import pandas as pd
@@ -28,13 +27,13 @@ DATA_DIR = "/data/individual_stocks_5yr/"
 OUT_PATH = "./data/np_data/input.npy"
 
 
-def main(count_of_stocks=5, max_count_of_periods=10000, save=False):
+def main(no_of_stocks=5, max_count_of_periods=10000, save=False):
 
     all_valid_stocks = _get_valid_stock_filepaths()
 
     chosen_stock_filepaths = []
 
-    for idx in range(count_of_stocks):
+    for idx in range(no_of_stocks):
         stock_index = PREFERRED_STOCK_INDECES[idx]
         chosen_stock_filepaths.append(all_valid_stocks[stock_index])
 
@@ -46,6 +45,11 @@ def main(count_of_stocks=5, max_count_of_periods=10000, save=False):
     if save:
         print("Saving stocks numpy tensor to path: {}".format(OUT_PATH))
         np.save(OUT_PATH, stocks_tensor)
+
+    print("Returning dataset")
+    print(chosen_stock_names)
+    pprint(stocks_tensor.shape)
+    print()
 
     return stocks_tensor, chosen_stock_names
 

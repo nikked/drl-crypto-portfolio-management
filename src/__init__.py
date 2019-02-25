@@ -53,7 +53,7 @@ def plot_training_results(  # pylint: disable= too-many-arguments, too-many-loca
     for j in range(no_of_asset + 1):
         plt.plot(w_list[:, j], label="Weight Stock {}".format(names[j]))
         plt.title("Weight evolution during testing")
-        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.5)
     plt.show()
 
     plt.plot(np.array(p_list) - np.array(p_list_eq))

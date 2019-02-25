@@ -18,7 +18,7 @@ from src.params import (
     WINDOW_LENGTH,
 )
 
-from data_pipelines import data_pipe
+from data_pipelines import data_pipe, data_pipe_poloniex
 
 
 DEFAULT_TRADE_ENV_ARGS = {
@@ -70,10 +70,18 @@ def main(**train_configs):
 
 
 def _initialize_trade_envs(train_configs):
-    dataset, asset_names = data_pipe.main(
-        count_of_stocks=train_configs["no_of_assets"],
-        max_count_of_periods=train_configs["max_no_of_training_periods"],
-    )
+
+    if train_configs["crypto_data"]:
+        dataset, asset_names = data_pipe_poloniex.main(
+            no_of_cryptos=train_configs["no_of_assets"],
+            max_count_of_periods=train_configs["max_no_of_training_periods"],
+        )
+
+    else:
+        dataset, asset_names = data_pipe.main(
+            no_of_stocks=train_configs["no_of_assets"],
+            max_count_of_periods=train_configs["max_no_of_training_periods"],
+        )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
     trade_env_args["data"] = dataset
@@ -246,7 +254,7 @@ if __name__ == "__main__":
             gpu_device=None,
             verbose=False,
             no_of_assets=2,
-            max_no_of_training_periods=10000,
+            max_no_of_training_periods=1258,
             plot_results=False,
             n_episodes=1,
             n_batches=1,
@@ -268,5 +276,5 @@ if __name__ == "__main__":
             n_batches=ARGS.no_of_batches,
             window_length=ARGS.window_length,
             batch_size=ARGS.batch_size,
-            portfolio_value=ARGS.portfolio_value,
+            portfolio_value=ARGS.portfolio_initial_value,
         )

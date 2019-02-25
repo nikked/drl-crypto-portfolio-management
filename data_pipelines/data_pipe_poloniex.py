@@ -10,34 +10,37 @@ The columns correspond to:
 
 We don't need to normalize the data since it's already of ratio of 2 prices closed to one.
 
+    # The shape corresponds to:
+    # - 3: Number of features
+    # - 10: Number of cryptos
+    # - 17030: Number of data points
+
 """
 
 import os
+from pprint import pprint
+
 import pandas as pd
 import numpy as np
 
-from tqdm import tqdm
 
-
-def main():  # pylint: disable=too-many-locals
-    data_dir = "./data/poloniex_data/"
+def main(no_of_cryptos=5, max_count_of_periods=10000, save=False):
+    data_dir = "/data/poloniex_data/"
     directory = os.getcwd() + data_dir  # path to the files
     files_tags = os.listdir(directory)  # these are the differents pdf files
 
     # this is here because hidden files are also shown in the list.
     for file in files_tags:
-        if file[0] == ".":
+        if file[0] == "." or file == "f":
             files_tags.remove(file)
-    crypto_name = [file.split(".")[0] for file in files_tags]
+
+    crypto_names = [file.split(".")[0] for file in files_tags]
     cryptos = [file for file in files_tags]
-    print(len(crypto_name) == len(cryptos))
-    print("There are {} different currencies.".format(len(crypto_name)))
+    # print("There are {} different currencies.".format(len(crypto_names)))
+    # pprint(crypto_names)
 
-    for crypto in cryptos:
-        crypto_df = pd.read_csv("." + data_dir + crypto)
-        print(crypto, len(crypto_df))
-
-    # We want roughly 1 year of data. So, we drop the data with less than 17000 rows.
+    # We want roughly 1 year of data. So, we drop the data with less than
+    # 17000 rows.
 
     kept_cryptos = [
         "ETCBTC.csv",
@@ -50,10 +53,13 @@ def main():  # pylint: disable=too-many-locals
         "XMRBTC.csv",
         "LTCBTC.csv",
         # "ETCETH.csv",
-    ]
+    ][:no_of_cryptos]
+
+    asset_list = ["ETC", "ETH", "DOGE", "XRP", "DASH", "XMR", "LTC"][:no_of_cryptos]
+
     len_cryptos = list()
 
-    for kept_crypto in kept_cryptos:
+    for idx, kept_crypto in enumerate(kept_cryptos):
         crypto_df = pd.read_csv("." + data_dir + kept_crypto)
         len_cryptos.append(len(crypto_df))
 
@@ -64,14 +70,18 @@ def main():  # pylint: disable=too-many-locals
     list_high = list()
     list_low = list()
 
-    for crypto in tqdm(kept_cryptos):
+    for crypto in kept_cryptos:
+
+        if idx >= no_of_cryptos:
+            break
+
         data = pd.read_csv(os.getcwd() + data_dir + crypto).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
         data = data.tail(min_len)
-        list_open.append(data.open.values)
-        list_close.append(data.close.values)
-        list_high.append(data.high.values)
-        list_low.append(data.low.values)
+        list_open.append(data.open.values[:max_count_of_periods])
+        list_close.append(data.close.values[:max_count_of_periods])
+        list_high.append(data.high.values[:max_count_of_periods])
+        list_low.append(data.low.values[:max_count_of_periods])
 
     array_open = np.transpose(np.array(list_open))[:-1]
     array_open_of_the_day = np.transpose(np.array(list_open))[1:]
@@ -92,12 +102,15 @@ def main():  # pylint: disable=too-many-locals
         axes=(0, 2, 1),
     )
 
-    # The shape corresponds to:
-    # - 3: Number of features
-    # - 10: Number of cryptos
-    # - 17030: Number of data points
+    if save:
+        np.save("./data/np_data/inputCrypto.npy", crypto_tensor)
 
-    np.save("./data/np_data/inputCrypto.npy", crypto_tensor)
+    print("Returning dataset")
+    print(asset_list)
+    pprint(crypto_tensor.shape)
+    print()
+
+    return crypto_tensor, asset_list
 
 
 if __name__ == "__main__":
