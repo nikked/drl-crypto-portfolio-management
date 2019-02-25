@@ -55,6 +55,7 @@ def main(**cli_options):  # pylint: disable=too-many-locals
         cli_options["window_length"],
         cli_options["n_episodes"],
         cli_options["n_batches"],
+        cli_options["batch_size"],
         cli_options["interactive_session"],
         trade_envs,
         asset_list,
@@ -219,6 +220,9 @@ if __name__ == "__main__":
         default=10,
     )
     PARSER.add_argument(
+        "-bs", "--batch_size", type=int, help="Select batch size", default=50
+    )
+    PARSER.add_argument(
         "-ne",
         "--no_of_episodes",
         type=int,
@@ -263,6 +267,7 @@ if __name__ == "__main__":
             n_episodes=1,
             n_batches=1,
             window_length=400,
+            batch_size=50,
         )
 
     else:
@@ -277,4 +282,5 @@ if __name__ == "__main__":
             n_episodes=ARGS.no_of_episodes,
             n_batches=ARGS.no_of_batches,
             window_length=ARGS.window_length,
+            batch_size=ARGS.batch_size,
         )

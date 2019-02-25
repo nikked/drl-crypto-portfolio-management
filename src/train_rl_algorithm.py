@@ -9,7 +9,6 @@ from src.params import (  # pylint: disable=ungrouped-imports
     INTEREST_RATE,
     PF_INITIAL_VALUE,
     RATIO_GREEDY,
-    BATCH_SIZE,
     PF_INIT_TEST,
 )
 
@@ -22,6 +21,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     window_length,
     n_episodes,
     n_batches,
+    batch_size,
     interactive_session: bool,
     trade_envs,
     asset_list,
@@ -105,7 +105,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         # dict_train['w_init_train']
         w_init_train = np.array(np.array([1] + [0] * no_of_assets))
 
-        memory = PVM(total_steps_train, BATCH_SIZE, w_init_train)
+        memory = PVM(total_steps_train, batch_size, w_init_train)
 
         for idx in range(n_batches):
 
@@ -143,7 +143,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             for i in range(no_of_assets):
                 list_pf_value_previous_fu.append(list())
 
-            for batch_item in range(BATCH_SIZE):
+            for batch_item in range(batch_size):
 
                 # load the different inputs from the previous loaded state
                 x_t = state[0].reshape([-1] + list(state[0].shape))
@@ -195,7 +195,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 for i in range(no_of_assets):
                     list_pf_value_previous_fu[i].append(pf_value_t_fu[i])
 
-                if batch_item == BATCH_SIZE - 1:
+                if batch_item == batch_size - 1:
                     list_final_pf.append(pf_value_t)
                     list_final_pf_eq.append(pf_value_t_eq)
                     list_final_pf_s.append(pf_value_t_s)
@@ -207,7 +207,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                             print("start", i_start)
                             print("PF_start", round(pf_value_previous, 0))
 
-                        if batch_item == BATCH_SIZE - 1:
+                        if batch_item == batch_size - 1:
                             print("Ptf value: ", round(pf_value_t, 0))
                             print("Ptf weights: ", w_t)
 
