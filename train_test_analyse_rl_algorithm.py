@@ -21,9 +21,6 @@ from src.params import (
 from data_pipelines import data_pipe
 
 
-# CRYPTO_DATA_FP = "./data/np_data/inputCrypto.npy"
-# STOCK_DATA_FP = "./data/np_data/input.npy"
-
 DEFAULT_TRADE_ENV_ARGS = {
     "path": None,
     "window_length": WINDOW_LENGTH,

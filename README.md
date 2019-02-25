@@ -40,10 +40,5 @@ Since this is my first work related to deep reinforcement learning, I was strong
 
 
 ## TODO
-* feature: a small test dataset to run through full pipeline
-    * can be run with unittests to rapidly check scenarios
-* refactor train_test_analyse.py
 * write docstrings to each function and refactor further
-* write a small unit test that is run on a precommit hook
 * improve requirements.txt : decide an specific env that the code is ran on
-* add coverage to git hook
