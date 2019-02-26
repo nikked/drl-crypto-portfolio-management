@@ -1,6 +1,6 @@
 import unittest
 
-import train_test_analyse_rl_algorithm
+import deep_rl_portfolio
 
 
 class TestTrainTestAnalyse(unittest.TestCase):
@@ -21,14 +21,14 @@ class TestTrainTestAnalyse(unittest.TestCase):
         }
 
     def test_crypto_train_completes_fully(self):
-        train_test_analyse_rl_algorithm.main(**self.cli_options)
+        deep_rl_portfolio.main(**self.cli_options)
         self.assertEqual(True, True)
 
     def test_stock_train_completes_fully(self):
         stock_options = self.cli_options
         stock_options["stock_data"] = True
 
-        train_test_analyse_rl_algorithm.main(**stock_options)
+        deep_rl_portfolio.main(**stock_options)
 
         self.assertEqual(True, True)
 
