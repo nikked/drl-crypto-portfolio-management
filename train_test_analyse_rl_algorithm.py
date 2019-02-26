@@ -22,13 +22,11 @@ from data_pipelines import data_pipe, data_pipe_poloniex
 
 
 DEFAULT_TRADE_ENV_ARGS = {
-    "path": None,
     "window_length": WINDOW_LENGTH,
     "portfolio_value": PF_INITIAL_VALUE,
     "trading_cost": TRADING_COST,
     "interest_rate": INTEREST_RATE,
     "train_size": RATIO_TRAIN,
-    "data": None,
 }
 
 
