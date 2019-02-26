@@ -16,14 +16,14 @@ from src.pvm import PVM
 
 
 def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals, too-many-branches, too-many-statements
-    train_options, trade_envs, asset_list, set_step_counts
+    train_options, trade_envs, asset_list, step_counts
 ):
     print("\nStarting to train deep reinforcement learning algorithm...")
 
     no_of_assets = len(asset_list)
 
-    total_steps_train = set_step_counts["train"]
-    total_steps_val = set_step_counts["validation"]
+    total_steps_train = step_counts["train"]
+    total_steps_val = step_counts["validation"]
 
     env_policy_network = trade_envs["policy_network"]
     env_equal_weighted = trade_envs["equal_weighted"]

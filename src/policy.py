@@ -26,10 +26,10 @@ class Policy:  # pylint: disable=too-many-instance-attributes
 
     def __init__(  # pylint: disable=too-many-arguments, too-many-locals, too-many-statements
         self,
-        nb_stocks,
+        no_of_assets,
         train_options,
         sess,
-        w_eq,
+        weights_equal,
         nb_feature_map,
         trading_cost=TRADING_COST,
         interest_rate=INTEREST_RATE,
@@ -43,7 +43,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
         self.n_filter_1 = n_filter_1
         self.n_filter_2 = n_filter_2
         self.window_length = train_options["window_length"]
-        self.nb_stocks = nb_stocks
+        self.no_of_assets = no_of_assets
 
         if train_options["gpu_device"]:
             self.tf_device = "/device:GPU:{}".format(train_options["gpu_device"])
@@ -61,14 +61,18 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                 # tensor of the prices
                 self.x_current = tf.placeholder(
                     tf.float32,
-                    [None, nb_feature_map, self.nb_stocks, self.window_length],
+                    [None, nb_feature_map, self.no_of_assets, self.window_length],
                 )  # The Price tensor
                 # weights at the previous time step
-                self.w_previous = tf.placeholder(tf.float32, [None, self.nb_stocks + 1])
+                self.w_previous = tf.placeholder(
+                    tf.float32, [None, self.no_of_assets + 1]
+                )
                 # portfolio value at the previous time step
                 self.pf_value_previous = tf.placeholder(tf.float32, [None, 1])
                 # vector of Open(t+1)/Open(t)
-                self.daily_return_t = tf.placeholder(tf.float32, [None, self.nb_stocks])
+                self.daily_return_t = tf.placeholder(
+                    tf.float32, [None, self.no_of_assets]
+                )
 
                 # self.pf_value_previous_eq = tf.placeholder(tf.float32, [None, 1])
 
@@ -164,8 +168,10 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                     cost = tf.expand_dims(cost, 1)
 
                     zero = tf.constant(
-                        np.array([0.0] * self.nb_stocks).reshape(1, self.nb_stocks),
-                        shape=[1, self.nb_stocks],
+                        np.array([0.0] * self.no_of_assets).reshape(
+                            1, self.no_of_assets
+                        ),
+                        shape=[1, self.no_of_assets],
                         dtype=tf.float32,
                     )
 
@@ -189,7 +195,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
                     )
                     y_t = tf.concat([cash_return, self.daily_return_t], axis=1)
 
-                    v_eq = w_eq * self.pf_value_previous
+                    v_eq = weights_equal * self.pf_value_previous
                     v_eq_second = tf.multiply(v_eq, y_t)
 
                     self.portfolio_value_eq = tf.norm(v_eq_second, ord=1)
