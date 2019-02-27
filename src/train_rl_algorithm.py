@@ -66,6 +66,8 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
             train_test_split["train"], train_options["batch_size"], w_init_train
         )
 
+        env_states = None
+
         for idx in range(train_options["n_batches"]):
 
             if train_options["verbose"]:
@@ -74,86 +76,16 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
                         idx + 1, train_options["n_batches"]
                     )
                 )
-
-            # draw the starting point of the batch
-            i_start = memory.draw()
-
-            env_states = _get_env_states(
-                train_options, trade_envs, memory, i_start, benchmark_weights
+            env_states = _train_batch(
+                actor,
+                single_asset_pf_values_t,
+                train_performance_lists,
+                train_options,
+                memory,
+                trade_envs,
+                benchmark_weights,
             )
 
-            train_session_tracker = _initialize_train_session_tracker(no_of_assets)
-
-            for batch_item in range(train_options["batch_size"]):
-                pf_value_previous = env_states["policy_network"]["state"][2]
-
-                x_t, w_previous = _take_train_step(
-                    actor, env_states, no_of_assets, trade_envs, benchmark_weights
-                )
-
-                # new_state["x_next"], new_state["w_t"], pf_value_t,
-                # new_state["pf_value_t_eq"], new_state['pf_value_t_s'] =
-                # _update_state(
-                new_state = _update_state(
-                    env_states, single_asset_pf_values_t, no_of_assets
-                )
-
-                # let us compute the returns
-                daily_return_t = new_state["x_next"][-1, :, -1]
-
-                # update into the PVM
-                memory.update(i_start + batch_item, new_state["w_t"])
-
-                _update_train_session_tracker(
-                    env_states,
-                    train_session_tracker,
-                    no_of_assets,
-                    x_t,
-                    w_previous,
-                    pf_value_previous,
-                    daily_return_t,
-                    new_state["pf_value_t_eq"],
-                    new_state["pf_value_t_s"],
-                    single_asset_pf_values_t,
-                )
-
-                if batch_item == train_options["batch_size"] - 1:
-                    _handle_after_last_item_of_batch(
-                        train_performance_lists,
-                        new_state,
-                        no_of_assets,
-                        single_asset_pf_values_t,
-                    )
-
-                    if train_options["verbose"]:
-                        if batch_item == 1:
-                            print("start", i_start)
-                            print("PF_start", round(pf_value_previous, 0))
-
-                        if batch_item == train_options["batch_size"] - 1:
-                            print("Ptf value: ", round(new_state["pf_value_t"], 0))
-                            print("Ptf weights: ", new_state["w_t"])
-
-            train_session_tracker["policy_x_t"] = np.array(
-                train_session_tracker["policy_x_t"]
-            )
-            train_session_tracker["policy_prev_weights"] = np.array(
-                train_session_tracker["policy_prev_weights"]
-            )
-            train_session_tracker["policy_prev_value"] = np.array(
-                train_session_tracker["policy_prev_value"]
-            )
-            train_session_tracker["policy_daily_return_t"] = np.array(
-                train_session_tracker["policy_daily_return_t"]
-            )
-
-            # for each batch, train the network to maximize the reward
-            actor.train(
-                train_session_tracker["policy_x_t"],
-                train_session_tracker["policy_prev_weights"],
-                train_session_tracker["policy_prev_value"],
-                train_session_tracker["policy_daily_return_t"],
-            )
         _eval_perf(
             train_options,
             n_episode,
@@ -170,6 +102,83 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
         env_states["single_assets_done"],
         train_performance_lists,
     )
+
+
+def _train_batch(
+    actor,
+    single_asset_pf_values_t,
+    train_performance_lists,
+    train_options,
+    memory,
+    trade_envs,
+    benchmark_weights,
+):
+
+    no_of_assets = train_options["no_of_assets"]
+
+    # draw the starting point of the batch
+    i_start = memory.draw()
+
+    env_states = _reset_memory_states(
+        train_options, trade_envs, memory, i_start, benchmark_weights
+    )
+
+    train_session_tracker = _initialize_train_session_tracker(no_of_assets)
+
+    for batch_item in range(train_options["batch_size"]):
+        pf_value_previous = env_states["policy_network"]["state"][2]
+
+        x_t, w_previous = _take_train_step(
+            actor, env_states, no_of_assets, trade_envs, benchmark_weights
+        )
+
+        new_state = _update_state(env_states, single_asset_pf_values_t, no_of_assets)
+
+        # let us compute the returns
+        daily_return_t = new_state["x_next"][-1, :, -1]
+
+        # update into the PVM
+        memory.update(i_start + batch_item, new_state["w_t"])
+
+        _update_train_session_tracker(
+            env_states,
+            train_session_tracker,
+            no_of_assets,
+            x_t,
+            w_previous,
+            pf_value_previous,
+            daily_return_t,
+            new_state["pf_value_t_eq"],
+            new_state["pf_value_t_s"],
+            single_asset_pf_values_t,
+        )
+
+        if batch_item == train_options["batch_size"] - 1:
+            _handle_after_last_item_of_batch(
+                train_performance_lists,
+                new_state,
+                no_of_assets,
+                single_asset_pf_values_t,
+            )
+
+            if train_options["verbose"]:
+                if batch_item == 1:
+                    print("start", i_start)
+                    print("PF_start", round(pf_value_previous, 0))
+
+                if batch_item == train_options["batch_size"] - 1:
+                    print("Ptf value: ", round(new_state["pf_value_t"], 0))
+                    print("Ptf weights: ", new_state["w_t"])
+
+    # for each batch, train the network to maximize the reward
+    actor.train(
+        np.array(train_session_tracker["policy_x_t"]),
+        np.array(train_session_tracker["policy_prev_weights"]),
+        np.array(train_session_tracker["policy_prev_value"]),
+        np.array(train_session_tracker["policy_daily_return_t"]),
+    )
+
+    return env_states
 
 
 def _update_state(env_states, single_asset_pf_values_t, no_of_assets):
@@ -244,9 +253,6 @@ def _initialize_train_session_tracker(no_of_assets):
     return train_session_tracker
 
 
-# def _print_batch_results():
-
-
 def _handle_after_last_item_of_batch(
     train_performance_lists, new_state, no_of_assets, single_asset_pf_values_t
 ):
@@ -273,7 +279,7 @@ def _initialize_benchmark_weights(no_of_assets):
     return benchmark_weights
 
 
-def _get_env_states(train_options, trade_envs, memory, i_start, benchmark_weights):
+def _reset_memory_states(train_options, trade_envs, memory, i_start, benchmark_weights):
     # reset the environment with the weight from PVM at the starting point
     # reset also with a portfolio value with initial portfolio value
     state, policy_done = trade_envs["policy_network"].reset(
