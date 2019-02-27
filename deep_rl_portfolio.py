@@ -2,8 +2,6 @@ import time
 import argparse
 from pprint import pprint
 
-import numpy as np
-
 from src.train_rl_algorithm import train_rl_algorithm
 from src.test_rl_algorithm import test_rl_algorithm
 from src import plot_training_results
@@ -225,7 +223,14 @@ if __name__ == "__main__":
         action="store_true",
     )
     PARSER.add_argument(
-        "-t", "--test_mode", help="Quick testrun", default=False, action="store_true"
+        "-t", "--test_mode", help="Proper testrun", default=False, action="store_true"
+    )
+    PARSER.add_argument(
+        "-qt",
+        "--quick_test_mode",
+        help="Quick testrun",
+        default=False,
+        action="store_true",
     )
 
     ARGS = PARSER.parse_args()
@@ -233,9 +238,27 @@ if __name__ == "__main__":
     if ARGS.verbose:
         print("\nVerbose session. Alot of vectors will be printed below.\n")
 
-    if ARGS.test_mode:
+    if ARGS.quick_test_mode:
 
         print("\nStarting rapid test run...")
+        main(
+            interactive_session=False,
+            stock_data=False,
+            gpu_device=None,
+            verbose=True,
+            no_of_assets=5,
+            max_no_of_training_periods=200,
+            plot_results=False,
+            n_episodes=1,
+            n_batches=1,
+            window_length=77,
+            batch_size=1,
+            portfolio_value=10000,
+        )
+
+    elif ARGS.test_mode:
+
+        print("\nStarting proper test run...")
         main(
             interactive_session=False,
             stock_data=False,
