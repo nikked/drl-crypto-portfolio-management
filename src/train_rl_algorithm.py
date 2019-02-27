@@ -107,9 +107,11 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 weights_single, train_options["portfolio_value"], index=i_start
             )
 
+            full_on_one_weights = np.eye(no_of_assets + 1, dtype=int)
+
             for i in range(no_of_assets):
                 state_fu[i], done_fu[i] = trade_envs["full_on_one_stocks"][i].reset(
-                    trade_envs["action_fu"][i],
+                    full_on_one_weights[i + 1, :],
                     train_options["portfolio_value"],
                     index=i_start,
                 )
@@ -237,9 +239,10 @@ def _train_batch_item(
     trade_envs["equal_weighted"].step(weights_equal)
     trade_envs["only_cash"].step(weights_single)
 
+    full_on_one_weights = np.eye(no_of_assets + 1, dtype=int)
     for i in range(no_of_assets):
         state_fu[i], _, done_fu[i] = trade_envs["full_on_one_stocks"][i].step(
-            trade_envs["action_fu"][i]
+            full_on_one_weights[i + 1, :]
         )
 
     return x_t, w_previous

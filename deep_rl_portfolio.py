@@ -115,23 +115,13 @@ def _get_train_environments(no_of_assets, trade_env_args):
 
     # full on one stock environment
     # these environments are set up for agents who play only on one stock
-    action_fu = list()
-    env_fu = list()
-
-    for i in range(no_of_assets):
-        action = np.array([0] * (i + 1) + [1] + [0] * (no_of_assets - (i + 1)))
-        action_fu.append(action)
-
-        env_fu_i = TradeEnv(**trade_env_args)
-
-        env_fu.append(env_fu_i)
+    env_fu = [TradeEnv(**trade_env_args) for asset in range(no_of_assets)]
 
     trade_envs = {
         "policy_network": env,
         "equal_weighted": env_eq,
         "only_cash": env_s,
         "full_on_one_stocks": env_fu,
-        "action_fu": action_fu,
         "args": trade_env_args,
     }
 
@@ -251,7 +241,7 @@ if __name__ == "__main__":
             stock_data=False,
             gpu_device=None,
             verbose=False,
-            no_of_assets=2,
+            no_of_assets=4,
             max_no_of_training_periods=200,
             plot_results=False,
             n_episodes=1,

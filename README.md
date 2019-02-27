@@ -30,15 +30,6 @@ Please run:
 This ensures that certain test procedures are ran before a commit is allowed
 
 
-## Credits
-
-Since this is my first work related to deep reinforcement learning, I was strongly inspired by work previously done by other authors. I would like to thank the following entities for making there code publicly available:
-
-* [The original authors of article "A Deep Reinforcement Learning Framework for the Financial Portfolio Management Problem"](https://github.com/ZhengyaoJiang/PGPortfolio)
-* [Mike Clark's further analysis based on the article above](https://github.com/wassname/rl-portfolio-management)
-* [Selim Amrouni's further analysis based on the article above](https://github.com/selimamrouni/Deep-Portfolio-Management-Reinforcement-Learning)
-
-
 ## TODO
 * write docstrings to each function and refactor further
 * improve requirements.txt : decide an specific env that the code is ran on

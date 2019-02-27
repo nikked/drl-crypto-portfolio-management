@@ -16,7 +16,6 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     env_equal_weighted = trade_envs["equal_weighted"]
     env_only_cash = trade_envs["only_cash"]
     env_full_on_one_stocks = trade_envs["full_on_one_stocks"]
-    action_fu = trade_envs["action_fu"]
 
     weights_equal = np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1)))
     weights_single = np.array(np.array([1] + [0.0] * no_of_assets))
@@ -35,9 +34,12 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         weights_single, train_options["portfolio_value"], index=total_steps_train
     )
 
+    full_on_one_weights = np.eye(no_of_assets + 1, dtype=int)
     for i in range(no_of_assets):
         state_fu[i], done_fu[i] = env_full_on_one_stocks[i].reset(
-            action_fu[i], train_options["portfolio_value"], index=total_steps_train
+            full_on_one_weights[i + 1, :],
+            train_options["portfolio_value"],
+            index=total_steps_train,
         )
 
     # first element of the weight and portfolio value
@@ -71,7 +73,9 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         state_s, _, _ = env_only_cash.step(weights_single)
 
         for i in range(no_of_assets):
-            state_fu[i], _, done_fu[i] = env_full_on_one_stocks[i].step(action_fu[i])
+            state_fu[i], _, done_fu[i] = env_full_on_one_stocks[i].step(
+                full_on_one_weights[i + 1, :]
+            )
 
         # x_next = state[0]
         w_current = state[1]
