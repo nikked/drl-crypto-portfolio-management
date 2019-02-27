@@ -25,27 +25,15 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     total_steps_train = step_counts["train"]
     total_steps_val = step_counts["validation"]
 
-    env_policy_network = trade_envs["policy_network"]
-    env_equal_weighted = trade_envs["equal_weighted"]
-    env_only_cash = trade_envs["only_cash"]
-    env_full_on_one_stocks = trade_envs["full_on_one_stocks"]
-    action_fu = trade_envs["action_fu"]
-    trade_env_args = trade_envs["args"]
-
-    nb_feature_map = trade_env_args["data"].shape[0]
-
-    ############# TRAINING #####################
-    ###########################################
+    nb_feature_map = trade_envs["args"]["data"].shape[0]
 
     weights_equal = np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1)))
     weights_single = np.array(np.array([1] + [0.0] * no_of_assets))
 
     tf.reset_default_graph()
 
-    # sess
     sess = tf.Session()
 
-    # initialize networks
     actor = Policy(
         no_of_assets,
         train_options,
@@ -54,9 +42,8 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         nb_feature_map,
         trading_cost=TRADING_COST,
         interest_rate=INTEREST_RATE,
-    )  # policy initialization
+    )
 
-    # initialize tensorflow graphs
     print("\nInitializing tensorflow graphs")
     sess.run(tf.global_variables_initializer())
 
@@ -73,7 +60,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     for i in range(no_of_assets):
         list_final_pf_fu.append(list())
 
-    ###### Train #####
+    # Run training episodes
     for n_episode in range(
         train_options["n_episodes"]
     ):  # pylint: disable= too-many-nested-blocks
@@ -83,7 +70,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 train_options,
                 "Before Training",
                 actor,
-                trade_env_args,
+                trade_envs["args"],
                 asset_list,
                 total_steps_train,
                 total_steps_val,
@@ -110,19 +97,21 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
             # reset the environment with the weight from PVM at the starting point
             # reset also with a portfolio value with initial portfolio value
-            state, _ = env_policy_network.reset(
+            state, _ = trade_envs["policy_network"].reset(
                 memory.get_w(i_start), train_options["portfolio_value"], index=i_start
             )
-            state_eq, _ = env_equal_weighted.reset(
+            state_eq, _ = trade_envs["equal_weighted"].reset(
                 weights_equal, train_options["portfolio_value"], index=i_start
             )
-            state_s, _ = env_only_cash.reset(
+            state_s, _ = trade_envs["only_cash"].reset(
                 weights_single, train_options["portfolio_value"], index=i_start
             )
 
             for i in range(no_of_assets):
-                state_fu[i], done_fu[i] = env_full_on_one_stocks[i].reset(
-                    action_fu[i], train_options["portfolio_value"], index=i_start
+                state_fu[i], done_fu[i] = trade_envs["full_on_one_stocks"][i].reset(
+                    trade_envs["action_fu"][i],
+                    train_options["portfolio_value"],
+                    index=i_start,
                 )
 
             list_x_t, list_w_previous, list_pf_value_previous, list_daily_return_t = (
@@ -137,29 +126,17 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 list_pf_value_previous_fu.append(list())
 
             for batch_item in range(train_options["batch_size"]):
-
-                # load the different inputs from the previous loaded state
-                x_t = state[0].reshape([-1] + list(state[0].shape))
-                w_previous = state[1].reshape([-1] + list(state[1].shape))
                 pf_value_previous = state[2]
-
-                if np.random.rand() < RATIO_GREEDY:
-                    # print('go')
-                    # computation of the action of the agent
-                    action = actor.compute_w(x_t, w_previous)
-                else:
-                    action = _get_random_action(no_of_assets)
-
-                # given the state and the action, call the environment to go one
-                # time step later
-                state, _, _ = env_policy_network.step(action)
-                state_eq, _, _ = env_equal_weighted.step(weights_equal)
-                state_s, _, _ = env_only_cash.step(weights_single)
-
-                for i in range(no_of_assets):
-                    state_fu[i], _, done_fu[i] = env_full_on_one_stocks[i].step(
-                        action_fu[i]
-                    )
+                x_t, w_previous = _train_batch_item(
+                    actor,
+                    state,
+                    no_of_assets,
+                    trade_envs,
+                    weights_equal,
+                    weights_single,
+                    state_fu,
+                    done_fu,
+                )
 
                 # get the new state
                 x_next = state[0]
@@ -217,7 +194,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             train_options,
             n_episode,
             actor,
-            trade_env_args,
+            trade_envs["args"],
             asset_list,
             total_steps_train,
             total_steps_val,
@@ -233,7 +210,39 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     return actor, state_fu, done_fu, train_performance_lists
 
 
-# random action function
+def _train_batch_item(
+    actor,
+    state,
+    no_of_assets,
+    trade_envs,
+    weights_equal,
+    weights_single,
+    state_fu,
+    done_fu,
+):
+    # load the different inputs from the previous loaded state
+    x_t = state[0].reshape([-1] + list(state[0].shape))
+    w_previous = state[1].reshape([-1] + list(state[1].shape))
+
+    if np.random.rand() < RATIO_GREEDY:
+        # print('go')
+        # computation of the action of the agent
+        action = actor.compute_w(x_t, w_previous)
+    else:
+        action = _get_random_action(no_of_assets)
+
+    # given the state and the action, call the environment to go one
+    # time step later
+    trade_envs["policy_network"].step(action)
+    trade_envs["equal_weighted"].step(weights_equal)
+    trade_envs["only_cash"].step(weights_single)
+
+    for i in range(no_of_assets):
+        state_fu[i], _, done_fu[i] = trade_envs["full_on_one_stocks"][i].step(
+            trade_envs["action_fu"][i]
+        )
+
+    return x_t, w_previous
 
 
 def _get_random_action(no_of_assets):
