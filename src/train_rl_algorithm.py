@@ -42,16 +42,14 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     print("\nInitializing tensorflow graphs")
     sess.run(tf.global_variables_initializer())
 
-    list_final_pf = list()
-    list_final_pf_eq = list()
-    list_final_pf_s = list()
-
-    list_final_pf_fu = list()
-
     pf_value_t_fu = [0] * no_of_assets
 
-    for i in range(no_of_assets):
-        list_final_pf_fu.append(list())
+    train_performance_lists = {
+        "policy_network": [],
+        "equal_weighted": [],
+        "only_cash": [],
+        "single_asset": [list() for item in range(no_of_assets)],
+    }
 
     # Run training episodes
     for n_episode in range(
@@ -135,11 +133,13 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                     )
 
                 if batch_item == train_options["batch_size"] - 1:
-                    list_final_pf.append(pf_value_t)
-                    list_final_pf_eq.append(pf_value_t_eq)
-                    list_final_pf_s.append(pf_value_t_s)
+                    train_performance_lists["policy_network"].append(pf_value_t)
+                    train_performance_lists["equal_weighted"].append(pf_value_t_eq)
+                    train_performance_lists["only_cash"].append(pf_value_t_s)
                     for i in range(no_of_assets):
-                        list_final_pf_fu[i].append(pf_value_t_fu[i])
+                        train_performance_lists["single_asset"][i].append(
+                            pf_value_t_fu[i]
+                        )
 
                     if train_options["verbose"]:
                         if batch_item == 0:
@@ -179,12 +179,6 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             train_test_split,
             no_of_assets,
         )
-
-    train_performance_lists = {
-        "policy_network": list_final_pf,
-        "equal_weighted": list_final_pf_eq,
-        "single_asset": list_final_pf,
-    }
 
     return (
         actor,

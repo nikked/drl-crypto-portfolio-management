@@ -21,7 +21,7 @@ def plot_training_results(  # pylint: disable= too-many-arguments, too-many-loca
 
     policy_network = train_performance_lists["policy_network"]
     equal_weighted = train_performance_lists["equal_weighted"]
-    single_asset = train_performance_lists["single_asset"]
+    only_cash = train_performance_lists["only_cash"]
 
     no_of_asset = len(asset_list)
 
@@ -63,7 +63,7 @@ def plot_training_results(  # pylint: disable= too-many-arguments, too-many-loca
 
     plt.plot(policy_network[index1:index2], label="Agent Portfolio Value")
     plt.plot(equal_weighted[index1:index2], label="Baseline Portfolio Value")
-    plt.plot(single_asset[index1:index2], label="Secured Portfolio Value")
+    plt.plot(only_cash[index1:index2], label="Secured Portfolio Value")
     plt.legend()
     plt.show()
 
