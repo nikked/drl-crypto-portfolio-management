@@ -16,14 +16,11 @@ from src.pvm import PVM
 
 
 def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals, too-many-branches, too-many-statements
-    train_options, trade_envs, asset_list, step_counts
+    train_options, trade_envs, asset_list, train_test_split
 ):
     print("\nStarting to train deep reinforcement learning algorithm...")
 
     no_of_assets = len(asset_list)
-
-    total_steps_train = step_counts["train"]
-    total_steps_val = step_counts["validation"]
 
     nb_feature_map = trade_envs["args"]["data"].shape[0]
 
@@ -78,8 +75,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 actor,
                 trade_envs["args"],
                 asset_list,
-                total_steps_train,
-                total_steps_val,
+                train_test_split,
                 no_of_assets,
             )
         # init the PVM with the training parameters
@@ -87,7 +83,9 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         # dict_train['w_init_train']
         w_init_train = np.array(np.array([1] + [0] * no_of_assets))
 
-        memory = PVM(total_steps_train, train_options["batch_size"], w_init_train)
+        memory = PVM(
+            train_test_split["train"], train_options["batch_size"], w_init_train
+        )
 
         for idx in range(train_options["n_batches"]):
 
@@ -184,8 +182,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             actor,
             trade_envs["args"],
             asset_list,
-            total_steps_train,
-            total_steps_val,
+            train_test_split,
             no_of_assets,
         )
 
@@ -284,8 +281,7 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
     actor,
     trade_env_args,
     asset_list,
-    total_steps_train,
-    total_steps_val,
+    train_test_split,
     no_of_assets,
 ):
     """
@@ -310,7 +306,7 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
 
     # initialization of the environment
     state_eval, _ = env_eval.reset(
-        w_init_test, train_options["portfolio_value"], index=total_steps_train
+        w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
     )
 
     # first element of the weight and portfolio value
@@ -319,9 +315,9 @@ def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
 
     for _ in tqdm(
         range(
-            total_steps_train,
-            total_steps_train
-            + total_steps_val
+            train_test_split["train"],
+            train_test_split["train"]
+            + train_test_split["validation"]
             - int(train_options["window_length"] / 2),
         )
     ):
