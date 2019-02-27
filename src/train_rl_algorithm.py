@@ -86,64 +86,53 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
 
             for batch_item in range(train_options["batch_size"]):
                 pf_value_previous = env_states["policy_network"]["state"][2]
+
                 x_t, w_previous = _take_train_step(
                     actor, env_states, no_of_assets, trade_envs, benchmark_weights
                 )
 
-                # get the new state
-                x_next = env_states["policy_network"]["state"][0]
-                w_t = env_states["policy_network"]["state"][1]
-                pf_value_t = env_states["policy_network"]["state"][2]
-
-                pf_value_t_eq = env_states["equal_weighted"]["state"][2]
-                pf_value_t_s = env_states["only_cash"]["state"][2]
-
-                for i in range(no_of_assets):
-                    single_asset_pf_values_t[i] = env_states["single_assets_states"][i][
-                        2
-                    ]
+                # new_state["x_next"], new_state["w_t"], pf_value_t,
+                # new_state["pf_value_t_eq"], new_state['pf_value_t_s'] =
+                # _update_state(
+                new_state = _update_state(
+                    env_states, single_asset_pf_values_t, no_of_assets
+                )
 
                 # let us compute the returns
-                daily_return_t = x_next[-1, :, -1]
+                daily_return_t = new_state["x_next"][-1, :, -1]
 
                 # update into the PVM
-                memory.update(i_start + batch_item, w_t)
+                memory.update(i_start + batch_item, new_state["w_t"])
 
-                # store elements
-                train_session_tracker["policy_x_t"].append(
-                    x_t.reshape(env_states["policy_network"]["state"][0].shape)
+                _update_train_session_tracker(
+                    env_states,
+                    train_session_tracker,
+                    no_of_assets,
+                    x_t,
+                    w_previous,
+                    pf_value_previous,
+                    daily_return_t,
+                    new_state["pf_value_t_eq"],
+                    new_state["pf_value_t_s"],
+                    single_asset_pf_values_t,
                 )
-                train_session_tracker["policy_prev_weights"].append(
-                    w_previous.reshape(env_states["policy_network"]["state"][1].shape)
-                )
-                train_session_tracker["policy_prev_value"].append([pf_value_previous])
-                train_session_tracker["policy_daily_return_t"].append(daily_return_t)
-
-                train_session_tracker["equal_prev_value"].append(pf_value_t_eq)
-                train_session_tracker["cash_prev_value"].append(pf_value_t_s)
-
-                for i in range(no_of_assets):
-                    train_session_tracker["single_asset_prev_values"][i].append(
-                        single_asset_pf_values_t[i]
-                    )
 
                 if batch_item == train_options["batch_size"] - 1:
-                    train_performance_lists["policy_network"].append(pf_value_t)
-                    train_performance_lists["equal_weighted"].append(pf_value_t_eq)
-                    train_performance_lists["only_cash"].append(pf_value_t_s)
-                    for i in range(no_of_assets):
-                        train_performance_lists["single_asset"][i].append(
-                            single_asset_pf_values_t[i]
-                        )
+                    _handle_after_last_item_of_batch(
+                        train_performance_lists,
+                        new_state,
+                        no_of_assets,
+                        single_asset_pf_values_t,
+                    )
 
                     if train_options["verbose"]:
-                        if batch_item == 0:
+                        if batch_item == 1:
                             print("start", i_start)
                             print("PF_start", round(pf_value_previous, 0))
 
                         if batch_item == train_options["batch_size"] - 1:
-                            print("Ptf value: ", round(pf_value_t, 0))
-                            print("Ptf weights: ", w_t)
+                            print("Ptf value: ", round(new_state["pf_value_t"], 0))
+                            print("Ptf weights: ", new_state["w_t"])
 
             train_session_tracker["policy_x_t"] = np.array(
                 train_session_tracker["policy_x_t"]
@@ -183,6 +172,60 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
     )
 
 
+def _update_state(env_states, single_asset_pf_values_t, no_of_assets):
+    # get the new state
+    x_next = env_states["policy_network"]["state"][0]
+    w_t = env_states["policy_network"]["state"][1]
+    pf_value_t = env_states["policy_network"]["state"][2]
+
+    pf_value_t_eq = env_states["equal_weighted"]["state"][2]
+    pf_value_t_s = env_states["only_cash"]["state"][2]
+
+    for i in range(no_of_assets):
+        single_asset_pf_values_t[i] = env_states["single_assets_states"][i][2]
+
+    new_state = {
+        "x_next": x_next,
+        "w_t": w_t,
+        "pf_value_t": pf_value_t,
+        "pf_value_t_eq": pf_value_t_eq,
+        "pf_value_t_s": pf_value_t_s,
+    }
+
+    return new_state
+
+
+def _update_train_session_tracker(
+    env_states,
+    train_session_tracker,
+    no_of_assets,
+    x_t,
+    w_previous,
+    pf_value_previous,
+    daily_return_t,
+    pf_value_t_eq,
+    pf_value_t_s,
+    single_asset_pf_values_t,
+):
+    # store elements
+    train_session_tracker["policy_x_t"].append(
+        x_t.reshape(env_states["policy_network"]["state"][0].shape)
+    )
+    train_session_tracker["policy_prev_weights"].append(
+        w_previous.reshape(env_states["policy_network"]["state"][1].shape)
+    )
+    train_session_tracker["policy_prev_value"].append([pf_value_previous])
+    train_session_tracker["policy_daily_return_t"].append(daily_return_t)
+
+    train_session_tracker["equal_prev_value"].append(pf_value_t_eq)
+    train_session_tracker["cash_prev_value"].append(pf_value_t_s)
+
+    for i in range(no_of_assets):
+        train_session_tracker["single_asset_prev_values"][i].append(
+            single_asset_pf_values_t[i]
+        )
+
+
 def _initialize_train_session_tracker(no_of_assets):
     single_asset_prev_values = list()
     for _ in range(no_of_assets):
@@ -199,6 +242,19 @@ def _initialize_train_session_tracker(no_of_assets):
     }
 
     return train_session_tracker
+
+
+# def _print_batch_results():
+
+
+def _handle_after_last_item_of_batch(
+    train_performance_lists, new_state, no_of_assets, single_asset_pf_values_t
+):
+    train_performance_lists["policy_network"].append(new_state["pf_value_t"])
+    train_performance_lists["equal_weighted"].append(new_state["pf_value_t_eq"])
+    train_performance_lists["only_cash"].append(new_state["pf_value_t_s"])
+    for i in range(no_of_assets):
+        train_performance_lists["single_asset"][i].append(single_asset_pf_values_t[i])
 
 
 def _initialize_benchmark_weights(no_of_assets):
