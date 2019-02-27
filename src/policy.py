@@ -45,7 +45,7 @@ class Policy:  # pylint: disable=too-many-instance-attributes
         self.window_length = train_options["window_length"]
         self.no_of_assets = no_of_assets
 
-        if train_options["gpu_device"]:
+        if train_options["gpu_device"] is not None:
             self.tf_device = "/device:GPU:{}".format(train_options["gpu_device"])
 
         else:
