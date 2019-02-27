@@ -4,12 +4,12 @@
 This repo requires Python 3.6+. For installing the dependencies, please run `pip install -r requirements.txt`
 
 ## Usage
-This repo exposes two CLIs:
+This repo exposes a single CLI:
 
-* `fetch_data_from_external_source.py`: This CLI is used to download data to your local from various sources.
-* `train_test_analyse_rl_algorithm.py`: This CLI controls the main workhorse of this repo. The actual training process and its validation.
+* `deep_rl_portfolio.py`: This CLI is used to download data to your local from various sources.
 
-To get started, please run a CLI with the `-h` flag. E.g.: `python fetch_data_from_external_source.py -h` to get a list of acceptable flags.
+
+To get started, please run a CLI with the `-h` flag. E.g.: `python deep_rl_portfolio.py -h` to get a list of acceptable flags.
 ## Content
 
 * `src` dir holds the models, environments etc. for the actual training
@@ -34,3 +34,4 @@ This ensures that certain test procedures are ran before a commit is allowed
 * write docstrings to each function and refactor further
 * improve requirements.txt : decide an specific env that the code is ran on
 * add tensorboard
+* improve train plotting
