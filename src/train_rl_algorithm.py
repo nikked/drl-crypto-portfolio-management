@@ -27,8 +27,16 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
     nb_feature_map = trade_envs["args"]["data"].shape[0]
 
-    weights_equal = np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1)))
-    weights_single = np.array(np.array([1] + [0.0] * no_of_assets))
+    benchmark_weights = {
+        "equal": np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1))),
+        "only_cash": np.array(np.array([1] + [0.0] * no_of_assets)),
+        "single_assets": np.eye(no_of_assets + 1, dtype=int),
+    }
+
+    benchmark_weights["equal"] = np.array(
+        np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1))
+    )
+    benchmark_weights["only_cash"] = np.array(np.array([1] + [0.0] * no_of_assets))
 
     tf.reset_default_graph()
 
@@ -38,7 +46,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         no_of_assets,
         train_options,
         sess,
-        weights_equal,
+        benchmark_weights["equal"],
         nb_feature_map,
         trading_cost=TRADING_COST,
         interest_rate=INTEREST_RATE,
@@ -52,8 +60,8 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     list_final_pf_s = list()
 
     list_final_pf_fu = list()
-    state_fu = [0] * no_of_assets
-    done_fu = [0] * no_of_assets
+    state_single_assets = [0] * no_of_assets
+    done_single_assets = [0] * no_of_assets
 
     pf_value_t_fu = [0] * no_of_assets
 
@@ -101,16 +109,22 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 memory.get_w(i_start), train_options["portfolio_value"], index=i_start
             )
             state_eq, _ = trade_envs["equal_weighted"].reset(
-                weights_equal, train_options["portfolio_value"], index=i_start
+                benchmark_weights["equal"],
+                train_options["portfolio_value"],
+                index=i_start,
             )
             state_s, _ = trade_envs["only_cash"].reset(
-                weights_single, train_options["portfolio_value"], index=i_start
+                benchmark_weights["only_cash"],
+                train_options["portfolio_value"],
+                index=i_start,
             )
 
             full_on_one_weights = np.eye(no_of_assets + 1, dtype=int)
 
             for i in range(no_of_assets):
-                state_fu[i], done_fu[i] = trade_envs["full_on_one_stocks"][i].reset(
+                state_single_assets[i], done_single_assets[i] = trade_envs[
+                    "full_on_one_stocks"
+                ][i].reset(
                     full_on_one_weights[i + 1, :],
                     train_options["portfolio_value"],
                     index=i_start,
@@ -129,15 +143,14 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
             for batch_item in range(train_options["batch_size"]):
                 pf_value_previous = state[2]
-                x_t, w_previous = _train_batch_item(
+                x_t, w_previous = _take_train_step(
                     actor,
                     state,
                     no_of_assets,
                     trade_envs,
-                    weights_equal,
-                    weights_single,
-                    state_fu,
-                    done_fu,
+                    benchmark_weights,
+                    state_single_assets,
+                    done_single_assets,
                 )
 
                 # get the new state
@@ -149,7 +162,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 pf_value_t_s = state_s[2]
 
                 for i in range(no_of_assets):
-                    pf_value_t_fu[i] = state_fu[i][2]
+                    pf_value_t_fu[i] = state_single_assets[i][2]
 
                 # let us compute the returns
                 daily_return_t = x_next[-1, :, -1]
@@ -209,25 +222,24 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         "single_asset": list_final_pf,
     }
 
-    return actor, state_fu, done_fu, train_performance_lists
+    return actor, state_single_assets, done_single_assets, train_performance_lists
 
 
-def _train_batch_item(
+def _take_train_step(
     actor,
     state,
     no_of_assets,
     trade_envs,
-    weights_equal,
-    weights_single,
-    state_fu,
-    done_fu,
+    benchmark_weights,
+    state_single_assets,
+    done_single_assets,
 ):
+
     # load the different inputs from the previous loaded state
     x_t = state[0].reshape([-1] + list(state[0].shape))
     w_previous = state[1].reshape([-1] + list(state[1].shape))
 
     if np.random.rand() < RATIO_GREEDY:
-        # print('go')
         # computation of the action of the agent
         action = actor.compute_w(x_t, w_previous)
     else:
@@ -236,14 +248,13 @@ def _train_batch_item(
     # given the state and the action, call the environment to go one
     # time step later
     trade_envs["policy_network"].step(action)
-    trade_envs["equal_weighted"].step(weights_equal)
-    trade_envs["only_cash"].step(weights_single)
+    trade_envs["equal_weighted"].step(benchmark_weights["equal"])
+    trade_envs["only_cash"].step(benchmark_weights["only_cash"])
 
-    full_on_one_weights = np.eye(no_of_assets + 1, dtype=int)
     for i in range(no_of_assets):
-        state_fu[i], _, done_fu[i] = trade_envs["full_on_one_stocks"][i].step(
-            full_on_one_weights[i + 1, :]
-        )
+        state_single_assets[i], _, done_single_assets[i] = trade_envs[
+            "full_on_one_stocks"
+        ][i].step(benchmark_weights["single_assets"][i + 1, :])
 
     return x_t, w_previous
 

@@ -87,10 +87,21 @@ class TradeEnv:  # pylint: disable=too-many-instance-attributes
         """
         This function is the main part of the render.
         At each step t, the trading agent gives as input the action he wants to do. So, he gives the new value of the weights of the portfolio.
-
+        
         The function computes the new value of the portfolio at the step (t+1), it returns also the reward associated with the action the agent took.
         The reward is defined as the evolution of the the value of the portfolio in %.
+        
+        Args:
+            action (TYPE): Description
+        
+        Returns:
 
+            Note: each env holds a full state of all asset's features
+
+            state: A list of tuples for each asset in the portfolio\
+                Tuple: (feats_mtrx, asset_weights, pv_value)
+                    Feats_mtrx: ndarray (nb_feats, nb_assets, window_length)
+        
         """
 
         index = self.index
