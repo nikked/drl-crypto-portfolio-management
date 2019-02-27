@@ -2,20 +2,11 @@ import numpy as np
 
 
 def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
-    train_options, actor, state_fu, done_fu, trade_envs, set_step_counts
+    train_options, actor, state_fu, done_fu, trade_envs, train_test_split
 ):
 
     print("\nTesting algorithm performance with test set")
     no_of_assets = len(state_fu)
-
-    total_steps_train = set_step_counts["train"]
-    total_steps_val = set_step_counts["validation"]
-    total_steps_test = set_step_counts["test"]
-
-    env_policy_network = trade_envs["policy_network"]
-    env_equal_weighted = trade_envs["equal_weighted"]
-    env_only_cash = trade_envs["only_cash"]
-    env_full_on_one_stocks = trade_envs["full_on_one_stocks"]
 
     weights_equal = np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1)))
     weights_single = np.array(np.array([1] + [0.0] * no_of_assets))
@@ -23,23 +14,25 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     w_init_test = np.array(np.array([1] + [0] * no_of_assets))
 
     # initialization of the environment
-    state, _ = env_policy_network.reset(
-        w_init_test, train_options["portfolio_value"], index=total_steps_train
+    state, _ = trade_envs["policy_network"].reset(
+        w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
     )
 
-    state_eq, _ = env_equal_weighted.reset(
-        weights_equal, train_options["portfolio_value"], index=total_steps_train
+    state_eq, _ = trade_envs["equal_weighted"].reset(
+        weights_equal, train_options["portfolio_value"], index=train_test_split["train"]
     )
-    state_s, _ = env_only_cash.reset(
-        weights_single, train_options["portfolio_value"], index=total_steps_train
+    state_s, _ = trade_envs["only_cash"].reset(
+        weights_single,
+        train_options["portfolio_value"],
+        index=train_test_split["train"],
     )
 
     full_on_one_weights = np.eye(no_of_assets + 1, dtype=int)
     for i in range(no_of_assets):
-        state_fu[i], done_fu[i] = env_full_on_one_stocks[i].reset(
+        state_fu[i], done_fu[i] = trade_envs["full_on_one_stocks"][i].reset(
             full_on_one_weights[i + 1, :],
             train_options["portfolio_value"],
-            index=total_steps_train,
+            index=train_test_split["train"],
         )
 
     # first element of the weight and portfolio value
@@ -56,10 +49,12 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     pf_value_t_fu = [0] * no_of_assets
 
     for k in range(
-        total_steps_train + total_steps_val - int(train_options["window_length"] / 2),
-        total_steps_train
-        + total_steps_val
-        + total_steps_test
+        train_test_split["train"]
+        + train_test_split["validation"]
+        - int(train_options["window_length"] / 2),
+        train_test_split["train"]
+        + train_test_split["validation"]
+        + train_test_split["test"]
         - train_options["window_length"],
     ):
         x_current = state[0].reshape([-1] + list(state[0].shape))
@@ -68,12 +63,12 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         # compute the action
         action = actor.compute_w(x_current, w_previous)
         # step forward environment
-        state, _, _ = env_policy_network.step(action)
-        state_eq, _, _ = env_equal_weighted.step(weights_equal)
-        state_s, _, _ = env_only_cash.step(weights_single)
+        state, _, _ = trade_envs["policy_network"].step(action)
+        state_eq, _, _ = trade_envs["equal_weighted"].step(weights_equal)
+        state_s, _, _ = trade_envs["only_cash"].step(weights_single)
 
         for i in range(no_of_assets):
-            state_fu[i], _, done_fu[i] = env_full_on_one_stocks[i].step(
+            state_fu[i], _, done_fu[i] = trade_envs["full_on_one_stocks"][i].step(
                 full_on_one_weights[i + 1, :]
             )
 
@@ -101,8 +96,8 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         # here to breack the loop/not in original code
         if (
             k
-            == total_steps_train
-            + total_steps_val
+            == train_test_split["train"]
+            + train_test_split["validation"]
             - int(train_options["window_length"] / 2)
             + 100
         ):
