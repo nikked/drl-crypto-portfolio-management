@@ -4,20 +4,14 @@ import matplotlib.pyplot as plt
 
 from tqdm import tqdm
 
-from src.params import (  # pylint: disable=ungrouped-imports
-    TRADING_COST,
-    INTEREST_RATE,
-    RATIO_GREEDY,
-)
+from src.params import TRADING_COST, INTEREST_RATE, RATIO_GREEDY
 
 from src.policy import Policy
 from src.environment import TradeEnv
 from src.pvm import PVM
 
 
-def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals, too-many-branches, too-many-statements
-    train_options, trade_envs, asset_list, train_test_split
-):
+def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
     print("\nStarting to train deep reinforcement learning algorithm...")
 
     no_of_assets = len(asset_list)
@@ -42,7 +36,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     print("\nInitializing tensorflow graphs")
     sess.run(tf.global_variables_initializer())
 
-    pf_value_t_fu = [0] * no_of_assets
+    single_asset_pf_values_t = [0] * no_of_assets
 
     train_performance_lists = {
         "policy_network": [],
@@ -52,9 +46,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     }
 
     # Run training episodes
-    for n_episode in range(
-        train_options["n_episodes"]
-    ):  # pylint: disable= too-many-nested-blocks
+    for n_episode in range(train_options["n_episodes"]):
         print("\nStarting reinforcement learning episode", n_episode + 1)
         if n_episode == 0:
             _eval_perf(
@@ -66,9 +58,8 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 train_test_split,
                 no_of_assets,
             )
-        # init the PVM with the training parameters
 
-        # dict_train['w_init_train']
+        # init the PVM with the training parameters
         w_init_train = np.array(np.array([1] + [0] * no_of_assets))
 
         memory = PVM(
@@ -108,12 +99,16 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 pf_value_t_s = env_states["only_cash"]["state"][2]
 
                 for i in range(no_of_assets):
-                    pf_value_t_fu[i] = env_states["single_assets_states"][i][2]
+                    single_asset_pf_values_t[i] = env_states["single_assets_states"][i][
+                        2
+                    ]
 
                 # let us compute the returns
                 daily_return_t = x_next[-1, :, -1]
+
                 # update into the PVM
                 memory.update(i_start + batch_item, w_t)
+
                 # store elements
                 train_session_tracker["policy_x_t"].append(
                     x_t.reshape(env_states["policy_network"]["state"][0].shape)
@@ -129,7 +124,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
                 for i in range(no_of_assets):
                     train_session_tracker["single_asset_prev_values"][i].append(
-                        pf_value_t_fu[i]
+                        single_asset_pf_values_t[i]
                     )
 
                 if batch_item == train_options["batch_size"] - 1:
@@ -138,7 +133,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                     train_performance_lists["only_cash"].append(pf_value_t_s)
                     for i in range(no_of_assets):
                         train_performance_lists["single_asset"][i].append(
-                            pf_value_t_fu[i]
+                            single_asset_pf_values_t[i]
                         )
 
                     if train_options["verbose"]:
@@ -190,7 +185,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
 
 def _initialize_train_session_tracker(no_of_assets):
     single_asset_prev_values = list()
-    for i in range(no_of_assets):
+    for _ in range(no_of_assets):
         single_asset_prev_values.append(list())
 
     train_session_tracker = {
@@ -297,7 +292,7 @@ def _get_random_action(no_of_assets):
     return random_vec / np.sum(random_vec)
 
 
-def _eval_perf(  # pylint: disable= too-many-arguments, too-many-locals
+def _eval_perf(
     train_options,
     n_episode,
     actor,
