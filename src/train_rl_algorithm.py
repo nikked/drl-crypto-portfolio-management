@@ -21,19 +21,9 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     print("\nStarting to train deep reinforcement learning algorithm...")
 
     no_of_assets = len(asset_list)
-
     nb_feature_map = trade_envs["args"]["data"].shape[0]
 
-    benchmark_weights = {
-        "equal": np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1))),
-        "only_cash": np.array(np.array([1] + [0.0] * no_of_assets)),
-        "single_assets": np.eye(no_of_assets + 1, dtype=int),
-    }
-
-    benchmark_weights["equal"] = np.array(
-        np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1))
-    )
-    benchmark_weights["only_cash"] = np.array(np.array([1] + [0.0] * no_of_assets))
+    benchmark_weights = _initialize_benchmark_weights(no_of_assets)
 
     tf.reset_default_graph()
 
@@ -103,16 +93,7 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 train_options, trade_envs, memory, i_start, benchmark_weights
             )
 
-            list_x_t, list_w_previous, list_pf_value_previous, list_daily_return_t = (
-                [],
-                [],
-                [],
-                [],
-            )
-            list_pf_value_previous_eq, list_pf_value_previous_s = [], []
-            list_pf_value_previous_fu = list()
-            for i in range(no_of_assets):
-                list_pf_value_previous_fu.append(list())
+            train_session_tracker = _initialize_train_session_tracker(no_of_assets)
 
             for batch_item in range(train_options["batch_size"]):
                 pf_value_previous = env_states["policy_network"]["state"][2]
@@ -136,20 +117,22 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 # update into the PVM
                 memory.update(i_start + batch_item, w_t)
                 # store elements
-                list_x_t.append(
+                train_session_tracker["policy_x_t"].append(
                     x_t.reshape(env_states["policy_network"]["state"][0].shape)
                 )
-                list_w_previous.append(
+                train_session_tracker["policy_prev_weights"].append(
                     w_previous.reshape(env_states["policy_network"]["state"][1].shape)
                 )
-                list_pf_value_previous.append([pf_value_previous])
-                list_daily_return_t.append(daily_return_t)
+                train_session_tracker["policy_prev_value"].append([pf_value_previous])
+                train_session_tracker["policy_daily_return_t"].append(daily_return_t)
 
-                list_pf_value_previous_eq.append(pf_value_t_eq)
-                list_pf_value_previous_s.append(pf_value_t_s)
+                train_session_tracker["equal_prev_value"].append(pf_value_t_eq)
+                train_session_tracker["cash_prev_value"].append(pf_value_t_s)
 
                 for i in range(no_of_assets):
-                    list_pf_value_previous_fu[i].append(pf_value_t_fu[i])
+                    train_session_tracker["single_asset_prev_values"][i].append(
+                        pf_value_t_fu[i]
+                    )
 
                 if batch_item == train_options["batch_size"] - 1:
                     list_final_pf.append(pf_value_t)
@@ -167,14 +150,25 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                             print("Ptf value: ", round(pf_value_t, 0))
                             print("Ptf weights: ", w_t)
 
-            list_x_t = np.array(list_x_t)
-            list_w_previous = np.array(list_w_previous)
-            list_pf_value_previous = np.array(list_pf_value_previous)
-            list_daily_return_t = np.array(list_daily_return_t)
+            train_session_tracker["policy_x_t"] = np.array(
+                train_session_tracker["policy_x_t"]
+            )
+            train_session_tracker["policy_prev_weights"] = np.array(
+                train_session_tracker["policy_prev_weights"]
+            )
+            train_session_tracker["policy_prev_value"] = np.array(
+                train_session_tracker["policy_prev_value"]
+            )
+            train_session_tracker["policy_daily_return_t"] = np.array(
+                train_session_tracker["policy_daily_return_t"]
+            )
 
             # for each batch, train the network to maximize the reward
             actor.train(
-                list_x_t, list_w_previous, list_pf_value_previous, list_daily_return_t
+                train_session_tracker["policy_x_t"],
+                train_session_tracker["policy_prev_weights"],
+                train_session_tracker["policy_prev_value"],
+                train_session_tracker["policy_daily_return_t"],
             )
         _eval_perf(
             train_options,
@@ -198,6 +192,40 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         env_states["single_assets_done"],
         train_performance_lists,
     )
+
+
+def _initialize_train_session_tracker(no_of_assets):
+    single_asset_prev_values = list()
+    for i in range(no_of_assets):
+        single_asset_prev_values.append(list())
+
+    train_session_tracker = {
+        "policy_x_t": [],
+        "policy_prev_weights": [],
+        "policy_prev_value": [],
+        "policy_daily_return_t": [],
+        "equal_prev_value": [],
+        "cash_prev_value": [],
+        "single_asset_prev_values": single_asset_prev_values,
+    }
+
+    return train_session_tracker
+
+
+def _initialize_benchmark_weights(no_of_assets):
+
+    benchmark_weights = {
+        "equal": np.array(np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1))),
+        "only_cash": np.array(np.array([1] + [0.0] * no_of_assets)),
+        "single_assets": np.eye(no_of_assets + 1, dtype=int),
+    }
+
+    benchmark_weights["equal"] = np.array(
+        np.array([1 / (no_of_assets + 1)] * (no_of_assets + 1))
+    )
+    benchmark_weights["only_cash"] = np.array(np.array([1] + [0.0] * no_of_assets))
+
+    return benchmark_weights
 
 
 def _get_env_states(train_options, trade_envs, memory, i_start, benchmark_weights):
