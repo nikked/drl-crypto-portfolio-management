@@ -43,15 +43,29 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
     # Run training episodes
     env_states = None
     for n_episode in range(train_options["n_episodes"]):
+
+        print("\nStarting reinforcement learning episode", n_episode + 1)
+        if n_episode == 0:
+            _test_and_report_progress(
+                train_options,
+                "Before Training",
+                agent,
+                trade_envs["args"],
+                asset_list,
+                train_test_split,
+            )
+
         env_states = _train_episode(
+            train_options, trade_envs, train_test_split, agent, train_performance_lists
+        )
+
+        _test_and_report_progress(
             train_options,
-            trade_envs,
+            n_episode,
+            agent,
+            trade_envs["args"],
             asset_list,
             train_test_split,
-            agent,
-            train_options["no_of_assets"],
-            n_episode,
-            train_performance_lists,
         )
 
     return (
@@ -78,32 +92,14 @@ def _initialize_benchmark_weights(no_of_assets):
     return benchmark_weights
 
 
-def _train_episode(  # pylint: disable=too-many-arguments
-    train_options,
-    trade_envs,
-    asset_list,
-    train_test_split,
-    agent,
-    no_of_assets,
-    n_episode,
-    train_performance_lists,
+def _train_episode(
+    train_options, trade_envs, train_test_split, agent, train_performance_lists
 ):
 
-    benchmark_weights = _initialize_benchmark_weights(no_of_assets)
-
-    print("\nStarting reinforcement learning episode", n_episode + 1)
-    if n_episode == 0:
-        _test_and_report_p(
-            train_options,
-            "Before Training",
-            agent,
-            trade_envs["args"],
-            asset_list,
-            train_test_split,
-        )
+    benchmark_weights = _initialize_benchmark_weights(train_options["no_of_assets"])
 
     # init the PVM with the training parameters
-    w_init_train = np.array(np.array([1] + [0] * no_of_assets))
+    w_init_train = np.array(np.array([1] + [0] * train_options["no_of_assets"]))
 
     memory = PVM(train_test_split["train"], train_options["batch_size"], w_init_train)
 
@@ -122,19 +118,10 @@ def _train_episode(  # pylint: disable=too-many-arguments
             benchmark_weights,
         )
 
-    _test_and_report_p(
-        train_options,
-        n_episode,
-        agent,
-        trade_envs["args"],
-        asset_list,
-        train_test_split,
-    )
-
     return env_states
 
 
-def _test_and_report_p(  # pylint: disable=too-many-arguments
+def _test_and_report_progress(  # pylint: disable=too-many-arguments
     train_options, n_episode, agent, trade_env_args, asset_list, train_test_split
 ):
     """
