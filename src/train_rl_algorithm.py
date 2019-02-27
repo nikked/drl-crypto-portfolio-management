@@ -60,8 +60,6 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
     list_final_pf_s = list()
 
     list_final_pf_fu = list()
-    state_single_assets = [0] * no_of_assets
-    done_single_assets = [0] * no_of_assets
 
     pf_value_t_fu = [0] * no_of_assets
 
@@ -103,32 +101,9 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
             # draw the starting point of the batch
             i_start = memory.draw()
 
-            # reset the environment with the weight from PVM at the starting point
-            # reset also with a portfolio value with initial portfolio value
-            state, _ = trade_envs["policy_network"].reset(
-                memory.get_w(i_start), train_options["portfolio_value"], index=i_start
+            env_states = _get_env_states(
+                train_options, trade_envs, memory, i_start, benchmark_weights
             )
-            state_eq, _ = trade_envs["equal_weighted"].reset(
-                benchmark_weights["equal"],
-                train_options["portfolio_value"],
-                index=i_start,
-            )
-            state_s, _ = trade_envs["only_cash"].reset(
-                benchmark_weights["only_cash"],
-                train_options["portfolio_value"],
-                index=i_start,
-            )
-
-            full_on_one_weights = np.eye(no_of_assets + 1, dtype=int)
-
-            for i in range(no_of_assets):
-                state_single_assets[i], done_single_assets[i] = trade_envs[
-                    "full_on_one_stocks"
-                ][i].reset(
-                    full_on_one_weights[i + 1, :],
-                    train_options["portfolio_value"],
-                    index=i_start,
-                )
 
             list_x_t, list_w_previous, list_pf_value_previous, list_daily_return_t = (
                 [],
@@ -142,35 +117,33 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
                 list_pf_value_previous_fu.append(list())
 
             for batch_item in range(train_options["batch_size"]):
-                pf_value_previous = state[2]
+                pf_value_previous = env_states["policy_network"]["state"][2]
                 x_t, w_previous = _take_train_step(
-                    actor,
-                    state,
-                    no_of_assets,
-                    trade_envs,
-                    benchmark_weights,
-                    state_single_assets,
-                    done_single_assets,
+                    actor, env_states, no_of_assets, trade_envs, benchmark_weights
                 )
 
                 # get the new state
-                x_next = state[0]
-                w_t = state[1]
-                pf_value_t = state[2]
+                x_next = env_states["policy_network"]["state"][0]
+                w_t = env_states["policy_network"]["state"][1]
+                pf_value_t = env_states["policy_network"]["state"][2]
 
-                pf_value_t_eq = state_eq[2]
-                pf_value_t_s = state_s[2]
+                pf_value_t_eq = env_states["equal_weighted"]["state"][2]
+                pf_value_t_s = env_states["only_cash"]["state"][2]
 
                 for i in range(no_of_assets):
-                    pf_value_t_fu[i] = state_single_assets[i][2]
+                    pf_value_t_fu[i] = env_states["single_assets_states"][i][2]
 
                 # let us compute the returns
                 daily_return_t = x_next[-1, :, -1]
                 # update into the PVM
                 memory.update(i_start + batch_item, w_t)
                 # store elements
-                list_x_t.append(x_t.reshape(state[0].shape))
-                list_w_previous.append(w_previous.reshape(state[1].shape))
+                list_x_t.append(
+                    x_t.reshape(env_states["policy_network"]["state"][0].shape)
+                )
+                list_w_previous.append(
+                    w_previous.reshape(env_states["policy_network"]["state"][1].shape)
+                )
                 list_pf_value_previous.append([pf_value_previous])
                 list_daily_return_t.append(daily_return_t)
 
@@ -222,22 +195,61 @@ def train_rl_algorithm(  # pylint: disable= too-many-arguments, too-many-locals,
         "single_asset": list_final_pf,
     }
 
-    return actor, state_single_assets, done_single_assets, train_performance_lists
+    return (
+        actor,
+        env_states["single_assets_states"],
+        env_states["single_assets_done"],
+        train_performance_lists,
+    )
 
 
-def _take_train_step(
-    actor,
-    state,
-    no_of_assets,
-    trade_envs,
-    benchmark_weights,
-    state_single_assets,
-    done_single_assets,
-):
+def _get_env_states(train_options, trade_envs, memory, i_start, benchmark_weights):
+    # reset the environment with the weight from PVM at the starting point
+    # reset also with a portfolio value with initial portfolio value
+    state, policy_done = trade_envs["policy_network"].reset(
+        memory.get_w(i_start), train_options["portfolio_value"], index=i_start
+    )
+    state_eq, equal_done = trade_envs["equal_weighted"].reset(
+        benchmark_weights["equal"], train_options["portfolio_value"], index=i_start
+    )
+    state_s, cash_done = trade_envs["only_cash"].reset(
+        benchmark_weights["only_cash"], train_options["portfolio_value"], index=i_start
+    )
+
+    state_single_assets = [0] * train_options["no_of_assets"]
+    done_single_assets = [0] * train_options["no_of_assets"]
+
+    full_on_one_weights = np.eye(train_options["no_of_assets"] + 1, dtype=int)
+
+    for i in range(train_options["no_of_assets"]):
+        state_single_assets[i], done_single_assets[i] = trade_envs[
+            "full_on_one_stocks"
+        ][i].reset(
+            full_on_one_weights[i + 1, :],
+            train_options["portfolio_value"],
+            index=i_start,
+        )
+
+    env_states = {
+        "policy_network": {"state": state, "done": policy_done},
+        "equal_weighted": {"state": state_eq, "done": equal_done},
+        "only_cash": {"state": state_s, "done": cash_done},
+        "single_assets_states": state_single_assets,
+        "single_assets_done": done_single_assets,
+    }
+
+    return env_states
+
+
+def _take_train_step(actor, env_states, no_of_assets, trade_envs, benchmark_weights):
 
     # load the different inputs from the previous loaded state
-    x_t = state[0].reshape([-1] + list(state[0].shape))
-    w_previous = state[1].reshape([-1] + list(state[1].shape))
+    x_t = env_states["policy_network"]["state"][0].reshape(
+        [-1] + list(env_states["policy_network"]["state"][0].shape)
+    )
+    w_previous = env_states["policy_network"]["state"][1].reshape(
+        [-1] + list(env_states["policy_network"]["state"][1].shape)
+    )
 
     if np.random.rand() < RATIO_GREEDY:
         # computation of the action of the agent
@@ -252,9 +264,11 @@ def _take_train_step(
     trade_envs["only_cash"].step(benchmark_weights["only_cash"])
 
     for i in range(no_of_assets):
-        state_single_assets[i], _, done_single_assets[i] = trade_envs[
-            "full_on_one_stocks"
-        ][i].step(benchmark_weights["single_assets"][i + 1, :])
+        env_states["single_assets_states"][i], _, env_states["single_assets_done"][
+            i
+        ] = trade_envs["full_on_one_stocks"][i].step(
+            benchmark_weights["single_assets"][i + 1, :]
+        )
 
     return x_t, w_previous
 
