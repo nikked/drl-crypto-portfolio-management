@@ -4,7 +4,7 @@ from pprint import pprint
 
 from src.train_rl_algorithm import train_rl_algorithm
 from src.test_rl_algorithm import test_rl_algorithm
-from src import plot_training_results
+from src.plot_train_results import plot_train_results
 from src.environment import TradeEnv
 
 from src.params import (
@@ -56,7 +56,7 @@ def main(**train_configs):
     print(f"Process took {train_time_secs} seconds")
 
     if train_configs["plot_results"]:
-        plot_training_results(
+        plot_train_results(
             train_configs,
             test_performance_lists,
             train_performance_lists,

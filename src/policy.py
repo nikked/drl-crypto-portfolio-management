@@ -39,13 +39,14 @@ class Policy:
         n_filter_2=N_FILTER_2,
     ):
 
-        # parameters
         self.trading_cost = trading_cost
         self.interest_rate = interest_rate
         self.n_filter_1 = n_filter_1
         self.n_filter_2 = n_filter_2
         self.window_length = train_options["window_length"]
         self.no_of_assets = no_of_assets
+        self.optimizer = OPTIMIZER
+        self.sess = sess
 
         if train_options["gpu_device"] is not None:
             self.tf_device = "/device:GPU:{}".format(train_options["gpu_device"])
@@ -64,9 +65,6 @@ class Policy:
 
                 shape_x_current = self._define_policy_layers()
 
-                # computation of the reward
-                # please look at the chronological map to understand
-
                 self._calculate_rewards(shape_x_current, weights_equal)
 
         # objective function
@@ -76,8 +74,6 @@ class Policy:
             self.train_op = OPTIMIZER.minimize(-self.adjusted_reward)
 
         # some bookkeeping
-        self.optimizer = OPTIMIZER
-        self.sess = sess
 
     def _define_input_placeholders(self, nb_feature_map):
         # tensor of the prices
