@@ -23,7 +23,15 @@ from pprint import pprint
 import pandas as pd
 import numpy as np
 
+from data_pipelines.get_poloniex_data import download_crypto_data
+
 DATA_DIR = "/data/poloniex_data/"
+DATA_DIR = "/data_temp/"
+
+START_DATE = "20190101"
+END_DATE = "20190319"
+
+TRADING_PERIOD = "2h"
 
 
 def main(no_of_cryptos=5, max_count_of_periods=10000, save=False):
@@ -35,16 +43,20 @@ def main(no_of_cryptos=5, max_count_of_periods=10000, save=False):
         if file[0] == "." or file == "f":
             files_tags.remove(file)
 
-    cryptos_dict = {
-        "ETC": "ETCBTC.csv",
-        "ETH": "ETHBTC.csv",
-        "DOGE": "DOGEBTC.csv",
-        "XRP": "XRPBTC.csv",
-        "DASH": "DASHBTC.csv",
-        "XMR": "XMRBTC.csv",
-        "LTC": "LTCBTC.csv",
-    }
+    cryptos_dict = {}
+
     chosen_cryptos = ["ETH", "XMR", "XRP", "LTC", "DASH", "DOGE", "ETC"][:no_of_cryptos]
+
+    for crypto in chosen_cryptos:
+        cryptos_dict[crypto] = os.path.join(
+            f"BTC_{crypto}",
+            f"{START_DATE}-{END_DATE}",
+            f"BTC_{crypto}_{START_DATE}-{END_DATE}_{TRADING_PERIOD}.csv",
+        )
+
+    for crypto_ticker, crypto_data_fp in cryptos_dict.items():
+        if not os.path.isfile(crypto_data_fp):
+            download_crypto_data(f"BTC_{crypto}", START_DATE, END_DATE, TRADING_PERIOD)
 
     chosen_crypto_fps = []
 

@@ -4,7 +4,6 @@ import os
 import time
 from datetime import datetime
 from pprint import pprint
-from tqdm import tqdm
 
 import pandas as pd
 
@@ -35,28 +34,36 @@ PERIOD_LENGTHS = {
 }
 
 
-def main(start_date, end_date, period_length, pairs):
+def download_crypto_portfolio_data(start_date, end_date, period_length, pairs):
     if not os.path.exists(DATA_DIR):
         os.mkdir(DATA_DIR)
 
     for pair in pairs:
-        print(f"Processing pair {pair}")
-        output_fn = "{}_{}-{}_{}.csv".format(pair, start_date, end_date, period_length)
+        download_crypto_data(pair, start_date, end_date, period_length)
 
-        output_dir = os.path.join(DATA_DIR, f"{pair}", f"{start_date}-{end_date}")
 
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+def download_crypto_data(crypto_pair, start_date, end_date, period_length):
+    print(f"Downloading {crypto_pair}")
+    output_fn = "{}_{}-{}_{}.csv".format(
+        crypto_pair, start_date, end_date, period_length
+    )
 
-        output_fp = os.path.join(output_dir, output_fn)
+    output_dir = os.path.join(DATA_DIR, f"{crypto_pair}", f"{start_date}-{end_date}")
 
-        if os.path.isfile(output_fp):
-            print(f"Skipping. File {output_fp} has already been downloaded.")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-        else:
-            get_data_from_poloniex(output_fp, pair, start_date, end_date, period_length)
-            time.sleep(0.3)
-        print()
+    output_fp = os.path.join(output_dir, output_fn)
+
+    if os.path.isfile(output_fp):
+        print(f"Skipping. File {output_fp} has already been downloaded.")
+
+    else:
+        get_data_from_poloniex(
+            output_fp, crypto_pair, start_date, end_date, period_length
+        )
+        time.sleep(0.3)
+    print()
 
 
 def print_all_pairs():
@@ -65,8 +72,8 @@ def print_all_pairs():
 
 
 def get_data_from_poloniex(output_fp, pair, start_date, end_date, period_length):
-    start_epoch = int(datetime.strptime(ARGS.start_date, "%Y%m%d").timestamp())
-    end_epoch = int(datetime.strptime(ARGS.end_date, "%Y%m%d").timestamp())
+    start_epoch = int(datetime.strptime(start_date, "%Y%m%d").timestamp())
+    end_epoch = int(datetime.strptime(end_date, "%Y%m%d").timestamp())
 
     period_length_in_secs = PERIOD_LENGTHS[period_length]
 
@@ -142,4 +149,6 @@ if __name__ == "__main__":
         print("Please provide start and end dates as kwargs")
         sys.exit(0)
 
-    main(ARGS.start_date, ARGS.end_date, ARGS.period_length, PAIRS)
+    download_crypto_portfolio_data(
+        ARGS.start_date, ARGS.end_date, ARGS.period_length, PAIRS
+    )

@@ -15,6 +15,8 @@ https://into.aalto.fi/display/enfinance/Graduation
 
 ## Must do
 * Dataset: 2 pg
+    * Fix bug where now the agent just invests in agent.
+        * is it a header thing? how was the data read in the previous version?
     * Poloniex stuff
     * Train for longer periods
     * Test with Jiangs periods
