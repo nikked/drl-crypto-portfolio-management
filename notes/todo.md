@@ -14,8 +14,6 @@ https://into.aalto.fi/display/enfinance/Maturity+test
 https://into.aalto.fi/display/enfinance/Graduation
 
 ## Must do
-* Research questions
-    * Research questions after intro?
 * Dataset: 2 pg
     * Poloniex stuff
     * Train for longer periods
@@ -60,5 +58,8 @@ https://into.aalto.fi/display/enfinance/Graduation
 ## Small doc changes
 * Change policy gradient to deterministic
 * add tx remainder mu image to jiang
+* stability of learning
 
 ## Done
+* Research questions
+    * Research questions after intro?
