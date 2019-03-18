@@ -3,6 +3,7 @@ import argparse
 import os
 import time
 from datetime import datetime
+from pprint import pprint
 
 import pandas as pd
 
@@ -42,10 +43,9 @@ def main(start_date, end_date, period_length, pairs):
         time.sleep(2)
 
 
-def get_all_pairs():
+def print_all_pairs():
     pairs_df = pd.read_json("https://poloniex.com/public?command=return24hVolume")
-    pairs = [pair for pair in pairs_df.columns if pair.startswith("BTC")]
-    return pairs
+    pprint([pair for pair in pairs_df.columns])
 
 
 def get_data_from_poloniex(pair, start_date, end_date, period_length):
@@ -77,16 +77,32 @@ if __name__ == "__main__":
     PARSER = argparse.ArgumentParser()
 
     PARSER.add_argument(
-        "-sd", "--start_date", type=str, default=None, help="date in format YYYYMMDD"
+        "-sd",
+        "--start_date",
+        type=str,
+        default="20170601",
+        help="date in format YYYYMMDD",
     )
     PARSER.add_argument(
-        "-ed", "--end_date", type=str, default=None, help="date in format YYYYMMDD"
+        "-ed",
+        "--end_date",
+        type=str,
+        default="20171231",
+        help="date in format YYYYMMDD",
     )
     PARSER.add_argument(
-        "-p", "--period", type=str, default="30min", help="Trade period length"
+        "-pl", "--period_length", type=str, default="1d", help="Trade period length"
+    )
+
+    PARSER.add_argument(
+        "-f", "--fetch_data", help="fetch_data", default=True, action="store_false"
     )
 
     ARGS = PARSER.parse_args()
+
+    if ARGS.fetch_data:
+        print_all_pairs()
+        sys.exit(0)
 
     if not ARGS.start_date or not ARGS.end_date:
         print("Please provide start and end dates as kwargs")
@@ -94,4 +110,4 @@ if __name__ == "__main__":
 
     PAIRS = ["BTC_ETH"]
 
-    main(ARGS.start_date, ARGS.end_date, ARGS.period, PAIRS)
+    main(ARGS.start_date, ARGS.end_date, ARGS.period_length, PAIRS)
