@@ -4,6 +4,7 @@ import os
 import time
 from datetime import datetime
 from pprint import pprint
+from tqdm import tqdm
 
 import pandas as pd
 
@@ -39,8 +40,18 @@ def main(start_date, end_date, period_length, pairs):
         os.mkdir(DATA_DIR)
 
     for pair in pairs:
-        get_data_from_poloniex(pair, start_date, end_date, period_length)
-        time.sleep(2)
+        print(f"Processing pair {pair}")
+        output_fn = "{}_{}-{}_{}.csv".format(pair, start_date, end_date, period_length)
+
+        output_fp = os.path.join(DATA_DIR, output_fn)
+
+        if os.path.isfile(output_fp):
+            print(f"Skipping. File {output_fp} has already been downloaded.")
+
+        else:
+            get_data_from_poloniex(output_fp, pair, start_date, end_date, period_length)
+            time.sleep(0.3)
+        print()
 
 
 def print_all_pairs():
@@ -48,13 +59,9 @@ def print_all_pairs():
     pprint([pair for pair in pairs_df.columns])
 
 
-def get_data_from_poloniex(pair, start_date, end_date, period_length):
+def get_data_from_poloniex(output_fp, pair, start_date, end_date, period_length):
     start_epoch = int(datetime.strptime(ARGS.start_date, "%Y%m%d").timestamp())
     end_epoch = int(datetime.strptime(ARGS.end_date, "%Y%m%d").timestamp())
-
-    filename = "{}_{}-{}_{}.csv".format(pair, start_date, end_date, period_length)
-
-    datafile = os.path.join(DATA_DIR, filename)
 
     period_length_in_secs = PERIOD_LENGTHS[period_length]
 
@@ -65,10 +72,9 @@ def get_data_from_poloniex(pair, start_date, end_date, period_length):
 
     if price_history_df["date"].iloc[-1] == 0:
         print("No data.")
-        return
 
-    with open(datafile, "w") as file:
-        print("Saving file {}".format(filename))
+    with open(output_fp, "w") as file:
+        print("Saving file {}".format(output_fp))
         price_history_df.to_csv(file, index=False, columns=COLUMNS)
 
 
@@ -95,19 +101,39 @@ if __name__ == "__main__":
     )
 
     PARSER.add_argument(
-        "-f", "--fetch_data", help="fetch_data", default=True, action="store_false"
+        "-pp",
+        "--print_all_pairs",
+        help="print_pairs",
+        default=False,
+        action="store_true",
+    )
+    PARSER.add_argument(
+        "-tp", "--top_pairs", help="top pairs", default=False, action="store_true"
     )
 
     ARGS = PARSER.parse_args()
 
-    if ARGS.fetch_data:
+    PAIRS = ["BTC_ETH"]
+
+    if ARGS.top_pairs:
+        PAIRS = [
+            "BTC_BCH",
+            "BTC_DASH",
+            "BTC_EOS",
+            "BTC_ETH",
+            "BTC_LTC",
+            "BTC_XMR",
+            "BTC_XRP",
+            "BTC_DOGE",
+            "BTC_ETC",
+        ]
+
+    if ARGS.print_all_pairs:
         print_all_pairs()
         sys.exit(0)
 
     if not ARGS.start_date or not ARGS.end_date:
         print("Please provide start and end dates as kwargs")
         sys.exit(0)
-
-    PAIRS = ["BTC_ETH"]
 
     main(ARGS.start_date, ARGS.end_date, ARGS.period_length, PAIRS)
