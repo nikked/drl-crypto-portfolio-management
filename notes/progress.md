@@ -35,3 +35,8 @@
 * Read Jiang well
 * Wrote 6 pages about Jiang
 
+## Mon 18.3
+> 4/5 Home and Vainu work
+
+* Wrote dynamic data fetching code for poloniex
+* Revised research questions and moved them to the beginning after intro
