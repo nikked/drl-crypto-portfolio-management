@@ -43,7 +43,12 @@ def main(start_date, end_date, period_length, pairs):
         print(f"Processing pair {pair}")
         output_fn = "{}_{}-{}_{}.csv".format(pair, start_date, end_date, period_length)
 
-        output_fp = os.path.join(DATA_DIR, output_fn)
+        output_dir = os.path.join(DATA_DIR, f"{pair}", f"{start_date}-{end_date}")
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        output_fp = os.path.join(output_dir, output_fn)
 
         if os.path.isfile(output_fp):
             print(f"Skipping. File {output_fp} has already been downloaded.")
@@ -126,6 +131,7 @@ if __name__ == "__main__":
             "BTC_XRP",
             "BTC_DOGE",
             "BTC_ETC",
+            "USDT_BTC",
         ]
 
     if ARGS.print_all_pairs:
