@@ -1,5 +1,12 @@
+## Mon 11.3
+> Hamis
+
+* nonlinearity
+
 ## Tue 12.3
 > Otaniemi
+
+* activation funcs (?)
 
 ## RIP 13.3 Wed
 
@@ -28,9 +35,3 @@
 * Read Jiang well
 * Wrote 6 pages about Jiang
 
-
-## TODO
-* train the agent for longer time
-* write whole pipeline to doc
-* make output charts
-* make output tables

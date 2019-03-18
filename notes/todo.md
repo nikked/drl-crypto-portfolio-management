@@ -23,6 +23,9 @@ https://into.aalto.fi/display/enfinance/Graduation
     * Get newer data
 * Methodology 8 pg
     * on policy or off policy
+    * deterministic or stochastic
+        * Stochastic: next period's price tensor is unknown to the model and appears "random"
+        * Deterministic: the choice of the next action (the weights) is calculated exactly
     * draw diagram of neural network
     * draw diagram of RL agent
     * make notes of selim amrouni ipynb
@@ -33,10 +36,10 @@ https://into.aalto.fi/display/enfinance/Graduation
 ## Should have (2nd priority)
 * Discussion 5-10 pg
 * Conclusions 5-10 pg
-    * Research summary 
-    * Practical implications 
-    * Limitations of the study 
-    * Suggestions for further research 
+    * Research summary
+    * Practical implications
+    * Limitations of the study
+    * Suggestions for further research
 * References: Citations to everywhere
 
 ## Could have (3rd priority)
@@ -46,6 +49,7 @@ https://into.aalto.fi/display/enfinance/Graduation
 * Maybe RNN
 * Maybe DDPG
 * 3.3 Trustworthiness of the study
+* taulukko tärkeimmistä olennaisista papereista
 
 
 ## Should't have (no priority)
@@ -53,6 +57,8 @@ https://into.aalto.fi/display/enfinance/Graduation
 * No genetic algorithms
 
 
+## Small doc changes
+* Change policy gradient to deterministic
+* add tx remainder mu image to jiang
 
-
-taulukko tärkeimmistä olennaisista papereista
+## Done
