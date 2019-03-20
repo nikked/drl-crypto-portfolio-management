@@ -2,7 +2,12 @@ import numpy as np
 
 # import pandas as pd
 import matplotlib.pyplot as plt
-from src.params import RATIO_GREEDY, LEARNING_RATE, KERNEL1_SIZE, RATIO_REGUL
+from src.params import (
+    EPSILON_GREEDY_THRESHOLD,
+    LEARNING_RATE,
+    KERNEL1_SIZE,
+    MAX_PF_WEIGHT_PENALTY,
+)
 
 
 def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
@@ -30,12 +35,12 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
             input_data_type,
             train_options["batch_size"],
             LEARNING_RATE,
-            RATIO_GREEDY,
+            EPSILON_GREEDY_THRESHOLD,
             train_options["n_episodes"],
             train_options["window_length"],
             KERNEL1_SIZE,
             train_options["n_batches"],
-            RATIO_REGUL,
+            MAX_PF_WEIGHT_PENALTY,
         )
     )
     plt.plot(p_list, label="Agent Portfolio Value")

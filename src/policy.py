@@ -1,12 +1,8 @@
 """
+Policy is an arbitrary algorithm that an RL agent uses to select actions.
 
-Policy is an arbitrary algorithm that determines which action to take
-in a Reinforcement learning setting.
+Here we are using a CNN similar to Jiang
 
-Here we are using a Deep Neural Network (CNN) as a policy
-
-Attributes:
-    OPTIMIZER (TYPE): Description
 """
 import tensorflow as tf
 import numpy as np
@@ -18,7 +14,7 @@ from src.params import (
     N_FILTER_2,
     KERNEL1_SIZE,
     CASH_BIAS_INIT,
-    RATIO_REGUL,
+    MAX_PF_WEIGHT_PENALTY,
     LEARNING_RATE,
 )
 
@@ -69,21 +65,20 @@ class Policy:
 
         # objective function
         # maximize reward over the batch
-        # min(-r) = max(r)
         with tf.device(self.tf_device):
             self.train_op = OPTIMIZER.minimize(-self.adjusted_reward)
 
-        # some bookkeeping
-
     def _define_input_placeholders(self, nb_feature_map):
-        # tensor of the prices
+        # Price tensor
         self.x_current = tf.placeholder(
             tf.float32, [None, nb_feature_map, self.no_of_assets, self.window_length]
-        )  # The Price tensor
+        )
+
         # weights at the previous time step
         self.w_previous = tf.placeholder(tf.float32, [None, self.no_of_assets + 1])
         # portfolio value at the previous time step
         self.pf_value_previous = tf.placeholder(tf.float32, [None, 1])
+
         # vector of Open(t+1)/Open(t)
         self.daily_return_t = tf.placeholder(tf.float32, [None, self.no_of_assets])
 
@@ -100,7 +95,6 @@ class Policy:
         self.cash_bias = tf.tile(  # pylint: disable=no-member
             bias, tf.stack([shape_x_current, 1, 1, 1])
         )
-        # print(self.cash_bias.shape)
 
         with tf.variable_scope("Conv1"):
             # first layer on the x_current tensor
@@ -224,7 +218,7 @@ class Policy:
             self.adjusted_reward = (
                 self.instantaneous_reward
                 - self.instantaneous_reward_eq
-                - RATIO_REGUL * self.max_weight
+                - MAX_PF_WEIGHT_PENALTY * self.max_weight
             )
 
     def compute_w(self, x_current, w_previous):

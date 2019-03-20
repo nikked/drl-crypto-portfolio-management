@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from tqdm import tqdm
 
-from src.params import TRADING_COST, INTEREST_RATE, RATIO_GREEDY
+from src.params import TRADING_COST, INTEREST_RATE, EPSILON_GREEDY_THRESHOLD
 
 from src.policy import Policy
 from src.environment import TradeEnv
@@ -420,7 +420,7 @@ def _take_train_step(agent, env_states, no_of_assets, trade_envs, benchmark_weig
         [-1] + list(env_states["policy_network"]["state"][1].shape)
     )
 
-    if np.random.rand() < RATIO_GREEDY:
+    if np.random.rand() < EPSILON_GREEDY_THRESHOLD:
         # computation of the action of the agent
         action = agent.compute_w(x_t, w_previous)
     else:
