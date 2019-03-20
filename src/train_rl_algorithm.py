@@ -428,9 +428,15 @@ def _take_train_step(agent, env_states, no_of_assets, trade_envs, benchmark_weig
 
     # given the state and the action, call the environment to go one
     # time step later
-    trade_envs["policy_network"].step(action)
-    trade_envs["equal_weighted"].step(benchmark_weights["equal"])
-    trade_envs["only_cash"].step(benchmark_weights["only_cash"])
+    env_states["policy_network"]["state"], _, _ = trade_envs["policy_network"].step(
+        action
+    )
+    env_states["equal_weighted"]["state"], _, _ = trade_envs["equal_weighted"].step(
+        benchmark_weights["equal"]
+    )
+    env_states["only_cash"]["state"], _, _ = trade_envs["only_cash"].step(
+        benchmark_weights["only_cash"]
+    )
 
     for i in range(no_of_assets):
         env_states["single_assets_states"][i], _, env_states["single_assets_done"][
@@ -443,6 +449,7 @@ def _take_train_step(agent, env_states, no_of_assets, trade_envs, benchmark_weig
 
 
 def _update_state(env_states, single_asset_pf_values_t, no_of_assets):
+
     # get the new state
     x_next = env_states["policy_network"]["state"][0]
     w_t = env_states["policy_network"]["state"][1]
