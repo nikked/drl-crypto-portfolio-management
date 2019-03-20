@@ -16,4 +16,4 @@ mongo_shell.sh
 local_data/
 *.ipynb.swp
 .coverage
-data_temp/*
+crypto_data/*

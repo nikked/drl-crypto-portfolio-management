@@ -16,7 +16,7 @@ from src.params import (
     WINDOW_LENGTH,
 )
 
-from data_pipelines import data_pipe, data_pipe_poloniex
+from data_pipelines import get_crypto_price_tensors
 
 
 DEFAULT_TRADE_ENV_ARGS = {
@@ -67,17 +67,10 @@ def main(**train_configs):
 
 def _initialize_trade_envs(train_configs):
 
-    if train_configs["stock_data"]:
-        dataset, asset_names = data_pipe.main(
-            no_of_stocks=train_configs["no_of_assets"],
-            max_count_of_periods=train_configs["max_no_of_training_periods"],
-        )
-
-    else:
-        dataset, asset_names = data_pipe_poloniex.main(
-            no_of_cryptos=train_configs["no_of_assets"],
-            max_count_of_periods=train_configs["max_no_of_training_periods"],
-        )
+    dataset, asset_names = get_crypto_price_tensors.main(
+        no_of_cryptos=train_configs["no_of_assets"],
+        max_count_of_periods=train_configs["max_no_of_training_periods"],
+    )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
     trade_env_args["data"] = dataset
@@ -164,14 +157,6 @@ if __name__ == "__main__":
     )
 
     PARSER.add_argument(
-        "-sd",
-        "--stock_data",
-        action="store_true",
-        help="Use cryptocurrency data",
-        default=False,
-    )
-
-    PARSER.add_argument(
         "-g", "--gpu_device", type=int, help="Choose GPU device number", default=None
     )
     PARSER.add_argument(
@@ -243,7 +228,6 @@ if __name__ == "__main__":
         print("\nStarting rapid test run...")
         main(
             interactive_session=False,
-            stock_data=False,
             gpu_device=None,
             verbose=True,
             no_of_assets=5,
@@ -261,7 +245,6 @@ if __name__ == "__main__":
         print("\nStarting proper test run...")
         main(
             interactive_session=False,
-            stock_data=False,
             gpu_device=None,
             verbose=True,
             no_of_assets=5,
@@ -277,7 +260,6 @@ if __name__ == "__main__":
     else:
         main(
             interactive_session=ARGS.interactive_session,
-            stock_data=ARGS.stock_data,
             gpu_device=ARGS.gpu_device,
             verbose=ARGS.verbose,
             no_of_assets=ARGS.no_of_assets,

@@ -24,14 +24,6 @@ class TestTrainTestAnalyse(unittest.TestCase):
         deep_rl_portfolio.main(**self.cli_options)
         self.assertEqual(True, True)
 
-    def test_stock_train_completes_fully(self):
-        stock_options = self.cli_options
-        stock_options["stock_data"] = True
-
-        deep_rl_portfolio.main(**stock_options)
-
-        self.assertEqual(True, True)
-
 
 if __name__ == "__main__":
     unittest.main()
