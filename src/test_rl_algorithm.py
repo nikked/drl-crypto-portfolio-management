@@ -48,6 +48,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
     pf_value_t_fu = [0] * no_of_assets
 
+    # Using test set
     for k in range(
         train_test_split["train"]
         + train_test_split["validation"]

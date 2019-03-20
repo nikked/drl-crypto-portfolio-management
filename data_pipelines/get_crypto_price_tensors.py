@@ -87,11 +87,8 @@ def _make_crypto_tensor(kept_cryptos, no_of_cryptos):
 
     array_open = np.transpose(np.array(list_open))[:-1]
     array_open_of_the_day = np.transpose(np.array(list_open))[1:]
-    # array_close = np.transpose(np.array(list_close))[:-1]
     array_high = np.transpose(np.array(list_high))[:-1]
     array_low = np.transpose(np.array(list_low))[:-1]
-
-    # np.transpose(np.array(list_low)).shape
 
     crypto_tensor = np.transpose(
         np.array(

@@ -208,6 +208,7 @@ def _test_agent_performance(train_options, trade_env_args, train_test_split, age
     p_list_eval = [train_options["portfolio_value"]]
     w_list_eval = [w_init_test]
 
+    # Using validation set
     for _ in tqdm(
         range(
             train_test_split["train"],
@@ -218,13 +219,12 @@ def _test_agent_performance(train_options, trade_env_args, train_test_split, age
     ):
         x_t = state_eval[0].reshape([-1] + list(state_eval[0].shape))
         w_previous = state_eval[1].reshape([-1] + list(state_eval[1].shape))
-        # pf_value_previous = state_eval[2]
+
         # compute the action
         action = agent.compute_w(x_t, w_previous)
         # step forward environment
         state_eval, _, _ = env_eval.step(action)
 
-        # x_next = state_eval[0]
         w_t_eval = state_eval[1]
         pf_value_t_eval = state_eval[2]
 

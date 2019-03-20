@@ -37,16 +37,16 @@ def main(**train_configs):
 
     # Creation of the trading environment
     print("\n")
-    trade_envs, asset_list, step_counts = _initialize_trade_envs(train_configs)
+    trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(train_configs)
 
     # Agent training
     actor, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
-        train_configs, trade_envs, asset_list, step_counts
+        train_configs, trade_envs, asset_list, train_test_val_steps
     )
 
     # Agent evaluation
     test_performance_lists = test_rl_algorithm(
-        train_configs, actor, state_fu, done_fu, trade_envs, step_counts
+        train_configs, actor, state_fu, done_fu, trade_envs, train_test_val_steps
     )
 
     end_time = time.time()
@@ -80,14 +80,14 @@ def _initialize_trade_envs(train_configs):
 
     trading_periods = dataset.shape[2]
     print("Trading periods: {}".format(dataset.shape[2]))
-    step_counts = _get_train_val_test_steps(trading_periods)
+    train_test_val_steps = _get_train_val_test_steps(trading_periods)
 
     print("Starting training for {} assets".format(len(asset_names)))
     print(asset_names)
 
     train_envs = _get_train_environments(train_configs["no_of_assets"], trade_env_args)
 
-    return train_envs, asset_names, step_counts
+    return train_envs, asset_names, train_test_val_steps
 
 
 def _get_train_environments(no_of_assets, trade_env_args):
@@ -131,13 +131,13 @@ def _get_train_val_test_steps(trading_period):
     # Total number of steps for the test
     total_steps_test = trading_period - total_steps_train - total_steps_val
 
-    step_counts = {
+    train_test_val_steps = {
         "train": total_steps_train,
         "test": total_steps_test,
         "validation": total_steps_val,
     }
 
-    return step_counts
+    return train_test_val_steps
 
 
 if __name__ == "__main__":
