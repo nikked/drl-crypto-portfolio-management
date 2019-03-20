@@ -37,7 +37,3 @@ class PVM:
             i_start = self.total_steps - self.batch_size + 1 - zeta
             if i_start >= 0:
                 return i_start
-
-    def test(self):
-        # just to test
-        return self.memory

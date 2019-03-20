@@ -46,10 +46,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     plt.plot(p_list, label="Agent Portfolio Value")
     plt.plot(p_list_eq, label="Equi-weighted Portfolio Value")
     plt.plot(p_list_s, label="Secured Portfolio Value")
-    # for i in range(no_of_asset):
-    #     plt.plot(
-    #         p_list_fu[i], label="Full Stock {} Portfolio Value".format(asset_list[i])
-    #     )
+
     plt.legend(bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.0)
     plt.show()
 
@@ -63,16 +60,3 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         plt.title("Weight evolution during testing")
         plt.legend(bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.5)
     plt.show()
-
-    # plt.plot(np.array(p_list) - np.array(p_list_eq))
-
-    # index1 = 0
-    # index2 = -1
-
-    # plt.plot(policy_network[index1:index2], label="Agent Portfolio Value")
-    # plt.plot(equal_weighted[index1:index2], label="Baseline Portfolio Value")
-    # plt.plot(only_cash[index1:index2], label="Secured Portfolio Value")
-    # plt.legend()
-    # plt.show()
-
-    # plt.plot((np.array(policy_network) - np.array(equal_weighted)))
