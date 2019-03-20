@@ -40,3 +40,10 @@
 
 * Wrote dynamic data fetching code for poloniex
 * Revised research questions and moved them to the beginning after intro
+
+
+## 19.3
+> Vainu work
+
+* Sauna, Loosiseter with Aleksi and Pate
+* 
