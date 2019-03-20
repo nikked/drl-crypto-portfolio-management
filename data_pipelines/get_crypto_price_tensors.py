@@ -25,13 +25,13 @@ import numpy as np
 
 from data_pipelines.get_data_from_poloniex_api import download_crypto_data, DATA_DIR
 
-START_DATE = "20190101"
-END_DATE = "20190319"
 
-TRADING_PERIOD = "2h"
-
-
-def main(no_of_cryptos=5, max_count_of_periods=10000):
+def main(
+    no_of_cryptos=5,
+    start_date="20190101",
+    end_date="20190319",
+    trading_period_length="2h",
+):
 
     cryptos_dict = {}
 
@@ -40,14 +40,14 @@ def main(no_of_cryptos=5, max_count_of_periods=10000):
     for crypto in chosen_cryptos:
         cryptos_dict[crypto] = os.path.join(
             f"BTC_{crypto}",
-            f"{START_DATE}-{END_DATE}",
-            f"BTC_{crypto}_{START_DATE}-{END_DATE}_{TRADING_PERIOD}.csv",
+            f"{start_date}-{end_date}",
+            f"BTC_{crypto}_{start_date}-{end_date}_{trading_period_length}.csv",
         )
 
     for crypto_ticker, crypto_data_fp in cryptos_dict.items():
         if not os.path.isfile(crypto_data_fp):
             download_crypto_data(
-                f"BTC_{crypto_ticker}", START_DATE, END_DATE, TRADING_PERIOD
+                f"BTC_{crypto_ticker}", start_date, end_date, trading_period_length
             )
 
     chosen_crypto_fps = []
@@ -55,9 +55,7 @@ def main(no_of_cryptos=5, max_count_of_periods=10000):
     for crypto in chosen_cryptos:
         chosen_crypto_fps.append(cryptos_dict[crypto])
 
-    crypto_tensor = _make_crypto_tensor(
-        chosen_crypto_fps, no_of_cryptos, max_count_of_periods
-    )
+    crypto_tensor = _make_crypto_tensor(chosen_crypto_fps, no_of_cryptos)
 
     print("Returning dataset")
     print(chosen_cryptos)
@@ -67,7 +65,7 @@ def main(no_of_cryptos=5, max_count_of_periods=10000):
     return crypto_tensor, chosen_cryptos
 
 
-def _make_crypto_tensor(kept_cryptos, no_of_cryptos, max_count_of_periods):
+def _make_crypto_tensor(kept_cryptos, no_of_cryptos):
     list_open = list()
     list_close = list()
     list_high = list()
@@ -82,10 +80,10 @@ def _make_crypto_tensor(kept_cryptos, no_of_cryptos, max_count_of_periods):
 
         data = pd.read_csv(data_fp).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
-        list_open.append(data.open.values[:max_count_of_periods])
-        list_close.append(data.close.values[:max_count_of_periods])
-        list_high.append(data.high.values[:max_count_of_periods])
-        list_low.append(data.low.values[:max_count_of_periods])
+        list_open.append(data.open.values)
+        list_close.append(data.close.values)
+        list_high.append(data.high.values)
+        list_low.append(data.low.values)
 
     array_open = np.transpose(np.array(list_open))[:-1]
     array_open_of_the_day = np.transpose(np.array(list_open))[1:]

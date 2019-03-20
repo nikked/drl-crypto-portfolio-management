@@ -9,15 +9,17 @@ class TestTrainTestAnalyse(unittest.TestCase):
             "stock_data": False,
             "gpu_device": None,
             "interactive_session": False,
-            "max_no_of_training_periods": 1000,
             "no_of_assets": 2,
             "plot_results": False,
             "verbose": False,
             "n_batches": 1,
             "n_episodes": 1,
-            "window_length": 300,
+            "window_length": 120,
             "batch_size": 10,
             "portfolio_value": 10000,
+            "start_date": "20190101",
+            "end_date": "20190301",
+            "trading_period_length": "2h",
         }
 
     def test_crypto_train_completes_fully(self):

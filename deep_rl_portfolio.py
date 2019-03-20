@@ -69,7 +69,9 @@ def _initialize_trade_envs(train_configs):
 
     dataset, asset_names = get_crypto_price_tensors.main(
         no_of_cryptos=train_configs["no_of_assets"],
-        max_count_of_periods=train_configs["max_no_of_training_periods"],
+        start_date=train_configs["start_date"],
+        end_date=train_configs["end_date"],
+        trading_period_length=train_configs["trading_period_length"],
     )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
@@ -187,13 +189,6 @@ if __name__ == "__main__":
         "-wl", "--window_length", type=int, help="Choose window length", default=40
     )
     PARSER.add_argument(
-        "-tp",
-        "--max_no_of_training_periods",
-        type=int,
-        help="Set upper limit for training periods",
-        default=1000,
-    )
-    PARSER.add_argument(
         "-pv",
         "--portfolio_initial_value",
         type=int,
@@ -217,6 +212,27 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
     )
+    PARSER.add_argument(
+        "-sd",
+        "--start_date",
+        type=str,
+        default="20170601",
+        help="date in format YYYYMMDD",
+    )
+    PARSER.add_argument(
+        "-ed",
+        "--end_date",
+        type=str,
+        default="20171231",
+        help="date in format YYYYMMDD",
+    )
+    PARSER.add_argument(
+        "-pl",
+        "--trading_period_length",
+        type=str,
+        default="1d",
+        help="Trade period length (5min, 15min, 30min, 2h, 4h, 1d)",
+    )
 
     ARGS = PARSER.parse_args()
 
@@ -224,20 +240,21 @@ if __name__ == "__main__":
         print("\nVerbose session. Alot of vectors will be printed below.\n")
 
     if ARGS.quick_test_mode:
-
         print("\nStarting rapid test run...")
         main(
             interactive_session=False,
             gpu_device=None,
             verbose=True,
             no_of_assets=5,
-            max_no_of_training_periods=200,
             plot_results=False,
             n_episodes=1,
             n_batches=1,
-            window_length=77,
+            window_length=130,
             batch_size=1,
             portfolio_value=10000,
+            start_date="20190101",
+            end_date="20190301",
+            trading_period_length="4h",
         )
 
     elif ARGS.test_mode:
@@ -248,13 +265,15 @@ if __name__ == "__main__":
             gpu_device=None,
             verbose=True,
             no_of_assets=5,
-            max_no_of_training_periods=700,
             plot_results=True,
             n_episodes=1,
             n_batches=1,
             window_length=77,
             batch_size=1,
             portfolio_value=10000,
+            start_date="20190101",
+            end_date="20190301",
+            trading_period_length="2h",
         )
 
     else:
@@ -263,11 +282,13 @@ if __name__ == "__main__":
             gpu_device=ARGS.gpu_device,
             verbose=ARGS.verbose,
             no_of_assets=ARGS.no_of_assets,
-            max_no_of_training_periods=ARGS.max_no_of_training_periods,
             plot_results=ARGS.plot_results,
             n_episodes=ARGS.no_of_episodes,
             n_batches=ARGS.no_of_batches,
             window_length=ARGS.window_length,
             batch_size=ARGS.batch_size,
             portfolio_value=ARGS.portfolio_initial_value,
+            start_date=ARGS.start_date,
+            end_date=ARGS.end_date,
+            trading_period_length=ARGS.trading_period_length,
         )
