@@ -367,6 +367,10 @@ def _train_batch_item(  # pylint: disable=too-many-arguments, too-many-locals
     )
 
     # let us compute the returns
+    print(
+        "\n******\nNOTE THIS BUG, SOMETIMES X_NEXT IS EMPTY CAUSING THE TRAIN TO CRASH"
+    )
+    print(new_state["x_next"])
     daily_return_t = new_state["x_next"][-1, :, -1]
 
     # update into the PVM
