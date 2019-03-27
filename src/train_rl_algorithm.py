@@ -127,7 +127,6 @@ def _test_and_report_progress(  # pylint: disable=too-many-arguments
     """
     This function evaluates the performance of the different types of agents.
 
-
     """
 
     print("\nEvaluating agent performance")
@@ -141,7 +140,7 @@ def _test_and_report_progress(  # pylint: disable=too-many-arguments
         "list_pf_dd_training": [],
     }
 
-    w_list_eval, p_list_eval = _test_agent_performance(
+    w_list_eval, p_list_eval = _validate_agent_performance(
         train_options, trade_env_args, train_test_split, agent
     )
 
@@ -193,7 +192,7 @@ def _test_and_report_progress(  # pylint: disable=too-many-arguments
         plt.show()
 
 
-def _test_agent_performance(train_options, trade_env_args, train_test_split, agent):
+def _validate_agent_performance(train_options, trade_env_args, train_test_split, agent):
     # environment for trading of the agent
     env_eval = TradeEnv(**trade_env_args)
 

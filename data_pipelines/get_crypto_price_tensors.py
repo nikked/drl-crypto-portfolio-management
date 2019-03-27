@@ -50,6 +50,11 @@ def main(
                 f"BTC_{crypto_ticker}", start_date, end_date, trading_period_length
             )
 
+    # Download bitcoin price for the period
+    btc_price_fp = f"USDT_BTC_{start_date}-{end_date}_{trading_period_length}.csv"
+    if not os.path.isfile(crypto_data_fp):
+        download_crypto_data(f"USDT_BTC", start_date, end_date, trading_period_length)
+
     chosen_crypto_fps = []
 
     for crypto in chosen_cryptos:

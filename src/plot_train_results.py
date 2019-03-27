@@ -1,6 +1,8 @@
 import os
 import numpy as np
 from datetime import datetime
+import pandas as pd
+from pprint import pprint
 
 import matplotlib.pyplot as plt
 from src.params import (
@@ -10,6 +12,7 @@ from src.params import (
     MAX_PF_WEIGHT_PENALTY,
 )
 
+DATA_DIR = "crypto_data/"
 OUTPUT_DIR = "train_graphs/"
 CASH_NAME = "BTC"
 
@@ -28,7 +31,12 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     train_performance_lists,
     asset_list,
     train_time_secs,
+    train_test_val_steps,
 ):
+
+    pprint("Making a plot of results")
+    pprint(train_configs)
+    pprint(train_test_val_steps)
 
     timestamp_now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
@@ -39,7 +47,11 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     fig.set_size_inches(12.5, 9.5)
 
     _plot_portfolio_value_progress(
-        axes[0][0], test_performance_lists, asset_list, train_configs
+        axes[0][0],
+        test_performance_lists,
+        asset_list,
+        train_configs,
+        train_test_val_steps,
     )
     _plot_weight_evolution(
         axes[0][1], asset_list, test_performance_lists["w_list"], train_configs
@@ -51,6 +63,8 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
 
     if train_configs["plot_results"]:
         plt.show()
+
+    pprint("Exiting")
 
 
 def _plot_train_params(axis, train_configs, train_time_secs, timestamp_now):
@@ -77,8 +91,10 @@ Training timestamp: {timestamp_now}
 
 
 def _plot_portfolio_value_progress(
-    axis, test_performance_lists, asset_list, train_configs
+    axis, test_performance_lists, asset_list, train_configs, train_test_val_steps
 ):
+
+    btc_price_data = _get_btc_price_data_for_period(train_configs, train_test_val_steps)
 
     p_list = test_performance_lists["p_list"]
     p_list_eq = test_performance_lists["p_list_eq"]
@@ -97,8 +113,23 @@ def _plot_portfolio_value_progress(
     )
     axis.plot(p_list, label="Agent")
     axis.plot(p_list_eq, label="Equally weighted")
+    axis.plot(btc_price_data, label="BTC price")
 
     axis.legend(bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.0)
+
+
+def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
+
+    tc = train_configs
+
+    btc_price_fn = f"USDT_BTC_{tc['start_date']}-{tc['end_date']}_{tc['trading_period_length']}.csv"
+
+    btc_price_fp = os.path.join(
+        DATA_DIR, "USDT_BTC", f"{tc['start_date']}-{tc['end_date']}", btc_price_fn
+    )
+    data = pd.read_csv(btc_price_fp).fillna("bfill").copy()
+
+    return data.close
 
 
 def _plot_weight_evolution(axis, asset_list, w_list, train_configs):

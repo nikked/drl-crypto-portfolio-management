@@ -35,8 +35,9 @@ def main(**train_configs):
 
     start_time = time.time()
 
-    # Creation of the trading environment
     print("\n")
+
+    # Creation of the trading environment
     trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(train_configs)
 
     # Agent training
@@ -61,6 +62,7 @@ def main(**train_configs):
         train_performance_lists,
         asset_list,
         train_time_secs,
+        train_test_val_steps,
     )
 
 
@@ -79,6 +81,8 @@ def _initialize_trade_envs(train_configs):
 
     trading_periods = dataset.shape[2]
     print("Trading periods: {}".format(dataset.shape[2]))
+
+    # Determine the step sizes of different datasets
     train_test_val_steps = _get_train_val_test_steps(trading_periods)
 
     print("Starting training for {} assets".format(len(asset_names)))
