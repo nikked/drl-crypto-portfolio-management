@@ -45,7 +45,7 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
     for n_episode in range(train_options["n_episodes"]):
 
         print("\nStarting reinforcement learning episode", n_episode + 1)
-        if n_episode == 0:
+        if n_episode == 0 and train_options["validate_during_training"]:
             _test_and_report_progress(
                 train_options,
                 "Before Training",
@@ -59,14 +59,15 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
             train_options, trade_envs, train_test_split, agent, train_performance_lists
         )
 
-        _test_and_report_progress(
-            train_options,
-            n_episode,
-            agent,
-            trade_envs["args"],
-            asset_list,
-            train_test_split,
-        )
+        if train_options["validate_during_training"]:
+            _test_and_report_progress(
+                train_options,
+                n_episode,
+                agent,
+                trade_envs["args"],
+                asset_list,
+                train_test_split,
+            )
 
     return (
         agent,

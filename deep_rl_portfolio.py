@@ -216,6 +216,13 @@ if __name__ == "__main__":
         action="store_true",
     )
     PARSER.add_argument(
+        "-vdt",
+        "--validate_during_training",
+        help="Run additional validation during training to monitor overfitting",
+        default=False,
+        action="store_true",
+    )
+    PARSER.add_argument(
         "-sd",
         "--start_date",
         type=str,
@@ -259,6 +266,7 @@ if __name__ == "__main__":
             end_date="20190301",
             trading_period_length="4h",
             test_mode=True,
+            validate_during_training=ARGS.validate_during_training,
         )
 
     elif ARGS.test_mode:
@@ -279,6 +287,7 @@ if __name__ == "__main__":
             end_date="20190301",
             trading_period_length="2h",
             test_mode=True,
+            validate_during_training=ARGS.validate_during_training,
         )
 
     else:
@@ -296,4 +305,5 @@ if __name__ == "__main__":
             start_date=ARGS.start_date,
             end_date=ARGS.end_date,
             trading_period_length=ARGS.trading_period_length,
+            validate_during_training=ARGS.validate_during_training,
         )
