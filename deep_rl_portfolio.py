@@ -40,13 +40,13 @@ def main(**train_configs):
     trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(train_configs)
 
     # Agent training
-    actor, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
+    agent, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
         train_configs, trade_envs, asset_list, train_test_val_steps
     )
 
     # Agent evaluation
     test_performance_lists = test_rl_algorithm(
-        train_configs, actor, state_fu, done_fu, trade_envs, train_test_val_steps
+        train_configs, agent, state_fu, done_fu, trade_envs, train_test_val_steps
     )
 
     end_time = time.time()
@@ -55,14 +55,13 @@ def main(**train_configs):
     print("\nTraining completed")
     print(f"Process took {train_time_secs} seconds")
 
-    if train_configs["plot_results"]:
-        plot_train_results(
-            train_configs,
-            test_performance_lists,
-            train_performance_lists,
-            "stocks",
-            asset_list,
-        )
+    plot_train_results(
+        train_configs,
+        test_performance_lists,
+        train_performance_lists,
+        "stocks",
+        asset_list,
+    )
 
 
 def _initialize_trade_envs(train_configs):
@@ -265,7 +264,7 @@ if __name__ == "__main__":
             gpu_device=None,
             verbose=True,
             no_of_assets=5,
-            plot_results=True,
+            plot_results=False,
             n_episodes=1,
             n_batches=1,
             window_length=77,

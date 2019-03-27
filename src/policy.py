@@ -239,7 +239,7 @@ class Policy:
         """
         This function trains the neural network
         maximizing the reward
-        the input is a batch of the differents values
+        the input is a batch of the different values
         """
         with tf.device(self.tf_device):
             self.sess.run(

@@ -17,3 +17,4 @@ local_data/
 *.ipynb.swp
 .coverage
 crypto_data/*
+train_graphs/
