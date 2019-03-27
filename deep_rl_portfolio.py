@@ -56,7 +56,11 @@ def main(**train_configs):
     print(f"Process took {train_time_secs} seconds")
 
     plot_train_results(
-        train_configs, test_performance_lists, train_performance_lists, asset_list
+        train_configs,
+        test_performance_lists,
+        train_performance_lists,
+        asset_list,
+        train_time_secs,
     )
 
 
@@ -250,6 +254,7 @@ if __name__ == "__main__":
             start_date="20190101",
             end_date="20190301",
             trading_period_length="4h",
+            test_mode=True,
         )
 
     elif ARGS.test_mode:
@@ -269,6 +274,7 @@ if __name__ == "__main__":
             start_date="20190101",
             end_date="20190301",
             trading_period_length="2h",
+            test_mode=True,
         )
 
     else:

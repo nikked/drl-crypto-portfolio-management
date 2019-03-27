@@ -20,6 +20,7 @@ class TestTrainTestAnalyse(unittest.TestCase):
             "start_date": "20190101",
             "end_date": "20190301",
             "trading_period_length": "2h",
+            "test_mode": True,
         }
 
     def test_crypto_train_completes_fully(self):
