@@ -78,7 +78,7 @@ class TradeEnv:  # pylint: disable=too-many-instance-attributes
 
         """
         self.state = (self.read_tensor(self.data, self.window_length), w_init, p_init)
-        self.index = self.window_length + index
+        self.index = index
         self.done = False
 
         return self.state, self.done

@@ -211,9 +211,7 @@ def _validate_agent_performance(train_options, trade_env_args, train_test_split,
     for _ in tqdm(
         range(
             train_test_split["train"],
-            train_test_split["train"]
-            + train_test_split["validation"]
-            - int(train_options["window_length"] / 2),
+            train_test_split["train"] + train_test_split["validation"],
         )
     ):
         x_t = state_eval[0].reshape([-1] + list(state_eval[0].shape))

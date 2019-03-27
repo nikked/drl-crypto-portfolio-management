@@ -49,16 +49,15 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     pf_value_t_fu = [0] * no_of_assets
 
     # Using test set
-    for k in range(
-        train_test_split["train"]
-        + train_test_split["validation"]
-        - int(train_options["window_length"] / 2),
+
+    low_index = train_test_split["train"] + train_test_split["validation"]
+    up_index = (
         train_test_split["train"]
         + train_test_split["validation"]
         + train_test_split["test"]
-        - train_options["window_length"],
-    ):
-        print(k)
+    )
+
+    for k in range(low_index, up_index):
         x_current = state[0].reshape([-1] + list(state[0].shape))
         w_previous = state[1].reshape([-1] + list(state[1].shape))
         pf_value_previous = state[2]
@@ -83,7 +82,6 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         for i in range(no_of_assets):
             pf_value_t_fu[i] = state_fu[i][2]
 
-        # dailyReturn_t = x_next[-1, :, -1]
         if k % 20 == 0:
             print("Ptf value: ", round(pf_value_previous, 0))
             print("Ptf weights: ", w_previous[0])
@@ -94,16 +92,6 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         p_list_s.append(pf_value_t_s)
         for i in range(no_of_assets):
             p_list_fu[i].append(pf_value_t_fu[i])
-
-        # # here to break the loop/not in original code
-        # if (
-        #     k
-        #     == train_test_split["train"]
-        #     + train_test_split["validation"]
-        #     - int(train_options["window_length"] / 2)
-        #     + 100
-        # ):
-        #     break
 
     test_performance_lists = {
         "p_list": p_list,
