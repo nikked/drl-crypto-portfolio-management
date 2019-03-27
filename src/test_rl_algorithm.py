@@ -2,7 +2,7 @@ import numpy as np
 
 
 def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
-    train_options, actor, state_fu, done_fu, trade_envs, train_test_split
+    train_options, agent, state_fu, done_fu, trade_envs, train_test_split
 ):
 
     print("\nTesting algorithm performance with test set")
@@ -62,7 +62,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         w_previous = state[1].reshape([-1] + list(state[1].shape))
         pf_value_previous = state[2]
         # compute the action
-        action = actor.compute_w(x_current, w_previous)
+        action = agent.compute_w(x_current, w_previous)
         # step forward environment
         state, _, _ = trade_envs["policy_network"].step(action)
         state_eq, _, _ = trade_envs["equal_weighted"].step(weights_equal)
