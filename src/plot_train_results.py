@@ -1,8 +1,9 @@
 import os
-import numpy as np
-from datetime import datetime
-import pandas as pd
 from pprint import pprint
+from datetime import datetime
+
+import numpy as np
+import pandas as pd
 
 import matplotlib.pyplot as plt
 from src.params import (
@@ -23,7 +24,6 @@ if not os.path.exists(OUTPUT_DIR):
 def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     train_configs,
     test_performance_lists,
-    train_performance_lists,
     asset_list,
     train_time_secs,
     train_test_val_steps,
@@ -39,25 +39,15 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
 
     btc_price_data = _get_btc_price_data_for_period(train_configs, train_test_val_steps)
 
-    _plot_portfolio_value_progress(
-        axes[0][0],
-        test_performance_lists,
-        asset_list,
-        train_configs,
-        train_test_val_steps,
-        btc_price_data,
-    )
+    _plot_portfolio_value_progress(axes[0][0], test_performance_lists, btc_price_data)
     _plot_weight_evolution(
-        axes[0][1],
-        asset_list,
-        test_performance_lists["w_list"],
-        train_configs,
-        btc_price_data,
+        axes[0][1], asset_list, test_performance_lists["w_list"], btc_price_data
     )
     _plot_train_params(axes[1][1], train_configs, train_time_secs, timestamp_now)
 
-    for ax in fig.axes:
-        plt.sca(ax)
+    # Rotate x axis labels
+    for axis in fig.axes:
+        plt.sca(axis)
         plt.xticks(rotation=30)
 
     output_fn = "test" if "test_mode" in train_configs else timestamp_now
@@ -70,14 +60,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     pprint("Exiting")
 
 
-def _plot_portfolio_value_progress(
-    axis,
-    test_performance_lists,
-    asset_list,
-    train_configs,
-    train_test_val_steps,
-    btc_price_data,
-):
+def _plot_portfolio_value_progress(axis, test_performance_lists, btc_price_data):
 
     p_list = test_performance_lists["p_list"]
     p_list_eq = test_performance_lists["p_list_eq"]
@@ -101,12 +84,15 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     during the test period.
 
     """
-    tc = train_configs
+    t_confs = train_configs
 
     # Open BTC price data from file
-    btc_price_fn = f"USDT_BTC_{tc['start_date']}-{tc['end_date']}_{tc['trading_period_length']}.csv"
+    btc_price_fn = f"USDT_BTC_{t_confs['start_date']}-{t_confs['end_date']}_{t_confs['trading_period_length']}.csv"
     btc_price_fp = os.path.join(
-        DATA_DIR, "USDT_BTC", f"{tc['start_date']}-{tc['end_date']}", btc_price_fn
+        DATA_DIR,
+        "USDT_BTC",
+        f"{t_confs['start_date']}-{t_confs['end_date']}",
+        btc_price_fn,
     )
     data = pd.read_csv(btc_price_fp).fillna("bfill").copy()
 
@@ -125,25 +111,22 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     of the period
     """
     output_series = pd.Series()
-    output_series = output_series.append(pd.Series(tc["portfolio_value"]))
+    output_series = output_series.append(pd.Series(t_confs["portfolio_value"]))
 
     btc_data_price_diffs = btc_data_test_period.pct_change()
 
-    for idx, btc_price_diff in enumerate(btc_data_price_diffs):
-        if idx == 0:
-            continue
-        else:
-            prev_pf_value = output_series[idx - 1]
-            current_price_diff = btc_data_price_diffs[idx]
-            changed_btc_pf_value = prev_pf_value * (current_price_diff + 1)
-            output_series.at[idx] = changed_btc_pf_value
+    for idx in range(1, len(btc_data_price_diffs)):
+        prev_pf_value = output_series[idx - 1]
+        current_price_diff = btc_data_price_diffs[idx]
+        changed_btc_pf_value = prev_pf_value * (current_price_diff + 1)
+        output_series.at[idx] = changed_btc_pf_value
 
     output_series.index = btc_data_test_period.index
 
     return output_series
 
 
-def _plot_weight_evolution(axis, asset_list, w_list, train_configs, btc_price_data):
+def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
 
     names = [CASH_NAME] + asset_list
     w_list = np.array(w_list)

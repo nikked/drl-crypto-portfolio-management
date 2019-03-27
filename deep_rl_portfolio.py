@@ -59,7 +59,6 @@ def main(**train_configs):
     plot_train_results(
         train_configs,
         test_performance_lists,
-        train_performance_lists,
         asset_list,
         train_time_secs,
         train_test_val_steps,
