@@ -11,34 +11,29 @@ from src.params import (
 )
 
 OUTPUT_DIR = "train_graphs/"
+CASH_NAME = "BTC"
 
 if not os.path.exists(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
 
 
 def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
-    train_configs,
-    test_performance_lists,
-    train_performance_lists,
-    input_data_type,
-    asset_list,
+    train_configs, test_performance_lists, train_performance_lists, asset_list
 ):
+
+    _plot_portfolio_value_progress(test_performance_lists, asset_list, train_configs)
+
+    _plot_weight_evolution(asset_list, test_performance_lists["w_list"], train_configs)
+
+
+def _plot_portfolio_value_progress(test_performance_lists, asset_list, train_configs):
 
     p_list = test_performance_lists["p_list"]
     p_list_eq = test_performance_lists["p_list_eq"]
     p_list_s = test_performance_lists["p_list_s"]
-    p_list_fu = test_performance_lists["p_list_fu"]
-    w_list = test_performance_lists["w_list"]
-
-    policy_network = train_performance_lists["policy_network"]
-    equal_weighted = train_performance_lists["equal_weighted"]
-    only_cash = train_performance_lists["only_cash"]
-
-    no_of_asset = len(asset_list)
 
     plt.title(
-        "Portfolio Value (Test Set) {}: {}, {}, {}, {}, {}, {}, {}, {}".format(
-            input_data_type,
+        "Portfolio Value (Test Set): {}, {}, {}, {}, {}, {}, {}, {}".format(
             train_configs["batch_size"],
             LEARNING_RATE,
             EPSILON_GREEDY_THRESHOLD,
@@ -63,10 +58,13 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
 
     plt.clf()
 
-    names = ["Money"] + asset_list
+
+def _plot_weight_evolution(asset_list, w_list, train_configs):
+
+    names = [CASH_NAME] + asset_list
     w_list = np.array(w_list)
-    for j in range(no_of_asset + 1):
-        if names[j] == "Money":
+    for j in range(len(asset_list) + 1):
+        if names[j] == CASH_NAME:
             continue
 
         plt.plot(w_list[1:, j], label="Weight Stock {}".format(names[j]))

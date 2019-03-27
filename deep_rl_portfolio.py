@@ -56,11 +56,7 @@ def main(**train_configs):
     print(f"Process took {train_time_secs} seconds")
 
     plot_train_results(
-        train_configs,
-        test_performance_lists,
-        train_performance_lists,
-        "stocks",
-        asset_list,
+        train_configs, test_performance_lists, train_performance_lists, asset_list
     )
 
 
