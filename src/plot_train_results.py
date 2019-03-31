@@ -23,6 +23,7 @@ if not os.path.exists(OUTPUT_DIR):
 
 def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     train_configs,
+    train_performance_lists,
     test_performance_lists,
     asset_list,
     train_time_secs,
@@ -39,7 +40,12 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
 
     btc_price_data = _get_btc_price_data_for_period(train_configs, train_test_val_steps)
 
-    _plot_portfolio_value_progress(axes[0][0], test_performance_lists, btc_price_data)
+    _plot_portfolio_value_progress_test(
+        axes[0][0], test_performance_lists, btc_price_data
+    )
+    _plot_portfolio_value_progress_train(
+        axes[1][0], train_performance_lists, btc_price_data
+    )
     _plot_weight_evolution(
         axes[0][1], asset_list, test_performance_lists["w_list"], btc_price_data
     )
@@ -69,7 +75,24 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     pprint("Exiting")
 
 
-def _plot_portfolio_value_progress(axis, test_performance_lists, btc_price_data):
+def _plot_portfolio_value_progress_train(axis, train_performance_lists, btc_price_data):
+
+    p_list = train_performance_lists["policy_network"]
+    p_list_eq = train_performance_lists["equal_weighted"]
+
+    p_list_series = pd.Series(p_list, index=btc_price_data.index)
+    p_list_eq_series = pd.Series(p_list_eq, index=btc_price_data.index)
+
+    axis.set_title("Portfolio Value (Train Set)")
+
+    axis.plot(p_list_series, label="Agent")
+    axis.plot(p_list_eq_series, label="Equally weighted")
+    # axis.plot(btc_price_data, label="BTC only")
+
+    axis.legend(bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.0)
+
+
+def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_data):
 
     p_list = test_performance_lists["p_list"]
     p_list_eq = test_performance_lists["p_list_eq"]
@@ -153,22 +176,24 @@ def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
 def _plot_train_params(axis, train_configs, train_time_secs, timestamp_now):
 
     train_params_str = f"""
+Training timestamp: {timestamp_now}
+Training duration: {train_time_secs} seconds
 Start date:  {train_configs['start_date']}
 End date:  {train_configs['end_date']}
-Batch size: {train_configs['batch_size']}
+
 No. batches: {train_configs['n_batches']}
 No. episodes: {train_configs['n_episodes']}
 Batch size: {train_configs['batch_size']}
+
 Trading period: {train_configs['trading_period_length']}
 Train window length: {train_configs['window_length']}
-Training duration: {train_time_secs} seconds
-Training timestamp: {timestamp_now}
+
 Kernel size: {KERNEL1_SIZE}
+
 Epsilon greedy threshold: {EPSILON_GREEDY_THRESHOLD}
 Learning rate: {LEARNING_RATE}
 Max weight penalty: {MAX_PF_WEIGHT_PENALTY}
     """
-
     axis.set_axis_off()
     axis.text(
         x=0.0,

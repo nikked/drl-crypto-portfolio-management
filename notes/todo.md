@@ -13,7 +13,12 @@ https://into.aalto.fi/display/enfinance/Completing+your+master%27s+thesis
 https://into.aalto.fi/display/enfinance/Maturity+test
 https://into.aalto.fi/display/enfinance/Graduation
 
+
+## Code
+* store train_performance_lists timeseries similarly to test_performance_lists
+
 ## Must do
+
 * Dataset: 2 pg
     * Fix bug where now the agent just invests in agent.
         * is it a header thing? how was the data read in the previous version?

@@ -35,3 +35,8 @@ This ensures that certain test procedures are ran before a commit is allowed
 * improve requirements.txt : decide an specific env that the code is ran on
 * add tensorboard
 * improve train plotting
+
+
+
+
+plot train results

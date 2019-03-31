@@ -72,6 +72,7 @@ def main(**train_configs):
 
     plot_train_results(
         train_configs,
+        train_performance_lists,
         test_performance_lists,
         asset_list,
         train_time_secs,
@@ -278,6 +279,13 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
     )
+    PARSER.add_argument(
+        "-fat",
+        "--fattii_erikoissettii",
+        help="Sita fattii erikoissettii jota on harvoin tarjol; fatimpaa saa edelleen ettii!",
+        default=False,
+        action="store_true",
+    )
 
     ARGS = PARSER.parse_args()
 
@@ -351,6 +359,20 @@ if __name__ == "__main__":
             train_session_name="Jiang_backtest_period_3",
             gpu_device=ARGS.gpu_device,
         )
+    elif ARGS.fattii_erikoissettii:
+        print("\nRunning Fattii Erikois Settii")
+
+        BASE_PARAMS = {
+            **JIANG_BASE_PARAMS,
+            "no_of_assets": 6,
+            "start_date": "20170101",
+            "end_date": "20171231",
+            "train_session_name": "Jiang_backtest_period_3",
+            "gpu_device": ARGS.gpu_device,
+        }
+
+        main(**BASE_PARAMS)
+
     else:
         main(
             interactive_session=ARGS.interactive_session,
