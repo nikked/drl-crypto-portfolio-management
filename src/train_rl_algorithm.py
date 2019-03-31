@@ -252,8 +252,15 @@ def _train_batch(  # pylint: disable=too-many-arguments
     no_of_assets = train_options["no_of_assets"]
     single_asset_pf_values_t = [0] * no_of_assets
 
+    """
+    Initially the starting point was chosen randomly with PVM.
+    Now it is just set to the beginning of the train set, i.e.:
+    to the length of the window
+    """
     # draw the starting point of the batch
-    i_start = memory.draw()
+    #
+    # i_start = memory.draw()
+    i_start = train_options["window_length"]
 
     env_states = _reset_memory_states(
         train_options, trade_envs, memory, i_start, benchmark_weights
@@ -294,6 +301,7 @@ def _reset_memory_states(train_options, trade_envs, memory, i_start, benchmark_w
     state, policy_done = trade_envs["policy_network"].reset(
         memory.get_w(i_start), train_options["portfolio_value"], index=i_start
     )
+
     state_eq, equal_done = trade_envs["equal_weighted"].reset(
         benchmark_weights["equal"], train_options["portfolio_value"], index=i_start
     )
@@ -367,10 +375,6 @@ def _train_batch_item(  # pylint: disable=too-many-arguments, too-many-locals
     )
 
     # let us compute the returns
-    print(
-        "\n******\nNOTE THIS BUG, SOMETIMES X_NEXT IS EMPTY CAUSING THE TRAIN TO CRASH"
-    )
-    print(new_state["x_next"])
     daily_return_t = new_state["x_next"][-1, :, -1]
 
     # update into the PVM
@@ -428,8 +432,8 @@ def _take_train_step(agent, env_states, no_of_assets, trade_envs, benchmark_weig
     else:
         action = _get_random_action(no_of_assets)
 
-    # given the state and the action, call the environment to go one
-    # time step later
+    # given the state and the action, call the environment to go forward one step
+
     env_states["policy_network"]["state"], _, _ = trade_envs["policy_network"].step(
         action
     )

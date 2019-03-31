@@ -1,3 +1,12 @@
+PERIOD_LENGTHS = {
+    "5min:": 300,
+    "15min": 900,
+    "30min": 1800,
+    "2h": 7200,
+    "4h": 14400,
+    "1d": 86400,
+}
+
 # Add to CLI
 EPSILON_GREEDY_THRESHOLD = 0.8
 MAX_PF_WEIGHT_PENALTY = 0.1

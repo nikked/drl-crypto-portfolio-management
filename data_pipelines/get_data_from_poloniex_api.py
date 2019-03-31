@@ -8,6 +8,9 @@ from pprint import pprint
 import pandas as pd
 
 
+from src.params import PERIOD_LENGTHS
+
+
 # https://docs.poloniex.com/#returntradehistory-public
 # https://github.com/jyunfan/poloniex-data/blob/master/getdata.py
 
@@ -24,15 +27,6 @@ COLUMNS = [
 ]
 
 DATA_DIR = "crypto_data/"
-
-PERIOD_LENGTHS = {
-    "5min:": 300,
-    "15min": 900,
-    "30min": 1800,
-    "2h": 7200,
-    "4h": 14400,
-    "1d": 86400,
-}
 
 
 def download_crypto_portfolio_data(start_date, end_date, period_length, pairs):
