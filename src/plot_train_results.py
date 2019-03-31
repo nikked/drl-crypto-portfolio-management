@@ -36,7 +36,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
 
     timestamp_now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     fig, axes = plt.subplots(nrows=2, ncols=2)
-    fig.set_size_inches(12.5, 9.5)
+    fig.set_size_inches(12.5, 11.5)
 
     btc_price_data = _get_btc_price_data_for_period(train_configs, train_test_val_steps)
 
@@ -65,6 +65,17 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         if train_configs["test_mode"]:
             output_fn = "test"
 
+    # Adjust the subplot layout, because the logit one may take more space
+    # than usual, due to y-tick labels like "1 - 10^{-3}"
+    plt.subplots_adjust(
+        # top=0.92,
+        # bottom=0.08,
+        # left=0.10,
+        # right=0.95,
+        hspace=0.25,
+        # wspace=0.35
+    )
+
     output_path = os.path.join(OUTPUT_DIR, f"train_results_{output_fn}.png")
     print(f"Saving plot to path: {output_path}")
     plt.savefig(output_path, bbox_inches="tight")
@@ -89,7 +100,11 @@ def _plot_portfolio_value_progress_train(axis, train_performance_lists, btc_pric
     axis.plot(p_list_eq_series, label="Equally weighted")
     # axis.plot(btc_price_data, label="BTC only")
 
-    axis.legend(bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.0)
+    axis.legend(
+        # bbox_to_anchor=(1.05, 1),
+        # loc=1,
+        # borderaxespad=0.0
+    )
 
 
 def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_data):
@@ -106,7 +121,7 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
     axis.plot(p_list_eq_series, label="Equally weighted")
     axis.plot(btc_price_data, label="BTC only")
 
-    axis.legend(bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.0)
+    axis.legend()
 
 
 def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
@@ -170,7 +185,9 @@ def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
 
         axis.plot(w_list_series, label="{}".format(names[j]))
         axis.set_title("Weight evolution")
-        axis.legend(bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.5)
+        axis.legend(
+            # bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.5
+        )
 
 
 def _plot_train_params(axis, train_configs, train_time_secs, timestamp_now):
