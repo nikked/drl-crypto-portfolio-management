@@ -50,8 +50,17 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         plt.sca(axis)
         plt.xticks(rotation=30)
 
-    output_fn = "test" if "test_mode" in train_configs else timestamp_now
+    output_fn = timestamp_now
+
+    if "train_session_name" in train_configs:
+        output_fn = f"{train_configs['train_session_name']}"
+
+    elif "test_mode" in train_configs:
+        if train_configs["test_mode"]:
+            output_fn = "test"
+
     output_path = os.path.join(OUTPUT_DIR, f"train_results_{output_fn}.png")
+    print(f"Saving plot to path: {output_path}")
     plt.savefig(output_path, bbox_inches="tight")
 
     if train_configs["plot_results"]:

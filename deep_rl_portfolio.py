@@ -27,6 +27,20 @@ DEFAULT_TRADE_ENV_ARGS = {
     "train_size": RATIO_TRAIN,
 }
 
+JIANG_BASE_PARAMS = {
+    "interactive_session": False,
+    "verbose": True,
+    "no_of_assets": 5,
+    "plot_results": False,
+    "n_episodes": 2,
+    "n_batches": 10,
+    "window_length": 40,
+    "batch_size": 50,
+    "portfolio_value": 10000,
+    "validate_during_training": False,
+    "trading_period_length": "4h",
+}
+
 
 def main(**train_configs):
 
@@ -143,6 +157,7 @@ def _get_train_val_test_steps(trading_period):
 
 
 if __name__ == "__main__":
+
     PARSER = argparse.ArgumentParser()
 
     PARSER.add_argument(
@@ -242,6 +257,27 @@ if __name__ == "__main__":
         default="1d",
         help="Trade period length (5min, 15min, 30min, 2h, 4h, 1d)",
     )
+    PARSER.add_argument(
+        "-jbt1",
+        "--jbt1",
+        help="Run model in Jiang's backtest period",
+        default=False,
+        action="store_true",
+    )
+    PARSER.add_argument(
+        "-jbt2",
+        "--jbt2",
+        help="Run model in Jiang's backtest period",
+        default=False,
+        action="store_true",
+    )
+    PARSER.add_argument(
+        "-jbt3",
+        "--jbt3",
+        help="Run model in Jiang's backtest period",
+        default=False,
+        action="store_true",
+    )
 
     ARGS = PARSER.parse_args()
 
@@ -269,7 +305,6 @@ if __name__ == "__main__":
         )
 
     elif ARGS.test_mode:
-
         print("\nStarting proper test run...")
         main(
             interactive_session=False,
@@ -289,6 +324,33 @@ if __name__ == "__main__":
             validate_during_training=ARGS.validate_during_training,
         )
 
+    elif ARGS.jbt1:
+        print("\nRunning model for Jiang's back test 1 period")
+        main(
+            **JIANG_BASE_PARAMS,
+            start_date="20141101",
+            end_date="20161028",
+            train_session_name="Jiang_backtest_period_1",
+            gpu_device=ARGS.gpu_device,
+        )
+    elif ARGS.jbt2:
+        print("\nRunning model for Jiang's back test 2 period")
+        main(
+            **JIANG_BASE_PARAMS,
+            start_date="20150201",
+            end_date="20170128",
+            train_session_name="Jiang_backtest_period_2",
+            gpu_device=ARGS.gpu_device,
+        )
+    elif ARGS.jbt3:
+        print("\nRunning model for Jiang's back test 2 period")
+        main(
+            **JIANG_BASE_PARAMS,
+            start_date="20150501",
+            end_date="20170427",
+            train_session_name="Jiang_backtest_period_3",
+            gpu_device=ARGS.gpu_device,
+        )
     else:
         main(
             interactive_session=ARGS.interactive_session,
