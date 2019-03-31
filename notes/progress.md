@@ -45,5 +45,12 @@
 ## 19.3
 > Vainu work
 
-* Sauna, Loosiseter with Aleksi and Pate
-* 
+* Sauna, Loosister with Aleksi and Pate
+* Trezor day
+
+
+## 20.3
+> 4/5 Kirkkonummi Passi ja Hämis
+
+* Selim Amrouni code/ Methodology day
+* Bug fixing and refactoring to repo

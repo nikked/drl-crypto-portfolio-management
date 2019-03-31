@@ -2,7 +2,7 @@
 
 The key idea underlying policy gradients is to push up the probabilities of actions that lead to higher return, and push down the probabilities of actions that lead to lower return, until you arrive at the optimal policy.
 
- A PG algorithms optimize the parameters of a policy by following the gradients toward higher rewards. 
+ A PG algorithms optimize the parameters of a policy by following the gradients toward higher rewards.
 
 
 ## four steps of pg
@@ -16,9 +16,19 @@ The key idea underlying policy gradients is to push up the probabilities of acti
 
 
 ## RL: What two steps are required to form an expression of the policy gradient that can be numerically computed?
-1) deriving the analytical gradient of policy performance, which turns out to have the form of an expected value, and then 
+1) deriving the analytical gradient of policy performance, which turns out to have the form of an expected value, and then
 
 2) forming a sample estimate of that expected value, which can be computed with data from a finite number of agent-environment interaction steps.
 
 
 ## We like sigmoid because its derivative is non zero everywhere. Also relu. dying (elu)
+
+
+
+## RElationship of RL and DL
+In the framework, the DL part automatically senses the dynamic market condition for informative feature learning. Then, the RL module interacts with deep representations and makes trading decisions to accumulate the ultimate rewards in an unknown environment.
+
+## Small doc changes
+* Change policy gradient to deterministic
+* add tx remainder mu image to jiang
+* stability of learning
