@@ -17,7 +17,30 @@ https://into.aalto.fi/display/enfinance/Graduation
 ## Code
 * store train_performance_lists timeseries similarly to test_performance_lists
 
+## Torstila Todo
+
+
+* I should take an honest and convincing approach to my results and admit that the DL approach is not a viable trading strategy. I should clearly state that the results are unstable and provide reasoning on why this is the case.
+
+
+
+## Literature review
+* How this has been done before. Old articles from phase 1 and Korniotis article
+* 
+
 ## Must do
+
+* Coding and metrics: I should report traditional financial performance metrics such as Sharpe ratio or maximum drawdown in addition to raw return. Make detailed tables of the performance of the model compared to equally weighted and Long Bitcoin strategies.
+
+* Results: I should take an honest and convincing approach to my results and admit that the DL approach is not a viable trading strategy. I should clearly state that the results are unstable and provide reasoning on why this is the case.
+
+* I should include a chapter on what type of machine learning models have previously been used in cryptocurrency price prediction. I should compare the deep learning approach to the previous attempts and justify why studying DL in price prediction is worthwhile investigating.
+    * Phase 1 papers
+    * Korniotis
+
+* ML literature: Revise the whole literature review part to be aligned with the actual model I am using. I should justify its importance to my study by providing relevant examples instead of abstractions.
+
+
 
 * Dataset: 2 pg
     * Fix bug where now the agent just invests in agent.
