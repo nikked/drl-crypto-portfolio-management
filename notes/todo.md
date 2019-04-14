@@ -17,16 +17,6 @@ https://into.aalto.fi/display/enfinance/Graduation
 ## Code
 * store train_performance_lists timeseries similarly to test_performance_lists
 
-## Torstila Todo
-
-
-* I should take an honest and convincing approach to my results and admit that the DL approach is not a viable trading strategy. I should clearly state that the results are unstable and provide reasoning on why this is the case.
-
-
-
-## Literature review
-* How this has been done before. Old articles from phase 1 and Korniotis article
-* 
 
 ## Must do
 

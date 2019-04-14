@@ -31,20 +31,27 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
 ):
 
     pprint("Making a plot of results")
+    print("\nTrain configs")
     pprint(train_configs)
+    print("\nTrain test val steps")
     pprint(train_test_val_steps)
 
     timestamp_now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     fig, axes = plt.subplots(nrows=2, ncols=2)
     fig.set_size_inches(12.5, 11.5)
 
-    btc_price_data = _get_btc_price_data_for_period(train_configs, train_test_val_steps)
+    btc_price_data, btc_price_sharpe = _get_btc_price_data_for_period(
+        train_configs, train_test_val_steps
+    )
 
     _plot_portfolio_value_progress_test(
         axes[0][0], test_performance_lists, btc_price_data
     )
-    _plot_portfolio_value_progress_train(
-        axes[1][0], train_performance_lists, btc_price_data
+    # _plot_portfolio_value_progress_train(
+    #     axes[1][0], train_performance_lists, btc_price_data
+    # )
+    _plot_sharpe_table(
+        axes[1][0], test_performance_lists, btc_price_sharpe, btc_price_data
     )
     _plot_weight_evolution(
         axes[0][1], asset_list, test_performance_lists["w_list"], btc_price_data
@@ -84,6 +91,35 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         plt.show()
 
     pprint("Exiting")
+
+
+def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price_data):
+
+    # Sharpe vs bitcoin or vs dollars
+    # Sharpe ratios are way too large
+
+    columns = ("Strategy", "MDD", "fAPV", "Sharpe")
+
+    sharpe_ratios = test_performance_lists["sharpe_ratios"]
+
+    portfolio_final_value = round(test_performance_lists["p_list"][-1], 2)
+    portfolio_eq_final_value = round(test_performance_lists["p_list_eq"][-1], 2)
+    btc_long_final_value = round(btc_price_data[-1], 2)
+
+    clust_data = [
+        ["DRL", None, portfolio_final_value, round(sharpe_ratios["p_list"], 3)],
+        [
+            "Equal weight",
+            None,
+            portfolio_eq_final_value,
+            round(sharpe_ratios["p_list_eq"], 3),
+        ],
+        ["Long Bitcoin", None, btc_long_final_value, round(btc_price_sharpe, 3)],
+    ]
+
+    axis.set_axis_off()
+
+    axis.table(cellText=clust_data, colLabels=columns, loc="center")
 
 
 def _plot_portfolio_value_progress_train(axis, train_performance_lists, btc_price_data):
@@ -157,20 +193,23 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     portfolio value and then multiplying the prev value with the BTC price diff
     of the period
     """
-    output_series = pd.Series()
-    output_series = output_series.append(pd.Series(t_confs["portfolio_value"]))
+    btc_price_data = pd.Series()
+    btc_price_data = btc_price_data.append(pd.Series(t_confs["portfolio_value"]))
 
     btc_data_price_diffs = btc_data_test_period.pct_change()
 
     for idx in range(1, len(btc_data_price_diffs)):
-        prev_pf_value = output_series[idx - 1]
+        prev_pf_value = btc_price_data[idx - 1]
         current_price_diff = btc_data_price_diffs[idx]
         changed_btc_pf_value = prev_pf_value * (current_price_diff + 1)
-        output_series.at[idx] = changed_btc_pf_value
+        btc_price_data.at[idx] = changed_btc_pf_value
 
-    output_series.index = btc_data_test_period.index
+    btc_price_sharpe = (btc_price_data[idx] - btc_price_data[0]) / np.std(
+        btc_price_data
+    )
+    btc_price_data.index = btc_data_test_period.index
 
-    return output_series
+    return btc_price_data, btc_price_sharpe
 
 
 def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):

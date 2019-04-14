@@ -99,6 +99,10 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         "p_list_fu": p_list_fu,
         "p_list_s": p_list_s,
         "w_list": w_list,
+        "sharpe_ratios": {
+            "p_list": (p_list[-1] - p_list[0]) / np.std(p_list),
+            "p_list_eq": (p_list_eq[-1] - p_list_eq[0]) / np.std(p_list_eq),
+        },
     }
 
     return test_performance_lists
