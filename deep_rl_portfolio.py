@@ -36,7 +36,7 @@ JIANG_BASE_PARAMS = {
     "n_batches": 10,
     "window_length": 40,
     "batch_size": 50,
-    "portfolio_value": 10000,
+    "portfolio_value": 1000,
     "validate_during_training": False,
     "trading_period_length": "4h",
 }
@@ -336,7 +336,7 @@ if __name__ == "__main__":
         print("\nRunning model for Jiang's back test 1 period")
         main(
             **JIANG_BASE_PARAMS,
-            start_date="20141101",
+            start_date="20150220",
             end_date="20161028",
             train_session_name="Jiang_backtest_period_1",
             gpu_device=ARGS.gpu_device,
@@ -345,7 +345,7 @@ if __name__ == "__main__":
         print("\nRunning model for Jiang's back test 2 period")
         main(
             **JIANG_BASE_PARAMS,
-            start_date="20150201",
+            start_date="20150220",
             end_date="20170128",
             train_session_name="Jiang_backtest_period_2",
             gpu_device=ARGS.gpu_device,
