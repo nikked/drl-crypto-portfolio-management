@@ -2,6 +2,8 @@ import os
 from pprint import pprint
 from datetime import datetime
 import matplotlib.dates as mdates
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 
 import numpy as np
 import pandas as pd
@@ -44,7 +46,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     fig, axes = plt.subplots(nrows=5, ncols=2)
 
     # width, height
-    fig.set_size_inches(22.5, 20.5)
+    fig.set_size_inches(20.5, 18.5)
 
     gs = axes[2, 0].get_gridspec()
     axes[1, 0].remove()
@@ -68,13 +70,13 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         price_ax, test_performance_lists, btc_price_data, asset_list
     )
     _plot_sharpe_table(
-        axes[0][1], test_performance_lists, btc_price_sharpe, btc_price_data
+        axes[0][1], test_performance_lists, btc_price_sharpe, btc_price_data, train_configs
     )
     _plot_weight_evolution(
         weight_ax, asset_list, test_performance_lists["w_list"], btc_price_data
     )
-    _plot_train_params(axes[0][1], train_configs, train_time_secs, timestamp_now)
-    _plot_train_params_detail(axes[4][0], train_configs, train_time_secs, timestamp_now)
+    _plot_train_params_detail(
+        axes[4][0], train_configs, train_time_secs, timestamp_now)
 
     # Rotate x axis labels
     for axis in fig.axes:
@@ -112,18 +114,19 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     pprint("Exiting")
 
 
-def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price_data):
+def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price_data, train_configs):
 
     # Sharpe vs bitcoin or vs dollars
     # Sharpe ratios are way too large
 
-    columns = ("Strategy", "Portfolio value", "Sharpe", "MDD")
+    columns = ("Strategy", "Ptf value", "Sharpe", "MDD")
 
     sharpe_ratios = test_performance_lists["sharpe_ratios"]
     max_drawdowns = test_performance_lists["max_drawdowns"]
 
     portfolio_final_value = round(test_performance_lists["p_list"][-1], 2)
-    portfolio_eq_final_value = round(test_performance_lists["p_list_eq"][-1], 2)
+    portfolio_eq_final_value = round(
+        test_performance_lists["p_list_eq"][-1], 2)
     btc_long_final_value = round(btc_price_data[-1], 2)
 
     clust_data = [
@@ -134,7 +137,7 @@ def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price
             round(max_drawdowns["p_list"], 3),
         ],
         [
-            "Equal weight",
+            "Eq weight",
             portfolio_eq_final_value,
             round(sharpe_ratios["p_list_eq"], 3),
             round(max_drawdowns["p_list_eq"], 3),
@@ -145,14 +148,45 @@ def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price
         #  round(btc_price_sharpe, 3)],
     ]
 
-    axis.set_axis_off()
+    train_time_table_columns = ("Dataset", "Start date", "End date")
 
-    axis.table(
+    train_time_table_clust_data = [
+        [
+            "Train period",
+            train_configs['start_date'],
+            train_configs['end_date'],
+        ],
+        [
+            "Test period",
+            train_configs['start_date'],
+            train_configs['end_date'],
+        ],
+    ]
+
+    divider = make_axes_locatable(axis)
+
+    axis.set_axis_off()
+    perf_table = axis.table(
         cellText=clust_data,
         colLabels=columns,
         loc="center",
-        label="Portfolio performance",
     )
+
+    perf_table.auto_set_font_size(False)
+    perf_table.set_fontsize(10)
+    perf_table.scale(1.0, 2)
+
+    axis1 = divider.append_axes("right", size="80%", pad=0.1, sharex=axis)
+    axis1.set_axis_off()
+    date_table = axis1.table(
+        cellText=train_time_table_clust_data,
+        colLabels=train_time_table_columns,
+        loc="center",
+    )
+
+    date_table.auto_set_font_size(False)
+    date_table.set_fontsize(10)
+    date_table.scale(1.0, 2)
 
 
 def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_data):
@@ -187,7 +221,8 @@ def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_
     p_list_fu = test_performance_lists["p_list_fu"]
 
     for i in range(len(asset_list)):
-        crypto_price_series = pd.Series(p_list_fu[i], index=btc_price_data.index)
+        crypto_price_series = pd.Series(
+            p_list_fu[i], index=btc_price_data.index)
         plt.plot(crypto_price_series, label="{} price".format(asset_list[i]))
 
     axis.xaxis.set_major_locator(
@@ -197,6 +232,9 @@ def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_
         mdates.DateFormatter("%Y-%m-%d")
     )  # optional formatting
 
+    axis.set_yscale('log')
+
+    axis.get_yaxis().get_major_formatter().labelOnlyBase = False
     axis.legend()
 
 
@@ -225,7 +263,7 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     data = data.set_index("datetime")
 
     btc_data_test_period = data.close[
-        train_test_val_steps["train"] + train_test_val_steps["validation"] :
+        train_test_val_steps["train"] + train_test_val_steps["validation"]:
     ]
 
     """
@@ -234,7 +272,8 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     of the period
     """
     btc_price_data = pd.Series()
-    btc_price_data = btc_price_data.append(pd.Series(t_confs["portfolio_value"]))
+    btc_price_data = btc_price_data.append(
+        pd.Series(t_confs["portfolio_value"]))
 
     btc_data_price_diffs = btc_data_test_period.pct_change()
 
@@ -277,26 +316,6 @@ def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
     )  # optional formatting
 
 
-def _plot_train_params(axis, train_configs, train_time_secs, timestamp_now):
-
-    train_params_str = f"""
-Train start date:  {train_configs['start_date']}
-Train end date:  {train_configs['end_date']}
-
-Test start date:  {train_configs['start_date']}
-Test end date:  {train_configs['end_date']}
-    """
-    axis.set_axis_off()
-    axis.text(
-        x=0.0,
-        y=0.0,
-        s=train_params_str,
-        # ha='center',
-        va="bottom",
-        size=10,
-    )
-
-
 def _plot_train_params_detail(axis, train_configs, train_time_secs, timestamp_now):
 
     train_params_str = f"""
@@ -325,5 +344,5 @@ Max weight penalty: {MAX_PF_WEIGHT_PENALTY}
         s=train_params_str,
         # ha='center',
         va="bottom",
-        size=10,
+        size=6,
     )
