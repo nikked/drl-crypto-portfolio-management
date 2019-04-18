@@ -30,7 +30,7 @@ DEFAULT_TRADE_ENV_ARGS = {
 JIANG_BASE_PARAMS = {
     "interactive_session": False,
     "verbose": True,
-    "no_of_assets": 5,
+    "no_of_assets": 3,
     "plot_results": False,
     "n_episodes": 2,
     "n_batches": 10,
@@ -352,8 +352,14 @@ if __name__ == "__main__":
         )
     elif ARGS.jbt3:
         print("\nRunning model for Jiang's back test 2 period")
-        main(
+
+        OVERRIDE_PARAMS = {
             **JIANG_BASE_PARAMS,
+            "no_of_assets": 8
+        }
+
+        main(
+            **OVERRIDE_PARAMS,
             start_date="20150501",
             end_date="20170427",
             train_session_name="Jiang_backtest_period_3",

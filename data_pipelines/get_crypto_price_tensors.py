@@ -35,7 +35,7 @@ def main(
 
     cryptos_dict = {}
 
-    chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "DOGE", "ETH", "ETC"][:no_of_cryptos]
+    chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "DOGE", "NMC", "BTS", "MAID", "ETH", "ETC"][:no_of_cryptos]
 
     for crypto in chosen_cryptos:
         cryptos_dict[crypto] = os.path.join(
