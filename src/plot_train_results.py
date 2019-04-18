@@ -64,11 +64,11 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     _plot_portfolio_value_progress_test(
         axes[1], test_performance_lists, btc_price_data
     )
-    _plot_crypto_price_test(
-        axes[2], test_performance_lists, btc_price_data, asset_list
-    )
     _plot_btc_price(
-        axes[3], btc_price_data
+        axes[2], btc_price_data
+    )
+    _plot_crypto_price_test(
+        axes[3], test_performance_lists, btc_price_data, asset_list
     )
     _plot_weight_evolution(
         weight_ax, asset_list, test_performance_lists["w_list"], btc_price_data
