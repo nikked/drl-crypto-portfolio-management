@@ -8,7 +8,15 @@ from pprint import pprint
 import pandas as pd
 
 
-from src.params import PERIOD_LENGTHS
+PERIOD_LENGTHS = {
+    "5min:": 300,
+    "15min": 900,
+    "30min": 1800,
+    "2h": 7200,
+    "4h": 14400,
+    "1d": 86400,
+}
+
 
 
 # https://docs.poloniex.com/#returntradehistory-public
@@ -74,6 +82,7 @@ def get_data_from_poloniex(output_fp, pair, start_date, end_date, period_length)
 
     url = FETCH_URL.format(pair, start_epoch, end_epoch, period_length_in_secs)
     print("Get {} from {} to {}".format(pair, start_epoch, end_epoch))
+    print(url)
 
     price_history_df = pd.read_json(url, convert_dates=False)
 
