@@ -85,6 +85,7 @@ def _initialize_trade_envs(train_configs):
         start_date=train_configs["start_date"],
         end_date=train_configs["end_date"],
         trading_period_length=train_configs["trading_period_length"],
+        train_session_name=train_configs['train_session_name']
     )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
@@ -295,9 +296,22 @@ if __name__ == "__main__":
         action="store_true",
     )
     PARSER.add_argument(
-        "-fat",
-        "--fattii_erikoissettii",
+        "-bull",
+        "--bull_run_year_2017",
         help="Sita fattii erikoissettii jota on harvoin tarjol; fatimpaa saa edelleen ettii!",
+        default=False,
+        action="store_true",
+    )
+
+    PARSER.add_argument(
+        "-bear",
+        "--bear_year_2018",
+        default=False,
+        action="store_true",
+    )
+    PARSER.add_argument(
+        "-recent",
+        "--recent_yr_2019",
         default=False,
         action="store_true",
     )
@@ -399,7 +413,7 @@ if __name__ == "__main__":
             train_session_name="Jiang_backtest_period_3",
             gpu_device=ARGS.gpu_device,
         )
-    elif ARGS.fattii_erikoissettii:
+    elif ARGS.bull_run_year_2017:
         print("\nRunning Fattii Erikois Settii")
 
         BASE_PARAMS = {
@@ -407,7 +421,42 @@ if __name__ == "__main__":
             "no_of_assets": 6,
             "start_date": "20170101",
             "end_date": "20171231",
-            "train_session_name": "Fattii_erikoissettii",
+            "train_session_name": "bull_run_year_2017",
+            "gpu_device": ARGS.gpu_device,
+            "ratio_train": 0.9,
+            "ratio_val": 0.0,
+            "trading_period_length": "2h",
+        }
+
+        main(**BASE_PARAMS)
+
+    elif ARGS.bear_year_2018:
+        print("\nRunning bear year 2018")
+
+        BASE_PARAMS = {
+            **JIANG_BASE_PARAMS,
+            "no_of_assets": 6,
+            "start_date": "20180101",
+            "end_date": "20181231",
+            "train_session_name": "bear_year_2018",
+            "gpu_device": ARGS.gpu_device,
+            "ratio_train": 0.9,
+            "ratio_val": 0.0,
+            "trading_period_length": "2h",
+        }
+
+        main(**BASE_PARAMS)
+
+
+    elif ARGS.recent_yr_2019:
+        print("\nRunning recent year 2019")
+
+        BASE_PARAMS = {
+            **JIANG_BASE_PARAMS,
+            "no_of_assets": 6,
+            "start_date": "20180101",
+            "end_date": "20191231",
+            "train_session_name": "recent_yr_2019",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,

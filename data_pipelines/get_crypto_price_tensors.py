@@ -31,19 +31,26 @@ def main(
     start_date="20190101",
     end_date="20190319",
     trading_period_length="2h",
+    train_session_name="none"
 ):
 
     cryptos_dict = {}
+
+
+
 
     # 11 workable
     # chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "DOGE", "NMC", "BTS", "NXT", "PPC", "MAID", "XCP", "ETH", "ETC"][:no_of_cryptos]
 
     # Orig list
-    # chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "DOGE", "NMC", "BTS", "PPC", "MAID", "ETH", "ETC"][:no_of_cryptos]
 
     # top 2015
-    chosen_cryptos = ["LTC", "XRP", "DASH", "DOGE", "NMC",
-                      "BTS", "PPC", "MAID"][:no_of_cryptos]
+    if train_session_name.startswith("Jiang_backtest"):
+        chosen_cryptos = ["LTC", "XRP", "DASH", "DOGE", "NMC",
+                          "BTS", "PPC", "MAID"][:no_of_cryptos]
+
+    else:
+        chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "DOGE", "ETH", "ETC", "NMC", "BTS", "PPC", "MAID"][:no_of_cryptos]
 
     for crypto in chosen_cryptos:
         cryptos_dict[crypto] = os.path.join(

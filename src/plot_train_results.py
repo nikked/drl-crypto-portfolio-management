@@ -217,7 +217,7 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
 
 def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_list):
 
-    axis.set_title("Cryptocurrency prices")
+    axis.set_title("Cryptocurrency price evolution (BTC as cash)")
 
     # axis.plot(btc_price_data, label="BTC only")
 
@@ -226,7 +226,7 @@ def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_
     for i in range(len(asset_list)):
         crypto_price_series = pd.Series(
             p_list_fu[i], index=btc_price_data.index)
-        plt.plot(crypto_price_series, label="{} price".format(asset_list[i]))
+        plt.plot(crypto_price_series, label="{}".format(asset_list[i]))
 
     axis.xaxis.set_major_locator(
         mdates.DayLocator(interval=7)
