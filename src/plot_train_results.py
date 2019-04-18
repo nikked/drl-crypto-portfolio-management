@@ -13,6 +13,8 @@ from src.params import (
     EPSILON_GREEDY_THRESHOLD,
     LEARNING_RATE,
     KERNEL1_SIZE,
+    N_FILTER_1,
+    N_FILTER_2,        
     MAX_PF_WEIGHT_PENALTY,
 )
 
@@ -88,7 +90,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         if train_configs["test_mode"]:
             output_fn = "test"
 
-    output_path = os.path.join(OUTPUT_DIR, f"train_results_{output_fn}.png")
+    output_path = os.path.join(OUTPUT_DIR, f"train_results_{output_fn}_{timestamp_now}.png")
     plt.subplots_adjust(hspace=0.5)
     print(f"Saving plot to path: {output_path}")
     plt.savefig(output_path, bbox_inches="tight")
@@ -185,6 +187,10 @@ Batch size: {train_configs['batch_size']}
 
 Trading period: {train_configs['trading_period_length']}
 Train window length: {train_configs['window_length']}
+
+No. conv filters, layer 1: {N_FILTER_1}
+No. conv filters, layer 2: {N_FILTER_2}
+Kernel size: : {KERNEL1_SIZE}
     """
     axis2.set_axis_off()
     axis2.text(
