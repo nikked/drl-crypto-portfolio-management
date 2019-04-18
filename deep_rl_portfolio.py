@@ -341,6 +341,7 @@ if __name__ == "__main__":
             trading_period_length="4h",
             test_mode=True,
             validate_during_training=ARGS.validate_during_training,
+            train_session_name="quick_test_run"
         )
 
     elif ARGS.test_mode:
@@ -363,6 +364,7 @@ if __name__ == "__main__":
             trading_period_length="2h",
             test_mode=True,
             validate_during_training=ARGS.validate_during_training,
+            train_session_name="test_run"
         )
 
     elif ARGS.jbt1:
