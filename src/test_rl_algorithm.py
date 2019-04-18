@@ -103,6 +103,23 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
             "p_list": (p_list[-1] - p_list[0]) / np.std(p_list),
             "p_list_eq": (p_list_eq[-1] - p_list_eq[0]) / np.std(p_list_eq),
         },
+        "max_drawdowns": {
+            "p_list": _get_max_draw_down(p_list),
+            "p_list_eq": _get_max_draw_down(p_list_eq),
+        },
     }
 
     return test_performance_lists
+
+
+def _get_max_draw_down(p_list_eval):
+    p_list_eval = np.array(p_list_eval)
+
+    # end of the period
+    i = np.argmax(  # pylint: disable=no-member
+        np.maximum.accumulate(p_list_eval)  # pylint: disable=no-member
+        - p_list_eval  # pylint: disable=no-member
+    )
+    j = np.argmax(p_list_eval[:i])  # start of period
+
+    return p_list_eval[j] - p_list_eval[i]

@@ -44,7 +44,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     fig, axes = plt.subplots(nrows=5, ncols=2)
 
     # width, height
-    fig.set_size_inches(22.5, 22.5)
+    fig.set_size_inches(22.5, 20.5)
 
     gs = axes[2, 0].get_gridspec()
     axes[1, 0].remove()
@@ -65,18 +65,16 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         axes[0][0], test_performance_lists, btc_price_data
     )
     _plot_crypto_price_test(
-        price_ax, test_performance_lists, btc_price_data
+        price_ax, test_performance_lists, btc_price_data, asset_list
     )
     _plot_sharpe_table(
-        axes[0][1], test_performance_lists, btc_price_sharpe, btc_price_data,
+        axes[0][1], test_performance_lists, btc_price_sharpe, btc_price_data
     )
     _plot_weight_evolution(
         weight_ax, asset_list, test_performance_lists["w_list"], btc_price_data
     )
-    _plot_train_params(axes[0][1], train_configs,
-                       train_time_secs, timestamp_now)
-    _plot_train_params_detail(
-        axes[4][0], train_configs, train_time_secs, timestamp_now)
+    _plot_train_params(axes[0][1], train_configs, train_time_secs, timestamp_now)
+    _plot_train_params_detail(axes[4][0], train_configs, train_time_secs, timestamp_now)
 
     # Rotate x axis labels
     for axis in fig.axes:
@@ -104,7 +102,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     )
 
     output_path = os.path.join(OUTPUT_DIR, f"train_results_{output_fn}.png")
-    plt.subplots_adjust(hspace=0.5)    
+    plt.subplots_adjust(hspace=0.5)
     print(f"Saving plot to path: {output_path}")
     plt.savefig(output_path, bbox_inches="tight")
 
@@ -122,29 +120,39 @@ def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price
     columns = ("Strategy", "MDD", "fAPV", "Sharpe")
 
     sharpe_ratios = test_performance_lists["sharpe_ratios"]
+    max_drawdowns = test_performance_lists["max_drawdowns"]
 
     portfolio_final_value = round(test_performance_lists["p_list"][-1], 2)
-    portfolio_eq_final_value = round(
-        test_performance_lists["p_list_eq"][-1], 2)
+    portfolio_eq_final_value = round(test_performance_lists["p_list_eq"][-1], 2)
     btc_long_final_value = round(btc_price_data[-1], 2)
 
     clust_data = [
-        ["DRL", None, portfolio_final_value,
-            round(sharpe_ratios["p_list"], 3)],
+        [
+            "DRL",
+            round(max_drawdowns["p_list"], 3),
+            portfolio_final_value,
+            round(sharpe_ratios["p_list"], 3),
+        ],
         [
             "Equal weight",
-            None,
+            round(max_drawdowns["p_list_eq"], 3),
             portfolio_eq_final_value,
             round(sharpe_ratios["p_list_eq"], 3),
         ],
-        ["Long Bitcoin", None, btc_long_final_value,
-            round(btc_price_sharpe, 3)],
+        # ["Long Bitcoin",
+        #  None,
+        #  btc_long_final_value,
+        #  round(btc_price_sharpe, 3)],
     ]
 
     axis.set_axis_off()
 
-    axis.table(cellText=clust_data, colLabels=columns,
-               loc="center", label="Portfolio performance")
+    axis.table(
+        cellText=clust_data,
+        colLabels=columns,
+        loc="center",
+        label="Portfolio performance",
+    )
 
 
 def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_data):
@@ -160,30 +168,34 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
     axis.plot(p_list_series, label="Agent")
     axis.plot(p_list_eq_series, label="Equally weighted")
 
-    axis.xaxis.set_major_locator(mdates.DayLocator(
-        interval=7))  # to get a tick every 15 minutes
+    axis.xaxis.set_major_locator(
+        mdates.DayLocator(interval=7)
+    )  # to get a tick every 15 minutes
     axis.xaxis.set_major_formatter(
-        mdates.DateFormatter('%Y-%m-%d'))  # optional formatting
+        mdates.DateFormatter("%Y-%m-%d")
+    )  # optional formatting
 
     axis.legend()
 
 
-def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data):
+def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_list):
 
-    p_list = test_performance_lists["p_list"]
-    p_list_eq = test_performance_lists["p_list_eq"]
+    axis.set_title("Cryptocurrency prices")
 
-    p_list_series = pd.Series(p_list, index=btc_price_data.index)
-    p_list_eq_series = pd.Series(p_list_eq, index=btc_price_data.index)
+    # axis.plot(btc_price_data, label="BTC only")
 
-    axis.set_title("Portfolio Value (Test Set)")
+    p_list_fu = test_performance_lists["p_list_fu"]
 
-    axis.plot(btc_price_data, label="BTC only")
+    for i in range(len(asset_list)):
+        crypto_price_series = pd.Series(p_list_fu[i], index=btc_price_data.index)
+        plt.plot(crypto_price_series, label="{} price".format(asset_list[i]))
 
-    axis.xaxis.set_major_locator(mdates.DayLocator(
-        interval=7))  # to get a tick every 15 minutes
+    axis.xaxis.set_major_locator(
+        mdates.DayLocator(interval=7)
+    )  # to get a tick every 15 minutes
     axis.xaxis.set_major_formatter(
-        mdates.DateFormatter('%Y-%m-%d'))  # optional formatting
+        mdates.DateFormatter("%Y-%m-%d")
+    )  # optional formatting
 
     axis.legend()
 
@@ -213,7 +225,7 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     data = data.set_index("datetime")
 
     btc_data_test_period = data.close[
-        train_test_val_steps["train"] + train_test_val_steps["validation"]:
+        train_test_val_steps["train"] + train_test_val_steps["validation"] :
     ]
 
     """
@@ -222,8 +234,7 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     of the period
     """
     btc_price_data = pd.Series()
-    btc_price_data = btc_price_data.append(
-        pd.Series(t_confs["portfolio_value"]))
+    btc_price_data = btc_price_data.append(pd.Series(t_confs["portfolio_value"]))
 
     btc_data_price_diffs = btc_data_test_period.pct_change()
 
@@ -251,17 +262,19 @@ def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
 
         w_list_series = pd.Series(w_list[1:, j], btc_price_data.index[1:])
 
-        axis.plot(w_list_series, label="{}".format(names[j]), alpha=0.5)
+        axis.plot(w_list_series, label="{} weight".format(names[j]), alpha=0.5)
 
-    axis.set_title("Weight evolution")
+    axis.set_title("Portfolio weight evolution")
     axis.legend(
         # bbox_to_anchor=(1.05, 1), loc=1, borderaxespad=0.5
     )
 
-    axis.xaxis.set_major_locator(mdates.DayLocator(
-        interval=7))  # to get a tick every 15 minutes
+    axis.xaxis.set_major_locator(
+        mdates.DayLocator(interval=7)
+    )  # to get a tick every 15 minutes
     axis.xaxis.set_major_formatter(
-        mdates.DateFormatter('%Y-%m-%d'))  # optional formatting
+        mdates.DateFormatter("%Y-%m-%d")
+    )  # optional formatting
 
 
 def _plot_train_params(axis, train_configs, train_time_secs, timestamp_now):
@@ -279,7 +292,7 @@ Test end date:  {train_configs['end_date']}
         y=0.0,
         s=train_params_str,
         # ha='center',
-        va='bottom',
+        va="bottom",
         size=10,
     )
 
@@ -311,6 +324,6 @@ Max weight penalty: {MAX_PF_WEIGHT_PENALTY}
         y=0.0,
         s=train_params_str,
         # ha='center',
-        va='bottom',
+        va="bottom",
         size=10,
     )

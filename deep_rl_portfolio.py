@@ -36,7 +36,7 @@ JIANG_BASE_PARAMS = {
     "n_batches": 10,
     "window_length": 40,
     "batch_size": 50,
-    "portfolio_value": 1000,
+    "portfolio_value": 100,
     "validate_during_training": False,
     "trading_period_length": "4h",
 }
@@ -211,7 +211,7 @@ if __name__ == "__main__":
         "--portfolio_initial_value",
         type=int,
         help="Initial cash invested in portfolio",
-        default=10000,
+        default=100,
     )
     PARSER.add_argument(
         "-v",
@@ -304,7 +304,7 @@ if __name__ == "__main__":
             n_batches=1,
             window_length=130,
             batch_size=1,
-            portfolio_value=10000,
+            portfolio_value=100,
             start_date="20190101",
             end_date="20190301",
             trading_period_length="4h",
@@ -318,13 +318,13 @@ if __name__ == "__main__":
             interactive_session=False,
             gpu_device=None,
             verbose=True,
-            no_of_assets=5,
+            no_of_assets=7,
             plot_results=False,
             n_episodes=1,
             n_batches=1,
             window_length=77,
             batch_size=1,
-            portfolio_value=10000,
+            portfolio_value=100,
             start_date="20190101",
             end_date="20190301",
             trading_period_length="2h",
@@ -367,7 +367,7 @@ if __name__ == "__main__":
             "no_of_assets": 6,
             "start_date": "20170101",
             "end_date": "20171231",
-            "train_session_name": "Jiang_backtest_period_3",
+            "train_session_name": "Fattii_erikoissettii",
             "gpu_device": ARGS.gpu_device,
         }
 
