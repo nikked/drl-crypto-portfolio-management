@@ -83,7 +83,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
             pf_value_t_fu[i] = state_fu[i][2]
 
         if k % 20 == 0:
-            print("Ptf value: ", round(pf_value_previous, 0))
+            print("Ptf value: ", round(pf_value_previous, 2))
             print("Ptf weights: ", w_previous[0])
         p_list.append(pf_value_t)
         w_list.append(w_current)
@@ -92,6 +92,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         p_list_s.append(pf_value_t_s)
         for i in range(no_of_assets):
             p_list_fu[i].append(pf_value_t_fu[i])
+
 
     test_performance_lists = {
         "p_list": p_list,

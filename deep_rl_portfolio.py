@@ -27,11 +27,11 @@ DEFAULT_TRADE_ENV_ARGS = {
 JIANG_BASE_PARAMS = {
     "interactive_session": False,
     "verbose": True,
-    "no_of_assets": 11,
+    "no_of_assets": 8,
     "plot_results": False,
     "n_episodes": 2,
     "n_batches": 10,
-    "window_length": 40,
+    "window_length": 50,
     "batch_size": 50,
     "portfolio_value": 1,
     "validate_during_training": False,
@@ -356,7 +356,7 @@ if __name__ == "__main__":
 
         OVERRIDE_PARAMS = {
             **JIANG_BASE_PARAMS,
-            "ratio_train": 0.919,
+            "ratio_train": 0.918,
             "ratio_val": 0,
         }
 
@@ -388,7 +388,7 @@ if __name__ == "__main__":
 
         OVERRIDE_PARAMS = {
             **JIANG_BASE_PARAMS,
-            "ratio_train": 0.932,
+            "ratio_train": 0.93,
             "ratio_val": 0,
         }
 
