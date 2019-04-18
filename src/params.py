@@ -38,8 +38,8 @@ PF_INITIAL_VALUE = 10000
 WINDOW_LENGTH = 10
 
 # can be changed following the type of stocks studied
-RATIO_TRAIN = 0.6
-RATIO_VAL = 0.2
+RATIO_TRAIN = 0.95
+RATIO_VAL = 0.0
 
 
 # not imported

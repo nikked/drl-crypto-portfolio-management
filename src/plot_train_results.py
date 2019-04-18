@@ -1,6 +1,6 @@
 import os
 from pprint import pprint
-from datetime import datetime
+from datetime import datetime, timedelta
 import matplotlib.dates as mdates
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -46,7 +46,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     fig, axes = plt.subplots(nrows=5, ncols=2)
 
     # width, height
-    fig.set_size_inches(20.5, 18.5)
+    fig.set_size_inches(22.5, 18.5)
 
     gs = axes[2, 0].get_gridspec()
     axes[1, 0].remove()
@@ -69,7 +69,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     _plot_crypto_price_test(
         price_ax, test_performance_lists, btc_price_data, asset_list
     )
-    _plot_sharpe_table(
+    _plot_backtest_perf_table(
         axes[0][1], test_performance_lists, btc_price_sharpe, btc_price_data, train_configs
     )
     _plot_weight_evolution(
@@ -114,7 +114,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     pprint("Exiting")
 
 
-def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price_data, train_configs):
+def _plot_backtest_perf_table(axis, test_performance_lists, btc_price_sharpe, btc_price_data, train_configs):
 
     # Sharpe vs bitcoin or vs dollars
     # Sharpe ratios are way too large
@@ -128,6 +128,9 @@ def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price
     portfolio_eq_final_value = round(
         test_performance_lists["p_list_eq"][-1], 2)
     btc_long_final_value = round(btc_price_data[-1], 2)
+
+    back_test_start_timestamp = btc_price_data.index[0]
+    train_end_timestamp = back_test_start_timestamp - timedelta(days=1)
 
     clust_data = [
         [
@@ -153,13 +156,13 @@ def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price
     train_time_table_clust_data = [
         [
             "Train period",
-            train_configs['start_date'],
-            train_configs['end_date'],
+            datetime.strptime(train_configs['start_date'], '%Y%m%d').strftime('%Y-%m-%d'),
+            train_end_timestamp.strftime('%Y-%m-%d'),
         ],
         [
             "Test period",
-            train_configs['start_date'],
-            train_configs['end_date'],
+            back_test_start_timestamp.strftime('%Y-%m-%d'),
+            datetime.strptime(train_configs['end_date'], '%Y%m%d').strftime('%Y-%m-%d'),
         ],
     ]
 
