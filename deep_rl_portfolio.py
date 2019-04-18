@@ -27,15 +27,15 @@ DEFAULT_TRADE_ENV_ARGS = {
 JIANG_BASE_PARAMS = {
     "interactive_session": False,
     "verbose": True,
-    "no_of_assets": 5,
+    "no_of_assets": 11,
     "plot_results": False,
     "n_episodes": 2,
     "n_batches": 10,
     "window_length": 40,
     "batch_size": 50,
-    "portfolio_value": 100,
+    "portfolio_value": 1,
     "validate_during_training": False,
-    "trading_period_length": "4h",
+    "trading_period_length": "2h",
 }
 
 
@@ -49,7 +49,8 @@ def main(**train_configs):
     print("\n")
 
     # Creation of the trading environment
-    trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(train_configs)
+    trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(
+        train_configs)
 
     # Agent training
     agent, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
@@ -95,12 +96,14 @@ def _initialize_trade_envs(train_configs):
     print("Trading periods: {}".format(dataset.shape[2]))
 
     # Determine the step sizes of different datasets
-    train_test_val_steps = _get_train_val_test_steps(trading_periods, train_configs)
+    train_test_val_steps = _get_train_val_test_steps(
+        trading_periods, train_configs)
 
     print("Starting training for {} assets".format(len(asset_names)))
     print(asset_names)
 
-    train_envs = _get_train_environments(train_configs["no_of_assets"], trade_env_args)
+    train_envs = _get_train_environments(
+        train_configs["no_of_assets"], trade_env_args)
 
     return train_envs, asset_names, train_test_val_steps
 
@@ -350,8 +353,15 @@ if __name__ == "__main__":
 
     elif ARGS.jbt1:
         print("\nRunning model for Jiang's back test 1 period")
-        main(
+
+        OVERRIDE_PARAMS = {
             **JIANG_BASE_PARAMS,
+            "ratio_train": 0.919,
+            "ratio_val": 0,
+        }
+
+        main(
+            **OVERRIDE_PARAMS,
             start_date="20150220",
             end_date="20161028",
             train_session_name="Jiang_backtest_period_1",
@@ -359,8 +369,15 @@ if __name__ == "__main__":
         )
     elif ARGS.jbt2:
         print("\nRunning model for Jiang's back test 2 period")
-        main(
+
+        OVERRIDE_PARAMS = {
             **JIANG_BASE_PARAMS,
+            "ratio_train": 0.928,
+            "ratio_val": 0,
+        }
+
+        main(
+            **OVERRIDE_PARAMS,
             start_date="20150220",
             end_date="20170128",
             train_session_name="Jiang_backtest_period_2",
@@ -369,7 +386,11 @@ if __name__ == "__main__":
     elif ARGS.jbt3:
         print("\nRunning model for Jiang's back test 2 period")
 
-        OVERRIDE_PARAMS = {**JIANG_BASE_PARAMS, "no_of_assets": 8}
+        OVERRIDE_PARAMS = {
+            **JIANG_BASE_PARAMS,
+            "ratio_train": 0.932,
+            "ratio_val": 0,
+        }
 
         main(
             **OVERRIDE_PARAMS,
@@ -388,6 +409,9 @@ if __name__ == "__main__":
             "end_date": "20171231",
             "train_session_name": "Fattii_erikoissettii",
             "gpu_device": ARGS.gpu_device,
+            "ratio_train": 0.9,
+            "ratio_val": 0.0,
+            "trading_period_length": "2h",
         }
 
         main(**BASE_PARAMS)
