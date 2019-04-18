@@ -246,9 +246,9 @@ def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_
 
 def _plot_btc_price(axis, btc_price_data):
 
-    axis.set_title("BTC/USD price change")
+    axis.set_title("BTC/USD price")
 
-    axis.plot(btc_price_data, label="BTC")
+    axis.plot(btc_price_data, label="BTC/USD")
 
     axis.xaxis.set_major_locator(
         mdates.DayLocator(interval=7)
@@ -289,29 +289,35 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
         train_test_val_steps["train"] + train_test_val_steps["validation"]:
     ]
 
-    """
-    Calculate the final output series by first setting its value to initial
-    portfolio value and then multiplying the prev value with the BTC price diff
-    of the period
-    """
-    btc_price_data = pd.Series()
-    btc_price_data = btc_price_data.append(
-        pd.Series(t_confs["portfolio_value"]))
-
-    btc_data_price_diffs = btc_data_test_period.pct_change()
-
-    for idx in range(1, len(btc_data_price_diffs)):
-        prev_pf_value = btc_price_data[idx - 1]
-        current_price_diff = btc_data_price_diffs[idx]
-        changed_btc_pf_value = prev_pf_value * (current_price_diff + 1)
-        btc_price_data.at[idx] = changed_btc_pf_value
-
-    btc_price_sharpe = (btc_price_data[idx] - btc_price_data[0]) / np.std(
-        btc_price_data
+    btc_price_sharpe = (btc_data_test_period[-1] - btc_data_test_period[0]) / np.std(
+        btc_data_test_period
     )
-    btc_price_data.index = btc_data_test_period.index
 
-    return btc_price_data, btc_price_sharpe
+    return btc_data_test_period, btc_price_sharpe
+
+    # """
+    # Calculate the final output series by first setting its value to initial
+    # portfolio value and then multiplying the prev value with the BTC price diff
+    # of the period
+    # """
+    # btc_price_data = pd.Series()
+    # btc_price_data = btc_price_data.append(
+    #     pd.Series(t_confs["portfolio_value"]))
+
+    # btc_data_price_diffs = btc_data_test_period.pct_change()
+
+    # for idx in range(1, len(btc_data_price_diffs)):
+    #     prev_pf_value = btc_price_data[idx - 1]
+    #     current_price_diff = btc_data_price_diffs[idx]
+    #     changed_btc_pf_value = prev_pf_value * (current_price_diff + 1)
+    #     btc_price_data.at[idx] = changed_btc_pf_value
+
+    # btc_price_sharpe = (btc_price_data[idx] - btc_price_data[0]) / np.std(
+    #     btc_price_data
+    # )
+    # btc_price_data.index = btc_data_test_period.index
+
+    # return btc_price_data, btc_price_sharpe
 
 
 def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
