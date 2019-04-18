@@ -11,8 +11,6 @@ from src.params import (
     PF_INITIAL_VALUE,
     TRADING_COST,
     INTEREST_RATE,
-    RATIO_TRAIN,
-    RATIO_VAL,
     WINDOW_LENGTH,
 )
 
@@ -24,7 +22,6 @@ DEFAULT_TRADE_ENV_ARGS = {
     "portfolio_value": PF_INITIAL_VALUE,
     "trading_cost": TRADING_COST,
     "interest_rate": INTEREST_RATE,
-    "train_size": RATIO_TRAIN,
 }
 
 JIANG_BASE_PARAMS = {
@@ -90,6 +87,7 @@ def _initialize_trade_envs(train_configs):
     )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
+    trade_env_args["train_size"] = train_configs['ratio_train']
     trade_env_args["data"] = dataset
     trade_env_args["window_length"] = train_configs["window_length"]
 
@@ -97,7 +95,7 @@ def _initialize_trade_envs(train_configs):
     print("Trading periods: {}".format(dataset.shape[2]))
 
     # Determine the step sizes of different datasets
-    train_test_val_steps = _get_train_val_test_steps(trading_periods)
+    train_test_val_steps = _get_train_val_test_steps(trading_periods, train_configs)
 
     print("Starting training for {} assets".format(len(asset_names)))
     print(asset_names)
@@ -138,12 +136,12 @@ def _get_train_environments(no_of_assets, trade_env_args):
     return trade_envs
 
 
-def _get_train_val_test_steps(trading_period):
+def _get_train_val_test_steps(trading_period, train_configs):
     # Total number of steps for pre-training in the training set
-    total_steps_train = int(RATIO_TRAIN * trading_period)
+    total_steps_train = int(train_configs['ratio_train'] * trading_period)
 
     # Total number of steps for pre-training in the validation set
-    total_steps_val = int(RATIO_VAL * trading_period)
+    total_steps_val = int(train_configs['ratio_val'] * trading_period)
 
     # Total number of steps for the test
     total_steps_test = trading_period - total_steps_train - total_steps_val
@@ -192,6 +190,20 @@ if __name__ == "__main__":
         type=int,
         help="Choose how many batches are trained",
         default=10,
+    )
+    PARSER.add_argument(
+        "-rt",
+        "--ratio_train",
+        type=float,
+        help="Proportional size of train set",
+        default=0.95,
+    )
+    PARSER.add_argument(
+        "-rv",
+        "--ratio_val",
+        type=float,
+        help="Proportional size of val set",
+        default=0.0,
     )
     PARSER.add_argument(
         "-bs", "--batch_size", type=int, help="Select batch size", default=50
@@ -302,6 +314,8 @@ if __name__ == "__main__":
             plot_results=False,
             n_episodes=1,
             n_batches=1,
+            ratio_train=ARGS.ratio_train,
+            ratio_val=ARGS.ratio_val,
             window_length=130,
             batch_size=1,
             portfolio_value=100,
@@ -320,6 +334,8 @@ if __name__ == "__main__":
             verbose=True,
             no_of_assets=7,
             plot_results=False,
+            ratio_train=ARGS.ratio_train,
+            ratio_val=ARGS.ratio_val,
             n_episodes=1,
             n_batches=1,
             window_length=77,
@@ -353,10 +369,7 @@ if __name__ == "__main__":
     elif ARGS.jbt3:
         print("\nRunning model for Jiang's back test 2 period")
 
-        OVERRIDE_PARAMS = {
-            **JIANG_BASE_PARAMS,
-            "no_of_assets": 8
-        }
+        OVERRIDE_PARAMS = {**JIANG_BASE_PARAMS, "no_of_assets": 8}
 
         main(
             **OVERRIDE_PARAMS,
@@ -387,6 +400,8 @@ if __name__ == "__main__":
             no_of_assets=ARGS.no_of_assets,
             plot_results=ARGS.plot_results,
             n_episodes=ARGS.no_of_episodes,
+            ratio_train=ARGS.ratio_train,
+            ratio_val=ARGS.ratio_val,
             n_batches=ARGS.no_of_batches,
             window_length=ARGS.window_length,
             batch_size=ARGS.batch_size,
