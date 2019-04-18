@@ -412,7 +412,7 @@ def _train_batch_item(  # pylint: disable=too-many-arguments, too-many-locals
                 print("PF_start", round(pf_value_previous, 0))
 
             if batch_item == train_options["batch_size"] - 1:
-                print("Ptf value: ", round(new_state["pf_value_t"], 0))
+                print("Ptf value: ", round(new_state["pf_value_t"], 2))
                 print("Ptf weights: ", new_state["w_t"])
 
 
