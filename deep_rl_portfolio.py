@@ -30,7 +30,7 @@ DEFAULT_TRADE_ENV_ARGS = {
 JIANG_BASE_PARAMS = {
     "interactive_session": False,
     "verbose": True,
-    "no_of_assets": 3,
+    "no_of_assets": 5,
     "plot_results": False,
     "n_episodes": 2,
     "n_batches": 10,

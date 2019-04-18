@@ -117,7 +117,7 @@ def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price
     # Sharpe vs bitcoin or vs dollars
     # Sharpe ratios are way too large
 
-    columns = ("Strategy", "MDD", "fAPV", "Sharpe")
+    columns = ("Strategy", "Portfolio value", "Sharpe", "MDD")
 
     sharpe_ratios = test_performance_lists["sharpe_ratios"]
     max_drawdowns = test_performance_lists["max_drawdowns"]
@@ -129,15 +129,15 @@ def _plot_sharpe_table(axis, test_performance_lists, btc_price_sharpe, btc_price
     clust_data = [
         [
             "DRL",
-            round(max_drawdowns["p_list"], 3),
             portfolio_final_value,
             round(sharpe_ratios["p_list"], 3),
+            round(max_drawdowns["p_list"], 3),
         ],
         [
             "Equal weight",
-            round(max_drawdowns["p_list_eq"], 3),
             portfolio_eq_final_value,
             round(sharpe_ratios["p_list_eq"], 3),
+            round(max_drawdowns["p_list_eq"], 3),
         ],
         # ["Long Bitcoin",
         #  None,
