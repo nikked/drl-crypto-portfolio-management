@@ -14,7 +14,7 @@ from src.params import (
     LEARNING_RATE,
     KERNEL1_SIZE,
     N_FILTER_1,
-    N_FILTER_2,        
+    N_FILTER_2,
     MAX_PF_WEIGHT_PENALTY,
 )
 
@@ -44,7 +44,6 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     print("\nTrain test val steps")
     pprint(train_test_val_steps)
 
-    timestamp_now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     fig, axes = plt.subplots(nrows=6, ncols=1)
 
     # width, height
@@ -61,7 +60,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     )
 
     _plot_backtest_perf_metadata(
-        axes[0], test_performance_lists, btc_price_sharpe, btc_price_data, train_configs, timestamp_now, train_time_secs
+        axes[0], test_performance_lists, btc_price_sharpe, btc_price_data, train_configs, train_time_secs, train_test_val_steps
     )
     _plot_portfolio_value_progress_test(
         axes[1], test_performance_lists, btc_price_data
@@ -81,16 +80,18 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         plt.sca(axis)
         plt.xticks(rotation=30)
 
-    output_fn = timestamp_now
+    timestamp_now = datetime.now().strftime("%Y-%m-%d_%H%M%S")
 
-    if "train_session_name" in train_configs:
-        output_fn = f"{train_configs['train_session_name']}"
+    output_fn = None
 
-    elif "test_mode" in train_configs:
+    if "test_mode" in train_configs:
         if train_configs["test_mode"]:
-            output_fn = "test"
+            output_fn = f"{train_configs['train_session_name']}"
 
-    output_path = os.path.join(OUTPUT_DIR, f"train_results_{output_fn}_{timestamp_now}.png")
+    if not output_fn:
+        output_fn = f"{train_configs['train_session_name']}_{timestamp_now}"
+
+    output_path = os.path.join(OUTPUT_DIR, f"train_results_{output_fn}.png")
     plt.subplots_adjust(hspace=0.5)
     print(f"Saving plot to path: {output_path}")
     plt.savefig(output_path, bbox_inches="tight")
@@ -101,8 +102,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     pprint("Exiting")
 
 
-def _plot_backtest_perf_metadata(axis, test_performance_lists, btc_price_sharpe, btc_price_data, train_configs, timestamp_now, train_time_secs):
-
+def _plot_backtest_perf_metadata(axis, test_performance_lists, btc_price_sharpe, btc_price_data, train_configs, train_time_secs, train_test_val_steps):
 
     axis.set_ylim(-3, 2)
     columns = ("Strategy", "Ptf value", "Sharpe", "MDD")
@@ -137,7 +137,7 @@ def _plot_backtest_perf_metadata(axis, test_performance_lists, btc_price_sharpe,
         #  round(btc_price_sharpe, 3)],
     ]
 
-    train_time_table_columns = ("Dataset", "Start date", "End date")
+    train_time_table_columns = ("Dataset", "Start date", "End date", "No. of steps")
 
     train_time_table_clust_data = [
         [
@@ -145,12 +145,14 @@ def _plot_backtest_perf_metadata(axis, test_performance_lists, btc_price_sharpe,
             datetime.strptime(
                 train_configs['start_date'], '%Y%m%d').strftime('%Y-%m-%d'),
             train_end_timestamp.strftime('%Y-%m-%d'),
+            train_test_val_steps['train']
         ],
         [
             "Test period",
             back_test_start_timestamp.strftime('%Y-%m-%d'),
             datetime.strptime(
                 train_configs['end_date'], '%Y%m%d').strftime('%Y-%m-%d'),
+            train_test_val_steps['test']
         ],
     ]
 
@@ -187,10 +189,11 @@ Batch size: {train_configs['batch_size']}
 
 Trading period: {train_configs['trading_period_length']}
 Train window length: {train_configs['window_length']}
-
-No. conv filters, layer 1: {N_FILTER_1}
-No. conv filters, layer 2: {N_FILTER_2}
-Kernel size: : {KERNEL1_SIZE}
+"""
+    """
+    No. conv filters, layer 1: {N_FILTER_1}
+    No. conv filters, layer 2: {N_FILTER_2}
+    Kernel size: : {KERNEL1_SIZE}
     """
     axis2.set_axis_off()
     axis2.text(
@@ -228,7 +231,6 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
 def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_list):
 
     axis.set_title("Cryptocurrency price evolution (BTC as cash)")
-
 
     p_list_fu = test_performance_lists["p_list_fu"]
 
@@ -301,11 +303,15 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
 
     return btc_data_test_period, btc_price_sharpe
 
-    # """
-    # Calculate the final output series by first setting its value to initial
-    # portfolio value and then multiplying the prev value with the BTC price diff
-    # of the period
-    # """
+    """
+
+    OLD CODE THAT RETURNS BTC RELATIVE PRICE DIFF
+
+
+    Calculate the final output series by first setting its value to initial
+    portfolio value and then multiplying the prev value with the BTC price diff
+    of the period
+    """
     # btc_price_data = pd.Series()
     # btc_price_data = btc_price_data.append(
     #     pd.Series(t_confs["portfolio_value"]))

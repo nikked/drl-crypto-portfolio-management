@@ -315,6 +315,30 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
     )
+    PARSER.add_argument(
+        "-long",
+        "--long_run",
+        default=False,
+        action="store_true",
+    )
+    PARSER.add_argument(
+        "-micro",
+        "--micro_run",
+        default=False,
+        action="store_true",
+    )
+    PARSER.add_argument(
+        "-nano",
+        "--nano_run",
+        default=False,
+        action="store_true",
+    )
+    PARSER.add_argument(
+        "-pico",
+        "--pico_run",
+        default=False,
+        action="store_true",
+    )
 
     ARGS = PARSER.parse_args()
 
@@ -449,7 +473,6 @@ if __name__ == "__main__":
 
         main(**BASE_PARAMS)
 
-
     elif ARGS.recent_yr_2019:
         print("\nRunning recent year 2019")
 
@@ -457,12 +480,77 @@ if __name__ == "__main__":
             **JIANG_BASE_PARAMS,
             "no_of_assets": 6,
             "start_date": "20180101",
-            "end_date": "20191231",
+            "end_date": "20190418",
             "train_session_name": "recent_yr_2019",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,
             "trading_period_length": "2h",
+        }
+
+        main(**BASE_PARAMS)
+
+
+    elif ARGS.long_run:
+
+        BASE_PARAMS = {
+            **JIANG_BASE_PARAMS,
+            "no_of_assets": 5,
+            "start_date": "20150220",
+            "end_date": "20190418",
+            "train_session_name": "long_run",
+            "gpu_device": ARGS.gpu_device,
+            "ratio_train": 0.9,
+            "ratio_val": 0.0,
+            "trading_period_length": "4h",
+        }
+
+        main(**BASE_PARAMS)
+
+    elif ARGS.micro_run:
+
+        BASE_PARAMS = {
+            **JIANG_BASE_PARAMS,
+            "no_of_assets": 5,
+            "start_date": "20180101",
+            "end_date": "20190418",
+            "train_session_name": "micro_run",
+            "gpu_device": ARGS.gpu_device,
+            "ratio_train": 0.9,
+            "ratio_val": 0.0,
+            "trading_period_length": "30min",
+        }
+
+        main(**BASE_PARAMS)
+
+    elif ARGS.nano_run:
+
+        BASE_PARAMS = {
+            **JIANG_BASE_PARAMS,
+            "no_of_assets": 5,
+            "start_date": "20180801",
+            "end_date": "20190418",
+            "train_session_name": "nano_run",
+            "gpu_device": ARGS.gpu_device,
+            "ratio_train": 0.9,
+            "ratio_val": 0.0,
+            "trading_period_length": "15min",
+        }
+
+        main(**BASE_PARAMS)
+
+    elif ARGS.pico_run:
+
+        BASE_PARAMS = {
+            **JIANG_BASE_PARAMS,
+            "no_of_assets": 5,
+            "start_date": "20190201",
+            "end_date": "20190418",
+            "train_session_name": "pico_run",
+            "gpu_device": ARGS.gpu_device,
+            "ratio_train": 0.9,
+            "ratio_val": 0.0,
+            "trading_period_length": "5min",
         }
 
         main(**BASE_PARAMS)

@@ -9,7 +9,7 @@ import pandas as pd
 
 
 PERIOD_LENGTHS = {
-    "5min:": 300,
+    "5min": 300,
     "15min": 900,
     "30min": 1800,
     "2h": 7200,

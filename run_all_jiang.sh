@@ -5,4 +5,9 @@ python deep_rl_portfolio.py -jbt3
 python deep_rl_portfolio.py -bull
 python deep_rl_portfolio.py -bear
 python deep_rl_portfolio.py -recent
+python deep_rl_portfolio.py -long
+python deep_rl_portfolio.py -micro
+python deep_rl_portfolio.py -nano
+python deep_rl_portfolio.py -pico
+
 
