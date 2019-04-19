@@ -110,10 +110,10 @@ def _plot_backtest_perf_metadata(axis, test_performance_lists, btc_price_sharpe,
     sharpe_ratios = test_performance_lists["sharpe_ratios"]
     max_drawdowns = test_performance_lists["max_drawdowns"]
 
-    portfolio_final_value = round(test_performance_lists["p_list"][-1], 2)
+    portfolio_final_value = round(test_performance_lists["p_list"][-1], 4)
     portfolio_eq_final_value = round(
-        test_performance_lists["p_list_eq"][-1], 2)
-    btc_long_final_value = round(btc_price_data[-1], 2)
+        test_performance_lists["p_list_eq"][-1], 4)
+    btc_long_final_value = round(btc_price_data[-1], 4)
 
     back_test_start_timestamp = btc_price_data.index[0]
     train_end_timestamp = back_test_start_timestamp - timedelta(days=1)
@@ -122,14 +122,14 @@ def _plot_backtest_perf_metadata(axis, test_performance_lists, btc_price_sharpe,
         [
             "DRL",
             portfolio_final_value,
-            round(sharpe_ratios["p_list"], 3),
-            round(max_drawdowns["p_list"], 3),
+            round(sharpe_ratios["p_list"], 4),
+            round(max_drawdowns["p_list"], 4),
         ],
         [
             "Eq weight",
             portfolio_eq_final_value,
-            round(sharpe_ratios["p_list_eq"], 3),
-            round(max_drawdowns["p_list_eq"], 3),
+            round(sharpe_ratios["p_list_eq"], 4),
+            round(max_drawdowns["p_list_eq"], 4),
         ],
         # ["Long Bitcoin",
         #  None,
@@ -249,7 +249,7 @@ def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_
     axis.set_yscale('log')
 
     axis.get_yaxis().get_major_formatter().labelOnlyBase = False
-    axis.legend()
+    axis.legend(loc='upper left')
 
 
 def _plot_btc_price(axis, btc_price_data):
