@@ -516,8 +516,8 @@ if __name__ == "__main__":
         BASE_PARAMS = {
             **JIANG_BASE_PARAMS,
             "no_of_assets": 7,
-            "start_date": "20180101",
-            "end_date": "20190418",
+            "start_date": "20170101",
+            "end_date": "20171001",
             "train_session_name": "micro_run",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,

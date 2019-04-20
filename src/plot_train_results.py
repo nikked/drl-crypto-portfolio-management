@@ -69,11 +69,9 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         train_time_secs,
         train_test_val_steps,
     )
-    _plot_portfolio_value_progress_test(
-        axes[1], test_performance_lists, btc_price_data)
+    _plot_portfolio_value_progress_test(axes[1], test_performance_lists, btc_price_data)
     _plot_btc_price(axes[2], btc_price_data)
-    _plot_crypto_price_test(
-        axes[3], test_performance_lists, btc_price_data, asset_list)
+    _plot_crypto_price_test(axes[3], test_performance_lists, btc_price_data, asset_list)
     _plot_weight_evolution(
         weight_ax, asset_list, test_performance_lists["w_list"], btc_price_data
     )
@@ -123,8 +121,7 @@ def _plot_backtest_perf_metadata(
 
     portfolio_final_value = round(test_performance_lists["p_list"][-1], 4)
     portfolio_static_final_value = round(test_performance_lists["p_list_static"][-1], 4)
-    portfolio_eq_final_value = round(
-        test_performance_lists["p_list_eq"][-1], 4)
+    portfolio_eq_final_value = round(test_performance_lists["p_list_eq"][-1], 4)
 
     back_test_start_timestamp = btc_price_data.index[0]
     train_end_timestamp = back_test_start_timestamp - timedelta(days=1)
@@ -147,11 +144,10 @@ def _plot_backtest_perf_metadata(
             portfolio_eq_final_value,
             round(sharpe_ratios["p_list_eq"], 4),
             round(max_drawdowns["p_list_eq"], 4),
-        ]
+        ],
     ]
 
-    train_time_table_columns = (
-        "Dataset", "Start date", "End date", "No. of steps")
+    train_time_table_columns = ("Dataset", "Start date", "End date", "No. of steps")
 
     train_time_table_clust_data = [
         [
@@ -165,8 +161,7 @@ def _plot_backtest_perf_metadata(
         [
             "Test period",
             back_test_start_timestamp.strftime("%Y-%m-%d"),
-            datetime.strptime(
-                train_configs["end_date"], "%Y%m%d").strftime("%Y-%m-%d"),
+            datetime.strptime(train_configs["end_date"], "%Y%m%d").strftime("%Y-%m-%d"),
             train_test_val_steps["test"],
         ],
     ]
@@ -176,20 +171,19 @@ def _plot_backtest_perf_metadata(
     axis.set_axis_off()
 
     axis.set_title(
-        train_configs['train_session_name'].replace('_', ' '),
-        fontdict={'fontsize': 20,
-                  'position': (0.0, 0.8)},  # x, y
-        horizontalalignment='left'
+        train_configs["train_session_name"].replace("_", " "),
+        fontdict={"fontsize": 20, "position": (0.0, 0.8)},  # x, y
+        horizontalalignment="left",
     )
-    perf_table = axis.table(cellText=clust_data,
-                            colLabels=columns,
-                            loc="center",
-                            cellLoc='center'
-                            )
+    perf_table = axis.table(
+        cellText=clust_data, colLabels=columns, loc="center", cellLoc="center"
+    )
 
     for (row, col), cell in perf_table.get_celld().items():
-        if (row == 0):
-            cell.set_text_props(fontproperties=FontProperties(weight='bold'), color='white')
+        if row == 0:
+            cell.set_text_props(
+                fontproperties=FontProperties(weight="bold"), color="white"
+            )
             cell.set_facecolor("gray")
 
     perf_table.auto_set_font_size(False)
@@ -202,7 +196,7 @@ def _plot_backtest_perf_metadata(
         cellText=train_time_table_clust_data,
         colLabels=train_time_table_columns,
         loc="center",
-        cellLoc='center',
+        cellLoc="center",
         colWidths=[0.3 for x in train_time_table_columns],
     )
 
@@ -211,33 +205,63 @@ def _plot_backtest_perf_metadata(
     date_table.scale(1.0, 2)
 
     for (row, col), cell in date_table.get_celld().items():
-        if (row == 0):
-            cell.set_text_props(fontproperties=FontProperties(weight='bold'), color='white')
+        if row == 0:
+            cell.set_text_props(
+                fontproperties=FontProperties(weight="bold"), color="white"
+            )
             cell.set_facecolor("gray")
 
-    axis2 = divider.append_axes("right", size="80%", pad=0.2, sharex=axis)
+    axis2 = divider.append_axes("right", size="50%", pad=0.4, sharex=axis)
 
-    train_params_str = f"""
-No. batches: {train_configs['n_batches']}
-No. episodes: {train_configs['n_episodes']}
-Batch size: {train_configs['batch_size']}
+    #     train_params_str = f"""
+    # No. batches: {train_configs['n_batches']}
+    # No. episodes: {train_configs['n_episodes']}
+    # Batch size: {train_configs['batch_size']}
 
-Trading period: {train_configs['trading_period_length']}
-Train window length: {train_configs['window_length']}
-"""
+    # Trading period: {train_configs['trading_period_length']}
+    # Train window length: {train_configs['window_length']}
+    # """
     """
     No. conv filters, layer 1: {N_FILTER_1}
     No. conv filters, layer 2: {N_FILTER_2}
     Kernel size: : {KERNEL1_SIZE}
     """
     axis2.set_axis_off()
-    axis2.text(
-        x=0.1,
-        y=0.2,
-        s=train_params_str,
-        # ha='center',
-        size=10,
+
+    trading_period = train_configs["trading_period_length"]
+
+    # import pdb; pdb.set_trace()
+
+    config_table_data = [
+        ["No. batches", train_configs["n_batches"]],
+        ["No. episodes", train_configs["n_episodes"]],
+        ["Batch size", train_configs["batch_size"]],
+        ["Trading period", trading_period],
+        ["Window length", train_configs["window_length"]],
+        ["Conv Filters, 1", N_FILTER_1],
+        ['Conv Filters, 2', N_FILTER_2],
+        ['Kernel size', KERNEL1_SIZE],
+    ]
+
+    config_table_columns = ("Statistic", "Value")
+
+    config_table = axis2.table(
+        cellText=config_table_data,
+        colLabels=config_table_columns,
+        loc="center",
+        cellLoc="center",
     )
+
+    config_table.auto_set_font_size(False)
+    config_table.set_fontsize(8)
+    config_table.scale(0.8, 1.6)
+
+    for (row, col), cell in config_table.get_celld().items():
+        if row == 0:
+            cell.set_text_props(
+                fontproperties=FontProperties(weight="bold"), color="white"
+            )
+            cell.set_facecolor("gray")
 
 
 def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_data):
@@ -248,8 +272,7 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
 
     p_list_series = pd.Series(p_list, index=btc_price_data.index)
     p_list_eq_series = pd.Series(p_list_eq, index=btc_price_data.index)
-    p_list_static_series = pd.Series(
-        p_list_static, index=btc_price_data.index)
+    p_list_static_series = pd.Series(p_list_static, index=btc_price_data.index)
 
     axis.set_title("Portfolio Value (Test Set)")
 
@@ -270,8 +293,7 @@ def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_
     p_list_fu = test_performance_lists["p_list_fu"]
 
     for i in range(len(asset_list)):
-        crypto_price_series = pd.Series(
-            p_list_fu[i], index=btc_price_data.index)
+        crypto_price_series = pd.Series(p_list_fu[i], index=btc_price_data.index)
         axis.plot(crypto_price_series, label="{}".format(asset_list[i]))
 
     axis.set_yscale("log")
@@ -319,7 +341,7 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     data = data.set_index("datetime")
 
     btc_data_test_period = data.close[
-        train_test_val_steps["train"] + train_test_val_steps["validation"]:
+        train_test_val_steps["train"] + train_test_val_steps["validation"] :
     ]
 
     btc_price_sharpe = (btc_data_test_period[-1] - btc_data_test_period[0]) / np.std(
@@ -380,8 +402,7 @@ def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
             marker=markers[j % len(markers)],
         )
 
-    cash_list_series = pd.Series(
-        w_list[1:, cash_idx], btc_price_data.index[1:])
+    cash_list_series = pd.Series(w_list[1:, cash_idx], btc_price_data.index[1:])
 
     axis.plot(
         cash_list_series,
