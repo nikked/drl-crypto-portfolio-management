@@ -45,12 +45,12 @@ def main(
     # Orig list
 
     # top 2015
-    if train_session_name.startswith("Jiang_backtest"):
+    if train_session_name.startswith("Jiang_backtest") or train_session_name == "long_run":
         chosen_cryptos = ["LTC", "XRP", "DASH", "DOGE", "NMC",
                           "BTS", "PPC", "MAID"][:no_of_cryptos]
 
     else:
-        chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "DOGE", "ETH", "ETC", "NMC", "BTS", "PPC", "MAID"][:no_of_cryptos]
+        chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "ETH", "MAID", "ETC",  "NMC", "BTS", "PPC", ][:no_of_cryptos]
 
     for crypto in chosen_cryptos:
         cryptos_dict[crypto] = os.path.join(
