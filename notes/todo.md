@@ -1,3 +1,19 @@
+weight chart: large dots instead of linechart 
+    * gridlines to charts
+    * x 's instead of dots (stars?)
+
+
+## Progress
+intro OK
+Research Qs OK
+Portfolio opt lit revise
+ML lit OK
+Dataset OK
+Methodology OK (slight revise)
+Results and findings Write after torstila
+Discussion Write after torstila (can already write something)
+Conclusion (write after torstila)
+
 ## onko mahollista oikeasti treidaa tätä strategiaa?
 > important to Torstila
 
@@ -14,13 +30,25 @@ https://into.aalto.fi/display/enfinance/Maturity+test
 https://into.aalto.fi/display/enfinance/Graduation
 
 
-## Code
-* store train_performance_lists timeseries similarly to test_performance_lists
-
 
 ## Must do
 
-* Coding and metrics: I should report traditional financial performance metrics such as Sharpe ratio or maximum drawdown in addition to raw return. Make detailed tables of the performance of the model compared to equally weighted and Long Bitcoin strategies.
+* Rewrite lit review with how ML stuff should be done approach
+    * genetic algos
+    * korniotis
+    * heaton
+    * jiang
+* Move Jiang stuff to methodology
+* Write stuff about backtests
+* Go through GD comments
+* write discussion
+    * model
+        * did not really care about no of assets 
+        * always learns that eq weighted good
+        * 
+
+
+* Discuss financial literature before ML literature. Describe old articles and korniotis. And then conclude that this study wanted to investigate a representation free approach, pure fina data
 
 * Results: I should take an honest and convincing approach to my results and admit that the DL approach is not a viable trading strategy. I should clearly state that the results are unstable and provide reasoning on why this is the case.
 
@@ -32,13 +60,6 @@ https://into.aalto.fi/display/enfinance/Graduation
 
 
 
-* Dataset: 2 pg
-    * Fix bug where now the agent just invests in agent.
-        * is it a header thing? how was the data read in the previous version?
-    * Poloniex stuff
-    * Train for longer periods
-    * Test with Jiangs periods
-    * Get newer data
 * Methodology 8 pg
     * on policy or off policy
     * deterministic or stochastic
