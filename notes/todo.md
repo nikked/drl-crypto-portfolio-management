@@ -1,3 +1,9 @@
+Previously agent's eq weight was constantly re-adjusting ptf to new eq weight. no it is changed that it just takes a position at beginning
+drl only first step grabs DL's first choices and keeps them at that
+
+* ptf just pretty much constantly readjusts to eq weighted
+
+
 weight chart: large dots instead of linechart 
     * gridlines to charts
     * x 's instead of dots (stars?)
