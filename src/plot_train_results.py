@@ -122,6 +122,7 @@ def _plot_backtest_perf_metadata(
     max_drawdowns = test_performance_lists["max_drawdowns"]
 
     portfolio_final_value = round(test_performance_lists["p_list"][-1], 4)
+    portfolio_static_final_value = round(test_performance_lists["p_list_static"][-1], 4)
     portfolio_eq_final_value = round(
         test_performance_lists["p_list_eq"][-1], 4)
 
@@ -136,7 +137,13 @@ def _plot_backtest_perf_metadata(
             round(max_drawdowns["p_list"], 4),
         ],
         [
-            "Eq weight",
+            "Static agent",
+            portfolio_static_final_value,
+            round(sharpe_ratios["p_list_static"], 4),
+            round(max_drawdowns["p_list_static"], 4),
+        ],
+        [
+            "Eq. weighted",
             portfolio_eq_final_value,
             round(sharpe_ratios["p_list_eq"], 4),
             round(max_drawdowns["p_list_eq"], 4),
@@ -183,7 +190,7 @@ def _plot_backtest_perf_metadata(
     for (row, col), cell in perf_table.get_celld().items():
         if (row == 0):
             cell.set_text_props(fontproperties=FontProperties(weight='bold'), color='white')
-            cell.set_facecolor("blue")
+            cell.set_facecolor("gray")
 
     perf_table.auto_set_font_size(False)
     perf_table.set_fontsize(10)
@@ -205,7 +212,7 @@ def _plot_backtest_perf_metadata(
     for (row, col), cell in date_table.get_celld().items():
         if (row == 0):
             cell.set_text_props(fontproperties=FontProperties(weight='bold'), color='white')
-            cell.set_facecolor("blue")
+            cell.set_facecolor("gray")
 
     axis2 = divider.append_axes("right", size="80%", pad=0.2, sharex=axis)
 
@@ -236,17 +243,17 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
 
     p_list = test_performance_lists["p_list"]
     p_list_eq = test_performance_lists["p_list_eq"]
-    p_list_first_step_only = test_performance_lists["p_list_first_step_only"]
+    p_list_static = test_performance_lists["p_list_static"]
 
     p_list_series = pd.Series(p_list, index=btc_price_data.index)
     p_list_eq_series = pd.Series(p_list_eq, index=btc_price_data.index)
-    p_list_first_step_only_series = pd.Series(
-        p_list_first_step_only, index=btc_price_data.index)
+    p_list_static_series = pd.Series(
+        p_list_static, index=btc_price_data.index)
 
     axis.set_title("Portfolio Value (Test Set)")
 
     axis.plot(p_list_series, label="Dynamic agent")
-    axis.plot(p_list_first_step_only_series, label="Static agent")
+    axis.plot(p_list_static_series, label="Static agent")
     axis.plot(p_list_eq_series, label="Equally weighted")
 
     axis.set_ylabel("Price performance vs BTC")

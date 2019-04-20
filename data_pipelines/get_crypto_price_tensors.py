@@ -45,7 +45,7 @@ def main(
     # Orig list
 
     # top 2015
-    if train_session_name.startswith("Jiang_backtest") or train_session_name == "long_run":
+    if train_session_name.startswith("Jiang_et_al.") or train_session_name == "long_run":
         chosen_cryptos = ["LTC", "XRP", "DASH", "DOGE", "NMC",
                           "BTS", "PPC", "MAID"][:no_of_cryptos]
 
