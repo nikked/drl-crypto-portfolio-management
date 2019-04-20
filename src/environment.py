@@ -83,7 +83,7 @@ class TradeEnv:  # pylint: disable=too-many-instance-attributes
 
         return self.state, self.done
 
-    def step(self, action):  # pylint: disable=too-many-locals
+    def step(self, action, adjust_portfolio=True):  # pylint: disable=too-many-locals
         """
         This function is the main part of the render.
         At each step t, the trading agent gives as input the action he wants to do. So, he gives the new value of the weights of the portfolio.
@@ -121,6 +121,9 @@ class TradeEnv:  # pylint: disable=too-many-instance-attributes
         # allocation choice
         w_alloc = action
         pf_alloc = pf_previous
+
+        if not adjust_portfolio:
+            w_alloc = w_previous
 
         # Compute transaction cost
         cost = (

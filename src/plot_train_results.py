@@ -222,13 +222,16 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
 
     p_list = test_performance_lists["p_list"]
     p_list_eq = test_performance_lists["p_list_eq"]
+    p_list_first_step_only = test_performance_lists["p_list_first_step_only"]
 
     p_list_series = pd.Series(p_list, index=btc_price_data.index)
     p_list_eq_series = pd.Series(p_list_eq, index=btc_price_data.index)
+    p_list_first_step_only_series = pd.Series(p_list_first_step_only, index=btc_price_data.index)
 
     axis.set_title("Portfolio Value (Test Set)")
 
     axis.plot(p_list_series, label="Agent")
+    axis.plot(p_list_first_step_only_series, label="DRL only first step")
     axis.plot(p_list_eq_series, label="Equally weighted")
 
     axis.set_ylabel("Price performance vs BTC")

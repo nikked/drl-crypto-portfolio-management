@@ -18,6 +18,10 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
     )
 
+    state_first_step_only, _ = trade_envs["policy_network_first_step_only"].reset(
+        w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
+    )
+
     state_eq, _ = trade_envs["equal_weighted"].reset(
         weights_equal, train_options["portfolio_value"], index=train_test_split["train"]
     )
@@ -37,6 +41,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
     # first element of the weight and portfolio value
     p_list = [train_options["portfolio_value"]]
+    p_list_first_step_only = [train_options["portfolio_value"]]
     w_list = [w_init_test]
 
     p_list_eq = [train_options["portfolio_value"]]
@@ -57,6 +62,10 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         + train_test_split["test"]
     )
 
+    first_weights = []
+
+    first_step = True
+
     for k in range(low_index, up_index):
         x_current = state[0].reshape([-1] + list(state[0].shape))
         w_previous = state[1].reshape([-1] + list(state[1].shape))
@@ -64,8 +73,13 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         # compute the action
         action = agent.compute_w(x_current, w_previous)
         # step forward environment
+
+        if not len(first_weights):
+            first_weights = np.copy(action)
+
         state, _, _ = trade_envs["policy_network"].step(action)
-        state_eq, _, _ = trade_envs["equal_weighted"].step(weights_equal)
+        state_first_step_only, _, _ = trade_envs["policy_network_first_step_only"].step(first_weights, adjust_portfolio=first_step)
+        state_eq, _, _ = trade_envs["equal_weighted"].step(weights_equal, adjust_portfolio=first_step)
         state_s, _, _ = trade_envs["only_cash"].step(weights_single)
 
         for i in range(no_of_assets):
@@ -73,9 +87,13 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
                 full_on_one_weights[i + 1, :]
             )
 
+        if first_step:
+            first_step = False
+
         # x_next = state[0]
         w_current = state[1]
         pf_value_t = state[2]
+
 
         pf_value_t_eq = state_eq[2]
         pf_value_t_s = state_s[2]
@@ -93,8 +111,12 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         for i in range(no_of_assets):
             p_list_fu[i].append(pf_value_t_fu[i])
 
+        pf_value_t_first_step_only = state_first_step_only[2]
+        p_list_first_step_only.append(pf_value_t_first_step_only)
+
 
     test_performance_lists = {
+        "p_list_first_step_only": p_list_first_step_only,
         "p_list": p_list,
         "p_list_eq": p_list_eq,
         "p_list_fu": p_list_fu,

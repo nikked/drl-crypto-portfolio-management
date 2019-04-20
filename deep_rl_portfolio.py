@@ -113,8 +113,11 @@ def _get_train_environments(no_of_assets, trade_env_args):
 
     # environment for trading of the agent
     # this is the agent trading environment (policy network agent)
-
     env = TradeEnv(**trade_env_args)
+
+    # environment for trading of the agent
+    # that just does the first cash distribution and then holds eq
+    env_first_action = TradeEnv(**trade_env_args)
 
     # environment for equally weighted
     # this environment is set up for an agent who only plays an equally weithed
@@ -131,6 +134,7 @@ def _get_train_environments(no_of_assets, trade_env_args):
 
     trade_envs = {
         "policy_network": env,
+        "policy_network_first_step_only": env_first_action,
         "equal_weighted": env_eq,
         "only_cash": env_s,
         "full_on_one_stocks": env_fu,
