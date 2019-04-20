@@ -328,12 +328,6 @@ if __name__ == "__main__":
         action="store_true",
     )
     PARSER.add_argument(
-        "-micro",
-        "--micro_run",
-        default=False,
-        action="store_true",
-    )
-    PARSER.add_argument(
         "-nano",
         "--nano_run",
         default=False,
@@ -402,13 +396,13 @@ if __name__ == "__main__":
 
         OVERRIDE_PARAMS = {
             **TRAIN_BASE_PARAMS,
-            "ratio_train": 0.918,
+            "ratio_train": 0.916,
             "ratio_val": 0,
         }
 
         main(
             **OVERRIDE_PARAMS,
-            start_date="20150220",
+            start_date="2015038",
             end_date="20161028",
             train_session_name="Jiang_et_al._backtest_period_1",
             gpu_device=ARGS.gpu_device,
@@ -418,13 +412,13 @@ if __name__ == "__main__":
 
         OVERRIDE_PARAMS = {
             **TRAIN_BASE_PARAMS,
-            "ratio_train": 0.928,
+            "ratio_train": 0.916,
             "ratio_val": 0,
         }
 
         main(
             **OVERRIDE_PARAMS,
-            start_date="20150220",
+            start_date="20150609",
             end_date="20170128",
             train_session_name="Jiang_et_al._backtest_period_2",
             gpu_device=ARGS.gpu_device,
@@ -436,8 +430,6 @@ if __name__ == "__main__":
             **TRAIN_BASE_PARAMS,
             "ratio_train": 0.916,
             "ratio_val": 0,
-            "no_of_episodes": 1,
-            "no_of_batches": 1,
         }
 
         main(
@@ -460,7 +452,7 @@ if __name__ == "__main__":
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,
-            "trading_period_length": "2h",
+            "trading_period_length": "30min",
         }
 
         main(**BASE_PARAMS)
@@ -477,7 +469,7 @@ if __name__ == "__main__":
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,
-            "trading_period_length": "2h",
+            "trading_period_length": "30min",
         }
 
         main(**BASE_PARAMS)
@@ -494,7 +486,7 @@ if __name__ == "__main__":
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,
-            "trading_period_length": "2h",
+            "trading_period_length": "30min",
         }
 
         main(**BASE_PARAMS)
@@ -512,22 +504,6 @@ if __name__ == "__main__":
             "ratio_train": 0.9,
             "ratio_val": 0.0,
             "trading_period_length": "4h",
-        }
-
-        main(**BASE_PARAMS)
-
-    elif ARGS.micro_run:
-
-        BASE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "no_of_assets": 7,
-            "start_date": "20170101",
-            "end_date": "20171001",
-            "train_session_name": "micro_run",
-            "gpu_device": ARGS.gpu_device,
-            "ratio_train": 0.9,
-            "ratio_val": 0.0,
-            "trading_period_length": "30min",
         }
 
         main(**BASE_PARAMS)
