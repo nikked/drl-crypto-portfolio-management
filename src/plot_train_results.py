@@ -168,7 +168,7 @@ def _plot_backtest_perf_metadata(
     axis.set_axis_off()
 
     axis.set_title(
-        train_configs['train_session_name'],
+        train_configs['train_session_name'].replace('_', ' '),
         fontdict={'fontsize': 20,
                   'position': (0.0,0.8)}, # x, y
         horizontalalignment='left'
