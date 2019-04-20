@@ -369,7 +369,7 @@ if __name__ == "__main__":
             trading_period_length="4h",
             test_mode=True,
             validate_during_training=ARGS.validate_during_training,
-            train_session_name="quick_test_run"
+            train_session_name="quick_test_run_with_long_name"
         )
 
     elif ARGS.test_mode:
@@ -392,7 +392,7 @@ if __name__ == "__main__":
             trading_period_length="2h",
             test_mode=True,
             validate_during_training=ARGS.validate_during_training,
-            train_session_name="test_run"
+            train_session_name="test_run_with_long_name"
         )
 
     elif ARGS.jbt1:
@@ -408,7 +408,7 @@ if __name__ == "__main__":
             **OVERRIDE_PARAMS,
             start_date="20150220",
             end_date="20161028",
-            train_session_name="Jiang_backtest_period_1",
+            train_session_name="Jiang_et_al._backtest_period_1",
             gpu_device=ARGS.gpu_device,
         )
     elif ARGS.jbt2:
@@ -424,7 +424,7 @@ if __name__ == "__main__":
             **OVERRIDE_PARAMS,
             start_date="20150220",
             end_date="20170128",
-            train_session_name="Jiang_backtest_period_2",
+            train_session_name="Jiang_et_al._backtest_period_2",
             gpu_device=ARGS.gpu_device,
         )
     elif ARGS.jbt3:
@@ -440,7 +440,7 @@ if __name__ == "__main__":
             **OVERRIDE_PARAMS,
             start_date="20150501",
             end_date="20170427",
-            train_session_name="Jiang_backtest_period_3",
+            train_session_name="Jiang_et_al._backtest_period_3",
             gpu_device=ARGS.gpu_device,
         )
     elif ARGS.bull_run_year_2017:
@@ -451,7 +451,7 @@ if __name__ == "__main__":
             "no_of_assets": 7,
             "start_date": "20170101",
             "end_date": "20171231",
-            "train_session_name": "bull_run_year_2017",
+            "train_session_name": "Bull_run_year_2017",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,
@@ -468,7 +468,7 @@ if __name__ == "__main__":
             "no_of_assets": 7,
             "start_date": "20180101",
             "end_date": "20181231",
-            "train_session_name": "bear_year_2018",
+            "train_session_name": "Bear_year_2018",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,
@@ -485,7 +485,7 @@ if __name__ == "__main__":
             "no_of_assets": 7,
             "start_date": "20180101",
             "end_date": "20190418",
-            "train_session_name": "recent_yr_2019",
+            "train_session_name": "Recent_year_2019",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,

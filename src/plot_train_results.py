@@ -2,6 +2,7 @@ import os
 from pprint import pprint
 from datetime import datetime, timedelta
 import matplotlib.dates as mdates
+from matplotlib.font_manager import FontProperties
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
@@ -129,7 +130,7 @@ def _plot_backtest_perf_metadata(
 
     clust_data = [
         [
-            "DRL",
+            "Dynamic agent",
             portfolio_final_value,
             round(sharpe_ratios["p_list"], 4),
             round(max_drawdowns["p_list"], 4),
@@ -170,13 +171,19 @@ def _plot_backtest_perf_metadata(
     axis.set_title(
         train_configs['train_session_name'].replace('_', ' '),
         fontdict={'fontsize': 20,
-                  'position': (0.0,0.8)}, # x, y
+                  'position': (0.0, 0.8)},  # x, y
         horizontalalignment='left'
     )
     perf_table = axis.table(cellText=clust_data,
-                            colLabels=columns, 
-                            loc="center"
+                            colLabels=columns,
+                            loc="center",
+                            cellLoc='center'
                             )
+
+    for (row, col), cell in perf_table.get_celld().items():
+        if (row == 0):
+            cell.set_text_props(fontproperties=FontProperties(weight='bold'), color='white')
+            cell.set_facecolor("blue")
 
     perf_table.auto_set_font_size(False)
     perf_table.set_fontsize(10)
@@ -188,11 +195,18 @@ def _plot_backtest_perf_metadata(
         cellText=train_time_table_clust_data,
         colLabels=train_time_table_columns,
         loc="center",
+        cellLoc='center'
     )
 
     date_table.auto_set_font_size(False)
     date_table.set_fontsize(10)
     date_table.scale(1.0, 2)
+
+    for (row, col), cell in date_table.get_celld().items():
+        if (row == 0):
+            cell.set_text_props(fontproperties=FontProperties(weight='bold'), color='white')
+            cell.set_facecolor("blue")
+
     axis2 = divider.append_axes("right", size="80%", pad=0.2, sharex=axis)
 
     train_params_str = f"""
@@ -226,12 +240,13 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
 
     p_list_series = pd.Series(p_list, index=btc_price_data.index)
     p_list_eq_series = pd.Series(p_list_eq, index=btc_price_data.index)
-    p_list_first_step_only_series = pd.Series(p_list_first_step_only, index=btc_price_data.index)
+    p_list_first_step_only_series = pd.Series(
+        p_list_first_step_only, index=btc_price_data.index)
 
     axis.set_title("Portfolio Value (Test Set)")
 
-    axis.plot(p_list_series, label="Agent")
-    axis.plot(p_list_first_step_only_series, label="DRL only first step")
+    axis.plot(p_list_series, label="Dynamic agent")
+    axis.plot(p_list_first_step_only_series, label="Static agent")
     axis.plot(p_list_eq_series, label="Equally weighted")
 
     axis.set_ylabel("Price performance vs BTC")
