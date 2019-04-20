@@ -444,7 +444,7 @@ if __name__ == "__main__":
 
         BASE_PARAMS = {
             **JIANG_BASE_PARAMS,
-            "no_of_assets": 6,
+            "no_of_assets": 7,
             "start_date": "20170101",
             "end_date": "20171231",
             "train_session_name": "bull_run_year_2017",
@@ -461,7 +461,7 @@ if __name__ == "__main__":
 
         BASE_PARAMS = {
             **JIANG_BASE_PARAMS,
-            "no_of_assets": 6,
+            "no_of_assets": 7,
             "start_date": "20180101",
             "end_date": "20181231",
             "train_session_name": "bear_year_2018",
@@ -478,7 +478,7 @@ if __name__ == "__main__":
 
         BASE_PARAMS = {
             **JIANG_BASE_PARAMS,
-            "no_of_assets": 6,
+            "no_of_assets": 7,
             "start_date": "20180101",
             "end_date": "20190418",
             "train_session_name": "recent_yr_2019",
@@ -495,7 +495,7 @@ if __name__ == "__main__":
 
         BASE_PARAMS = {
             **JIANG_BASE_PARAMS,
-            "no_of_assets": 5,
+            "no_of_assets": 7,
             "start_date": "20150220",
             "end_date": "20190418",
             "train_session_name": "long_run",
@@ -511,7 +511,7 @@ if __name__ == "__main__":
 
         BASE_PARAMS = {
             **JIANG_BASE_PARAMS,
-            "no_of_assets": 5,
+            "no_of_assets": 7,
             "start_date": "20180101",
             "end_date": "20190418",
             "train_session_name": "micro_run",
@@ -527,7 +527,7 @@ if __name__ == "__main__":
 
         BASE_PARAMS = {
             **JIANG_BASE_PARAMS,
-            "no_of_assets": 5,
+            "no_of_assets": 7,
             "start_date": "20180801",
             "end_date": "20190418",
             "train_session_name": "nano_run",
@@ -543,7 +543,7 @@ if __name__ == "__main__":
 
         BASE_PARAMS = {
             **JIANG_BASE_PARAMS,
-            "no_of_assets": 5,
+            "no_of_assets": 6,
             "start_date": "20190201",
             "end_date": "20190418",
             "train_session_name": "pico_run",
