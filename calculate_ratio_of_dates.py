@@ -16,19 +16,26 @@ def calculate_ratio(start_dt, split_dt, end_dt):
 
 if __name__ == "__main__":
 
-    # # Jiang 1
-    start_dt = datetime.strptime("20150220", "%Y%m%d")
-    split_dt = datetime.strptime("20160907", "%Y%m%d")
-    end_dt = datetime.strptime("20161028", "%Y%m%d")
+    # # Jiang 1 2h
+    # start_dt = datetime.strptime("20150220", "%Y%m%d")
+    # split_dt = datetime.strptime("20160907", "%Y%m%d")
+    # end_dt = datetime.strptime("20161028", "%Y%m%d")
 
     # Jiang 2
-    # start_dt = datetime.strptime("20150220", "%Y%m%d")
-    # split_dt = datetime.strptime("20161208", "%Y%m%d")
-    # end_dt = datetime.strptime("20170128", "%Y%m%d")
+    start_dt = datetime.strptime("20150606", "%Y%m%d")
+    split_dt = datetime.strptime("20161208", "%Y%m%d")
+    end_dt = datetime.strptime("20170128", "%Y%m%d")
 
     # # Jiang 3
     # start_dt = datetime.strptime("20150501", "%Y%m%d")
     # split_dt = datetime.strptime("20170307", "%Y%m%d")
     # end_dt = datetime.strptime("20170427", "%Y%m%d")
+
+
+    # # Jiang 3 30min
+    start_dt = datetime.strptime("20150905", "%Y%m%d")
+    split_dt = datetime.strptime("20170307", "%Y%m%d")
+    end_dt = datetime.strptime("20170427", "%Y%m%d")
+
 
     calculate_ratio(start_dt, split_dt, end_dt)

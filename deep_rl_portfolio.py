@@ -434,12 +434,15 @@ if __name__ == "__main__":
 
         OVERRIDE_PARAMS = {
             **TRAIN_BASE_PARAMS,
-            "ratio_train": 0.93,
+            "ratio_train": 0.916,
             "ratio_val": 0,
+            "no_of_episodes": 1,
+            "no_of_batches": 1,
         }
 
         main(
             **OVERRIDE_PARAMS,
+
             start_date="20150905",
             end_date="20170427",
             train_session_name="Jiang_et_al._backtest_period_3",
