@@ -384,7 +384,7 @@ def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
     names = [CASH_NAME] + asset_list
     w_list = np.array(w_list)
 
-    markers = ["2", ".", "*", "x", "+"]
+    markers = ["2", ".", "x", "+", "1"]
 
     cash_idx = None
     for j in range(len(asset_list) + 1):
