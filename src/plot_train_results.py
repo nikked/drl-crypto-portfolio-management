@@ -196,13 +196,14 @@ def _plot_backtest_perf_metadata(
     perf_table.set_fontsize(10)
     perf_table.scale(1.0, 2)
 
-    axis1 = divider.append_axes("right", size="80%", pad=0.2, sharex=axis)
+    axis1 = divider.append_axes("right", size="80%", pad=0.6, sharex=axis)
     axis1.set_axis_off()
     date_table = axis1.table(
         cellText=train_time_table_clust_data,
         colLabels=train_time_table_columns,
         loc="center",
-        cellLoc='center'
+        cellLoc='center',
+        colWidths=[0.3 for x in train_time_table_columns],
     )
 
     date_table.auto_set_font_size(False)
