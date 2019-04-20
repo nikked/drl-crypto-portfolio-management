@@ -68,9 +68,11 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         train_time_secs,
         train_test_val_steps,
     )
-    _plot_portfolio_value_progress_test(axes[1], test_performance_lists, btc_price_data)
+    _plot_portfolio_value_progress_test(
+        axes[1], test_performance_lists, btc_price_data)
     _plot_btc_price(axes[2], btc_price_data)
-    _plot_crypto_price_test(axes[3], test_performance_lists, btc_price_data, asset_list)
+    _plot_crypto_price_test(
+        axes[3], test_performance_lists, btc_price_data, asset_list)
     _plot_weight_evolution(
         weight_ax, asset_list, test_performance_lists["w_list"], btc_price_data
     )
@@ -112,14 +114,15 @@ def _plot_backtest_perf_metadata(
     train_test_val_steps,
 ):
 
-    axis.set_ylim(-3, 2)
+    # axis.set_ylim(-3, 2)
     columns = ("Strategy", "Ptf value", "Sharpe", "MDD")
 
     sharpe_ratios = test_performance_lists["sharpe_ratios"]
     max_drawdowns = test_performance_lists["max_drawdowns"]
 
     portfolio_final_value = round(test_performance_lists["p_list"][-1], 4)
-    portfolio_eq_final_value = round(test_performance_lists["p_list_eq"][-1], 4)
+    portfolio_eq_final_value = round(
+        test_performance_lists["p_list_eq"][-1], 4)
 
     back_test_start_timestamp = btc_price_data.index[0]
     train_end_timestamp = back_test_start_timestamp - timedelta(days=1)
@@ -139,7 +142,8 @@ def _plot_backtest_perf_metadata(
         ]
     ]
 
-    train_time_table_columns = ("Dataset", "Start date", "End date", "No. of steps")
+    train_time_table_columns = (
+        "Dataset", "Start date", "End date", "No. of steps")
 
     train_time_table_clust_data = [
         [
@@ -153,7 +157,8 @@ def _plot_backtest_perf_metadata(
         [
             "Test period",
             back_test_start_timestamp.strftime("%Y-%m-%d"),
-            datetime.strptime(train_configs["end_date"], "%Y%m%d").strftime("%Y-%m-%d"),
+            datetime.strptime(
+                train_configs["end_date"], "%Y%m%d").strftime("%Y-%m-%d"),
             train_test_val_steps["test"],
         ],
     ]
@@ -161,7 +166,17 @@ def _plot_backtest_perf_metadata(
     divider = make_axes_locatable(axis)
 
     axis.set_axis_off()
-    perf_table = axis.table(cellText=clust_data, colLabels=columns, loc="center")
+
+    axis.set_title(
+        train_configs['train_session_name'],
+        fontdict={'fontsize': 20,
+                  'position': (0.0,0.8)}, # x, y
+        horizontalalignment='left'
+    )
+    perf_table = axis.table(cellText=clust_data,
+                            colLabels=columns, 
+                            loc="center"
+                            )
 
     perf_table.auto_set_font_size(False)
     perf_table.set_fontsize(10)
@@ -229,7 +244,8 @@ def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_
     p_list_fu = test_performance_lists["p_list_fu"]
 
     for i in range(len(asset_list)):
-        crypto_price_series = pd.Series(p_list_fu[i], index=btc_price_data.index)
+        crypto_price_series = pd.Series(
+            p_list_fu[i], index=btc_price_data.index)
         axis.plot(crypto_price_series, label="{}".format(asset_list[i]))
 
     axis.set_yscale("log")
@@ -277,7 +293,7 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     data = data.set_index("datetime")
 
     btc_data_test_period = data.close[
-        train_test_val_steps["train"] + train_test_val_steps["validation"] :
+        train_test_val_steps["train"] + train_test_val_steps["validation"]:
     ]
 
     btc_price_sharpe = (btc_data_test_period[-1] - btc_data_test_period[0]) / np.std(
@@ -338,7 +354,8 @@ def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
             marker=markers[j % len(markers)],
         )
 
-    cash_list_series = pd.Series(w_list[1:, cash_idx], btc_price_data.index[1:])
+    cash_list_series = pd.Series(
+        w_list[1:, cash_idx], btc_price_data.index[1:])
 
     axis.plot(
         cash_list_series,
