@@ -20,11 +20,19 @@ if __name__ == "__main__":
     # start_dt = datetime.strptime("20150220", "%Y%m%d")
     # split_dt = datetime.strptime("20160907", "%Y%m%d")
     # end_dt = datetime.strptime("20161028", "%Y%m%d")
+    # # Jiang 1 30min
+    # start_dt = datetime.strptime("20150306", "%Y%m%d")
+    # split_dt = datetime.strptime("20160907", "%Y%m%d")
+    # end_dt = datetime.strptime("20161028", "%Y%m%d")
 
     # Jiang 2
-    start_dt = datetime.strptime("20150606", "%Y%m%d")
-    split_dt = datetime.strptime("20161208", "%Y%m%d")
-    end_dt = datetime.strptime("20170128", "%Y%m%d")
+    # start_dt = datetime.strptime("20150606", "%Y%m%d")
+    # split_dt = datetime.strptime("20161208", "%Y%m%d")
+    # end_dt = datetime.strptime("20170128", "%Y%m%d")
+    # Jiang 2 30min
+    # start_dt = datetime.strptime("20150606", "%Y%m%d")
+    # split_dt = datetime.strptime("20161208", "%Y%m%d")
+    # end_dt = datetime.strptime("20170128", "%Y%m%d")
 
     # # Jiang 3
     # start_dt = datetime.strptime("20150501", "%Y%m%d")
