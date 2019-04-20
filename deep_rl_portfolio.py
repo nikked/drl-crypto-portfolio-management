@@ -24,7 +24,7 @@ DEFAULT_TRADE_ENV_ARGS = {
     "interest_rate": INTEREST_RATE,
 }
 
-JIANG_BASE_PARAMS = {
+TRAIN_BASE_PARAMS = {
     "interactive_session": False,
     "verbose": True,
     "no_of_assets": 8,
@@ -35,7 +35,7 @@ JIANG_BASE_PARAMS = {
     "batch_size": 50,
     "portfolio_value": 1,
     "validate_during_training": False,
-    "trading_period_length": "2h",
+    "trading_period_length": "30min",
 }
 
 
@@ -51,6 +51,7 @@ def main(**train_configs):
     # Creation of the trading environment
     trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(
         train_configs)
+
 
     # Agent training
     agent, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
@@ -145,6 +146,7 @@ def _get_train_environments(no_of_assets, trade_env_args):
 
 
 def _get_train_val_test_steps(trading_period, train_configs):
+
     # Total number of steps for pre-training in the training set
     total_steps_train = int(train_configs['ratio_train'] * trading_period)
 
@@ -399,7 +401,7 @@ if __name__ == "__main__":
         print("\nRunning model for Jiang's back test 1 period")
 
         OVERRIDE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "ratio_train": 0.918,
             "ratio_val": 0,
         }
@@ -415,7 +417,7 @@ if __name__ == "__main__":
         print("\nRunning model for Jiang's back test 2 period")
 
         OVERRIDE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "ratio_train": 0.928,
             "ratio_val": 0,
         }
@@ -431,14 +433,14 @@ if __name__ == "__main__":
         print("\nRunning model for Jiang's back test 2 period")
 
         OVERRIDE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "ratio_train": 0.93,
             "ratio_val": 0,
         }
 
         main(
             **OVERRIDE_PARAMS,
-            start_date="20150501",
+            start_date="20150905",
             end_date="20170427",
             train_session_name="Jiang_et_al._backtest_period_3",
             gpu_device=ARGS.gpu_device,
@@ -447,7 +449,7 @@ if __name__ == "__main__":
         print("\nRunning Fattii Erikois Settii")
 
         BASE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
             "start_date": "20170101",
             "end_date": "20171231",
@@ -464,7 +466,7 @@ if __name__ == "__main__":
         print("\nRunning bear year 2018")
 
         BASE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
             "start_date": "20180101",
             "end_date": "20181231",
@@ -481,7 +483,7 @@ if __name__ == "__main__":
         print("\nRunning recent year 2019")
 
         BASE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
             "start_date": "20180101",
             "end_date": "20190418",
@@ -498,7 +500,7 @@ if __name__ == "__main__":
     elif ARGS.long_run:
 
         BASE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
             "start_date": "20150220",
             "end_date": "20190418",
@@ -514,7 +516,7 @@ if __name__ == "__main__":
     elif ARGS.micro_run:
 
         BASE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
             "start_date": "20170101",
             "end_date": "20171001",
@@ -530,7 +532,7 @@ if __name__ == "__main__":
     elif ARGS.nano_run:
 
         BASE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
             "start_date": "20180801",
             "end_date": "20190418",
@@ -546,7 +548,7 @@ if __name__ == "__main__":
     elif ARGS.pico_run:
 
         BASE_PARAMS = {
-            **JIANG_BASE_PARAMS,
+            **TRAIN_BASE_PARAMS,
             "no_of_assets": 6,
             "start_date": "20190201",
             "end_date": "20190418",
