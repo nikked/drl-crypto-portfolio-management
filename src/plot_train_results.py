@@ -400,7 +400,7 @@ def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
 def _date_gridify_axis(axis):
     axis.xaxis.set_major_locator(mdates.DayLocator(interval=7))
     axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
-    axis.xaxis.set_minor_locator(mdates.HourLocator(byhour=[0, 6, 12, 18]))
+    axis.xaxis.set_minor_locator(mdates.HourLocator(byhour=[0, 8, 16]))
 
     # Or if you want different settings for the grids:
     axis.grid(which="minor", alpha=0.2)
