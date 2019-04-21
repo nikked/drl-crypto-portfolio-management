@@ -1,3 +1,8 @@
+backtest performance due to caching veyr nice ripple bullrun early april 2017
+add stories to each backtest and explain others run
+
+eth spike
+
 Previously agent's eq weight was constantly re-adjusting ptf to new eq weight. no it is changed that it just takes a position at beginning
 drl only first step grabs DL's first choices and keeps them at that
 

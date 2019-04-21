@@ -69,9 +69,9 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         train_time_secs,
         train_test_val_steps,
     )
-    _plot_portfolio_value_progress_test(axes[1], test_performance_lists, btc_price_data)
-    _plot_btc_price(axes[2], btc_price_data)
-    _plot_crypto_price_test(axes[3], test_performance_lists, btc_price_data, asset_list)
+    _plot_btc_price(axes[1], btc_price_data)
+    _plot_crypto_price_test(axes[2], test_performance_lists, btc_price_data, asset_list)
+    _plot_portfolio_value_progress_test(axes[3], test_performance_lists, btc_price_data)
     _plot_weight_evolution(
         weight_ax, asset_list, test_performance_lists["w_list"], btc_price_data
     )
@@ -274,7 +274,7 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
     p_list_eq_series = pd.Series(p_list_eq, index=btc_price_data.index)
     p_list_static_series = pd.Series(p_list_static, index=btc_price_data.index)
 
-    axis.set_title("Portfolio Value (Test Set)")
+    axis.set_title("Portfolio Value")
 
     axis.plot(p_list_series, label="Dynamic agent")
     axis.plot(p_list_static_series, label="Static agent")
