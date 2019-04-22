@@ -45,15 +45,18 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     print("\nTrain test val steps")
     pprint(train_test_val_steps)
 
-    fig, axes = plt.subplots(nrows=6, ncols=1)
+    fig, axes = plt.subplots(nrows=7, ncols=1)
 
     # width, height
     fig.set_size_inches(16.6, 23.4)
 
-    gs = axes[4].get_gridspec()
+    gs = axes[2].get_gridspec()
+    axes[2].remove()
+    axes[3].remove()
     axes[4].remove()
     axes[5].remove()
 
+    price_ax = fig.add_subplot(gs[2:4])
     weight_ax = fig.add_subplot(gs[4:6])
 
     btc_price_data, btc_price_sharpe = _get_btc_price_data_for_period(
@@ -69,12 +72,14 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         train_time_secs,
         train_test_val_steps,
     )
-    _plot_btc_price(axes[1], btc_price_data)
-    _plot_crypto_price_test(axes[2], test_performance_lists, btc_price_data, asset_list)
-    _plot_portfolio_value_progress_test(axes[3], test_performance_lists, btc_price_data)
+    _plot_portfolio_value_progress_test(
+        axes[1], test_performance_lists, btc_price_data)
+    _plot_crypto_price_test(
+        price_ax, test_performance_lists, btc_price_data, asset_list)
     _plot_weight_evolution(
         weight_ax, asset_list, test_performance_lists["w_list"], btc_price_data
     )
+    _plot_btc_price(axes[6], btc_price_data)
 
     # Rotate x axis labels
     for axis in fig.axes:
@@ -120,8 +125,10 @@ def _plot_backtest_perf_metadata(
     max_drawdowns = test_performance_lists["max_drawdowns"]
 
     portfolio_final_value = round(test_performance_lists["p_list"][-1], 4)
-    portfolio_static_final_value = round(test_performance_lists["p_list_static"][-1], 4)
-    portfolio_eq_final_value = round(test_performance_lists["p_list_eq"][-1], 4)
+    portfolio_static_final_value = round(
+        test_performance_lists["p_list_static"][-1], 4)
+    portfolio_eq_final_value = round(
+        test_performance_lists["p_list_eq"][-1], 4)
 
     back_test_start_timestamp = btc_price_data.index[0]
     train_end_timestamp = back_test_start_timestamp - timedelta(days=1)
@@ -147,7 +154,8 @@ def _plot_backtest_perf_metadata(
         ],
     ]
 
-    train_time_table_columns = ("Dataset", "Start date", "End date", "No. of steps")
+    train_time_table_columns = (
+        "Dataset", "Start date", "End date", "No. of steps")
 
     train_time_table_clust_data = [
         [
@@ -161,7 +169,8 @@ def _plot_backtest_perf_metadata(
         [
             "Test period",
             back_test_start_timestamp.strftime("%Y-%m-%d"),
-            datetime.strptime(train_configs["end_date"], "%Y%m%d").strftime("%Y-%m-%d"),
+            datetime.strptime(
+                train_configs["end_date"], "%Y%m%d").strftime("%Y-%m-%d"),
             train_test_val_steps["test"],
         ],
     ]
@@ -292,9 +301,11 @@ def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_
 
     p_list_fu = test_performance_lists["p_list_fu"]
 
+    linestyles = ['-',  '-', '-', ':', '-', '-', '-', '-', '-', '-', ':']
     for i in range(len(asset_list)):
-        crypto_price_series = pd.Series(p_list_fu[i], index=btc_price_data.index)
-        axis.plot(crypto_price_series, label="{}".format(asset_list[i]))
+        crypto_price_series = pd.Series(
+            p_list_fu[i], index=btc_price_data.index)
+        axis.plot(crypto_price_series, linestyle = linestyles[i % len(linestyles)], label="{}".format(asset_list[i]))
 
     axis.set_yscale("log")
 
@@ -341,7 +352,7 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     data = data.set_index("datetime")
 
     btc_data_test_period = data.close[
-        train_test_val_steps["train"] + train_test_val_steps["validation"] :
+        train_test_val_steps["train"] + train_test_val_steps["validation"]:
     ]
 
     btc_price_sharpe = (btc_data_test_period[-1] - btc_data_test_period[0]) / np.std(
@@ -402,7 +413,8 @@ def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
             marker=markers[j % len(markers)],
         )
 
-    cash_list_series = pd.Series(w_list[1:, cash_idx], btc_price_data.index[1:])
+    cash_list_series = pd.Series(
+        w_list[1:, cash_idx], btc_price_data.index[1:])
 
     axis.plot(
         cash_list_series,

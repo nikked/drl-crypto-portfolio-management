@@ -66,7 +66,7 @@ class Policy:
         # objective function
         # maximize reward over the batch
         with tf.device(self.tf_device):
-            self.train_op = OPTIMIZER.minimize(-self.adjusted_reward)
+            self.train_op = OPTIMIZER.minimize(-self.instantaneous_reward)
 
     def _define_input_placeholders(self, nb_feature_map):
         # Price tensor
