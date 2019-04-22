@@ -43,16 +43,25 @@ def main(
         chosen_cryptos = ["LTC", "XRP", "DASH", "DOGE", "NMC",
                           "BTS", "PPC", "MAID"][:no_of_cryptos]
 
+    if train_session_name == "Jiang_et_al._backtest_period_1":
+        chosen_cryptos = ["XMR", "USDT", "ETH", "ETC", "DASH", "FCT",
+                          "MAID", "LSK", "LTC", "STEEM", "BTS"][:no_of_cryptos]
+
+    if train_session_name == "Jiang_et_al._backtest_period_2":
+        chosen_cryptos = ["XMR", "USDT", "ETH", "ETC", "DASH", "FCT",
+                          "MAID", "XRP", "ZEC", "STEEM", "REP"][:no_of_cryptos]
+
     if train_session_name == "Jiang_et_al._backtest_period_3":
-        # chosen_cryptos = ["ETH","PASC","XMR","reversed_USDT","LTC","XRP","ETC","MAID","FCT","DASH","ZEC"][:no_of_cryptos]
-        chosen_cryptos = ["LTC", "ETH", "PASC", "XMR", "XRP",
-                          "ETC", "MAID", "FCT", "DASH", "ZEC"][:no_of_cryptos]
+        chosen_cryptos = ["XMR", "USDT", "ETH", "ETC", "DASH",
+                          "FCT", "MAID", "XRP", "ZEC", "LTC", "PASC"][:no_of_cryptos]
 
     else:
-        chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "ETH",
+        chosen_cryptos = ["XMR", "USDT", "XRP", "LTC", "DASH", "ETH",
                           "MAID", "ETC",  "NMC", "BTS", "PPC", ][:no_of_cryptos]
 
     for crypto in chosen_cryptos:
+        if crypto == "USDT":
+            continue
         cryptos_dict[crypto] = os.path.join(
             f"BTC_{crypto}",
             f"{start_date}-{end_date}",
@@ -66,14 +75,19 @@ def main(
             )
 
     # Download bitcoin price for the period
-    btc_price_fp = f"USDT_BTC_{start_date}-{end_date}_{trading_period_length}.csv"
-    if not os.path.isfile(btc_price_fp):
+    btc_price_fn = f"USDT_BTC_{start_date}-{end_date}_{trading_period_length}.csv"
+    if not os.path.isfile(btc_price_fn):
         download_crypto_data(f"USDT_BTC", start_date, end_date, trading_period_length)
 
     chosen_crypto_fps = []
 
     for crypto in chosen_cryptos:
-        chosen_crypto_fps.append(cryptos_dict[crypto])
+        if crypto == 'USDT':
+
+            btc_price_fp = os.path.join("USDT_BTC", f"{start_date}-{end_date}", btc_price_fn)
+            chosen_crypto_fps.append(btc_price_fp)
+        else:
+            chosen_crypto_fps.append(cryptos_dict[crypto])
 
     crypto_tensor = _make_crypto_tensor(chosen_crypto_fps, no_of_cryptos)
 
@@ -85,8 +99,7 @@ def main(
     return crypto_tensor, chosen_cryptos
 
 
-def _make_crypto_tensor(kept_cryptos, no_of_cryptos):
-    
+def _make_crypto_tensor(chosen_crypto_fps, no_of_cryptos):
     list_open = list()
     list_close = list()
     list_high = list()
@@ -96,12 +109,12 @@ def _make_crypto_tensor(kept_cryptos, no_of_cryptos):
     # to be able to zero pad data
     first_crypto_list_len = 0
 
-    for idx, crypto in enumerate(kept_cryptos):
+    for idx, crypto_fp in enumerate(chosen_crypto_fps):
 
         if idx >= no_of_cryptos:
             break
 
-        data_fp = os.path.join(os.getcwd(), DATA_DIR, crypto)
+        data_fp = os.path.join(os.getcwd(), DATA_DIR, crypto_fp)
 
         data = pd.read_csv(data_fp).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
@@ -113,23 +126,31 @@ def _make_crypto_tensor(kept_cryptos, no_of_cryptos):
         if len(data.open.values) < first_crypto_list_len:
             missing_datapoints = first_crypto_list_len - len(data.open.values)
 
+        open_price = data.open.values
+        close_price = data.close.values
+        high_price = data.high.values
+        low_price = data.low.values
+
+        # invert USDT values
+        if "USDT" in crypto_fp:
+            open_price = np.true_divide(1, data.open.values)
+            close_price = np.true_divide(1, data.close.values)
+            high_price = np.true_divide(1, data.high.values)
+            low_price = np.true_divide(1, data.low.values)
+
         list_open.append(
-            np.pad(data.open.values, (missing_datapoints, 0), 'edge'))
+            np.pad(open_price, (missing_datapoints, 0), 'edge'))
         list_close.append(
-            np.pad(data.close.values, (missing_datapoints, 0), 'edge'))
+            np.pad(close_price, (missing_datapoints, 0), 'edge'))
         list_high.append(
-            np.pad(data.high.values, (missing_datapoints, 0), 'edge'))
+            np.pad(high_price, (missing_datapoints, 0), 'edge'))
         list_low.append(
-            np.pad(data.low.values, (missing_datapoints, 0), 'edge'))
+            np.pad(low_price, (missing_datapoints, 0), 'edge'))
 
     array_open = np.transpose(np.array(list_open))[:-1]
     array_open_of_the_day = np.transpose(np.array(list_open))[1:]
     array_high = np.transpose(np.array(list_high))[:-1]
     array_low = np.transpose(np.array(list_low))[:-1]
-
-    for l in list_open:
-        print(len(l))
-        print(l[:100])
 
     crypto_tensor = np.transpose(
         np.array(
