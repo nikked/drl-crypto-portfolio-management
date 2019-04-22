@@ -446,7 +446,7 @@ if __name__ == "__main__":
         BASE_PARAMS = {
             **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
-            "start_date": "20170101",
+            "start_date": "20160801",
             "end_date": "20171231",
             "train_session_name": "Bull_run_year_2017",
             "gpu_device": ARGS.gpu_device,
@@ -463,7 +463,7 @@ if __name__ == "__main__":
         BASE_PARAMS = {
             **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
-            "start_date": "20180101",
+            "start_date": "20170601",
             "end_date": "20181231",
             "train_session_name": "Bear_year_2018",
             "gpu_device": ARGS.gpu_device,
@@ -513,8 +513,8 @@ if __name__ == "__main__":
         BASE_PARAMS = {
             **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
-            "start_date": "20180801",
-            "end_date": "20190418",
+            "start_date": "20160801",
+            "end_date": "20170427",
             "train_session_name": "nano_run",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
@@ -529,8 +529,8 @@ if __name__ == "__main__":
         BASE_PARAMS = {
             **TRAIN_BASE_PARAMS,
             "no_of_assets": 6,
-            "start_date": "20190201",
-            "end_date": "20190418",
+            "start_date": "20170115",
+            "end_date": "20170415",
             "train_session_name": "pico_run",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
