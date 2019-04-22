@@ -101,6 +101,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
             pf_value_t_fu[i] = state_fu[i][2]
 
         if k % 20 == 0:
+            print(f'\n{k}/{up_index}')
             print("Ptf value: ", round(pf_value_previous, 2))
             print("Ptf weights: ", w_previous[0])
         p_list.append(pf_value_t)
