@@ -36,21 +36,21 @@ def main(
 
     cryptos_dict = {}
 
-
-
-
     # 11 workable
     # chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "DOGE", "NMC", "BTS", "NXT", "PPC", "MAID", "XCP", "ETH", "ETC"][:no_of_cryptos]
 
-    # Orig list
-
-    # top 2015
-    if train_session_name.startswith("Jiang_et_al.") or train_session_name == "long_run":
+    if train_session_name == "long_run":
         chosen_cryptos = ["LTC", "XRP", "DASH", "DOGE", "NMC",
                           "BTS", "PPC", "MAID"][:no_of_cryptos]
 
+    if train_session_name == "Jiang_et_al._backtest_period_3":
+        # chosen_cryptos = ["ETH","PASC","XMR","reversed_USDT","LTC","XRP","ETC","MAID","FCT","DASH","ZEC"][:no_of_cryptos]
+        chosen_cryptos = ["LTC", "ETH", "PASC", "XMR", "XRP",
+                          "ETC", "MAID", "FCT", "DASH", "ZEC"][:no_of_cryptos]
+
     else:
-        chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "ETH", "MAID", "ETC",  "NMC", "BTS", "PPC", ][:no_of_cryptos]
+        chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "ETH",
+                          "MAID", "ETC",  "NMC", "BTS", "PPC", ][:no_of_cryptos]
 
     for crypto in chosen_cryptos:
         cryptos_dict[crypto] = os.path.join(
@@ -86,10 +86,15 @@ def main(
 
 
 def _make_crypto_tensor(kept_cryptos, no_of_cryptos):
+    
     list_open = list()
     list_close = list()
     list_high = list()
     list_low = list()
+
+    # hacky, put a crypto with full history first and calculate its length
+    # to be able to zero pad data
+    first_crypto_list_len = 0
 
     for idx, crypto in enumerate(kept_cryptos):
 
@@ -100,15 +105,31 @@ def _make_crypto_tensor(kept_cryptos, no_of_cryptos):
 
         data = pd.read_csv(data_fp).fillna("bfill").copy()
         data = data[["open", "close", "high", "low"]]
-        list_open.append(data.open.values)
-        list_close.append(data.close.values)
-        list_high.append(data.high.values)
-        list_low.append(data.low.values)
+
+        if not first_crypto_list_len:
+            first_crypto_list_len = len(data.open.values)
+
+        missing_datapoints = 0
+        if len(data.open.values) < first_crypto_list_len:
+            missing_datapoints = first_crypto_list_len - len(data.open.values)
+
+        list_open.append(
+            np.pad(data.open.values, (missing_datapoints, 0), 'edge'))
+        list_close.append(
+            np.pad(data.close.values, (missing_datapoints, 0), 'edge'))
+        list_high.append(
+            np.pad(data.high.values, (missing_datapoints, 0), 'edge'))
+        list_low.append(
+            np.pad(data.low.values, (missing_datapoints, 0), 'edge'))
 
     array_open = np.transpose(np.array(list_open))[:-1]
     array_open_of_the_day = np.transpose(np.array(list_open))[1:]
     array_high = np.transpose(np.array(list_high))[:-1]
     array_low = np.transpose(np.array(list_low))[:-1]
+
+    for l in list_open:
+        print(len(l))
+        print(l[:100])
 
     crypto_tensor = np.transpose(
         np.array(

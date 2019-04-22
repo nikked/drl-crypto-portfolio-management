@@ -27,7 +27,7 @@ DEFAULT_TRADE_ENV_ARGS = {
 TRAIN_BASE_PARAMS = {
     "interactive_session": False,
     "verbose": True,
-    "no_of_assets": 8,
+    "no_of_assets": 10,
     "plot_results": False,
     "n_episodes": 2,
     "n_batches": 10,
