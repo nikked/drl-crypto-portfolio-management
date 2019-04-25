@@ -1,3 +1,4 @@
+import pytz
 import math
 import os
 from pprint import pprint
@@ -109,9 +110,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     pprint("Exiting")
 
 
-def _annualize_sharpe_ratio(start_dt, end_dt, sharpe_ratio):
-
-    days_between = (end_dt - start_dt).days
+def _annualize_sharpe_ratio(days_between, sharpe_ratio):
 
     ratio_of_full_year = 365 / days_between
 
@@ -145,32 +144,44 @@ def _plot_backtest_perf_metadata(
     back_test_start_timestamp = btc_price_data.index[0]
     train_end_timestamp = back_test_start_timestamp - timedelta(days=1)
 
+    back_test_day_count = (
+        btc_price_data.index[-1] - back_test_start_timestamp).days
+
+
+    train_start_dt = datetime.strptime(train_configs["start_date"], "%Y%m%d")
+    train_start_dt = train_start_dt.replace(tzinfo=pytz.UTC)
+    train_day_count = (train_end_timestamp.to_pydatetime() -
+                       train_start_dt).days
+
     clust_data = [
         [
             "Dynamic agent",
             portfolio_final_value,
             round(sharpe_ratios["p_list"], 4),
-            _annualize_sharpe_ratio(back_test_start_timestamp, btc_price_data.index[-1] , sharpe_ratios["p_list"]),
+            _annualize_sharpe_ratio(
+                back_test_day_count, sharpe_ratios["p_list"]),
             round(max_drawdowns["p_list"], 4),
         ],
         [
             "Static agent",
             portfolio_static_final_value,
             round(sharpe_ratios["p_list_static"], 4),
-            _annualize_sharpe_ratio(back_test_start_timestamp, btc_price_data.index[-1] , sharpe_ratios["p_list_static"]),
+            _annualize_sharpe_ratio(
+                back_test_day_count, sharpe_ratios["p_list_static"]),
             round(max_drawdowns["p_list_static"], 4),
         ],
         [
             "Eq. weighted",
             portfolio_eq_final_value,
             round(sharpe_ratios["p_list_eq"], 4),
-            _annualize_sharpe_ratio(back_test_start_timestamp, btc_price_data.index[-1] , sharpe_ratios["p_list_eq"]),
+            _annualize_sharpe_ratio(
+                back_test_day_count, sharpe_ratios["p_list_eq"]),
             round(max_drawdowns["p_list_eq"], 4),
         ],
     ]
 
     train_time_table_columns = (
-        "Dataset", "Start date", "End date", "Steps")
+        "Dataset", "Start date", "End date", "Days", "Steps")
 
     train_time_table_clust_data = [
         [
@@ -179,6 +190,7 @@ def _plot_backtest_perf_metadata(
                 "%Y-%m-%d"
             ),
             train_end_timestamp.strftime("%Y-%m-%d"),
+            train_day_count,
             train_test_val_steps["train"],
         ],
         [
@@ -186,6 +198,7 @@ def _plot_backtest_perf_metadata(
             back_test_start_timestamp.strftime("%Y-%m-%d"),
             datetime.strptime(
                 train_configs["end_date"], "%Y%m%d").strftime("%Y-%m-%d"),
+            back_test_day_count,
             train_test_val_steps["test"],
         ],
     ]
@@ -214,14 +227,14 @@ def _plot_backtest_perf_metadata(
     perf_table.set_fontsize(10)
     perf_table.scale(1.0, 2)
 
-    axis1 = divider.append_axes("right", size="57%", pad=0.6, sharex=axis)
+    axis1 = divider.append_axes("right", size="57%", pad=0.8, sharex=axis)
     axis1.set_axis_off()
     date_table = axis1.table(
         cellText=train_time_table_clust_data,
         colLabels=train_time_table_columns,
         loc="center",
         cellLoc="center",
-        colWidths=[0.3 for x in train_time_table_columns],
+        colWidths=[0.3, 0.3, 0.3, 0.2, 0.2],
     )
 
     date_table.auto_set_font_size(False)
@@ -274,6 +287,7 @@ def _plot_backtest_perf_metadata(
         colLabels=config_table_columns,
         loc="center",
         cellLoc="center",
+        colWidths=[0.5, 0.3]
     )
 
     config_table.auto_set_font_size(False)
