@@ -19,3 +19,4 @@ local_data/
 crypto_data/*
 train_graphs/
 train_jsons/
+train_histograms/

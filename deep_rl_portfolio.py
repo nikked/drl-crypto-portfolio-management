@@ -5,6 +5,7 @@ from pprint import pprint
 from src.train_rl_algorithm import train_rl_algorithm
 from src.test_rl_algorithm import test_rl_algorithm
 from src.plot_train_results import plot_train_results
+from src.make_train_histograms import make_train_histograms
 from src.environment import TradeEnv
 
 from src.params import (
@@ -77,6 +78,9 @@ def main(**train_configs):
         train_time_secs,
         train_test_val_steps,
     )
+
+    print('\nAggregating simulation statistics...')
+    make_train_histograms(train_configs['train_session_name'])
 
     pprint("Exiting")
 

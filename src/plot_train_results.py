@@ -263,23 +263,17 @@ def _plot_backtest_perf_metadata(
 
     axis.set_title(
         train_configs["train_session_name"].replace("_", " "),
-        fontdict={"fontsize": 20, "position": (0.0, 0.8)},  # x, y
+        fontdict={"fontsize": 20, "position": (0.0, 0.85)},  # x, y
         horizontalalignment="left",
     )
     perf_table = axis.table(
         cellText=clust_data, colLabels=columns, loc="center", cellLoc="center"
     )
 
-    for (row, col), cell in perf_table.get_celld().items():
-        if row == 0:
-            cell.set_text_props(
-                fontproperties=FontProperties(weight="bold"), color="white"
-            )
-            cell.set_facecolor("gray")
-
     perf_table.auto_set_font_size(False)
     perf_table.set_fontsize(10)
     perf_table.scale(1.0, 2)
+    _format_table(perf_table)
 
     axis1 = divider.append_axes("right", size="57%", pad=0.8, sharex=axis)
     axis1.set_axis_off()
@@ -294,13 +288,7 @@ def _plot_backtest_perf_metadata(
     date_table.auto_set_font_size(False)
     date_table.set_fontsize(10)
     date_table.scale(1.0, 2)
-
-    for (row, col), cell in date_table.get_celld().items():
-        if row == 0:
-            cell.set_text_props(
-                fontproperties=FontProperties(weight="bold"), color="white"
-            )
-            cell.set_facecolor("gray")
+    _format_table(date_table)
 
     axis2 = divider.append_axes("right", size="40%", pad=0.35, sharex=axis)
 
@@ -348,12 +336,16 @@ def _plot_backtest_perf_metadata(
     config_table.set_fontsize(8)
     config_table.scale(0.8, 1.6)
 
-    for (row, col), cell in config_table.get_celld().items():
+    _format_table(config_table)
+
+
+def _format_table(table):
+    for (row, col), cell in table.get_celld().items():
         if row == 0:
             cell.set_text_props(
                 fontproperties=FontProperties(weight="bold"), color="white"
             )
-            cell.set_facecolor("gray")
+            cell.set_facecolor("#4C72B0")
 
 
 def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_data):
