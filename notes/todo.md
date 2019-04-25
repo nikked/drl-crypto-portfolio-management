@@ -20,7 +20,7 @@ weight chart: large dots instead of linechart
 ## Progress
 intro OK
 Research Qs OK
-Portfolio opt lit revise
+Portfolio opt lit OK
 ML lit OK
 Dataset OK
 Methodology OK (slight revise)

@@ -4,53 +4,57 @@
 * chosen because of sharp ripple peak
 
 
-### Probable pairs:
 XMR
-ETC
+USDT
 ETH
-FCT
+ETC
 DASH
+FCT
 MAID
-reversed_USDT
+
 LSK
 LTC
-BTS
 STEEM
-
-
+BTS
+["XMR","USDT","ETH","ETC","DASH","FCT","MAID","LSK","LTC","STEEM","BTS"]
 
 ## JBT2
 > BTC dominance 85.83 to 85.27
 
-ETH
 XMR
-ZEC
-FCT
-reversed_USDT
+USDT
+ETH
 ETC
-REP
-XRP
 DASH
-STEEM
+FCT
 MAID
 
+XRP
+ZEC
+STEEM
+REP
+
+["XMR","USDT","ETH","ETC","DASH","FCT","MAID","XRP","ZEC","STEEM","REP"]
 
 
 ## JBT3
 > BTC dom 84.48 -> 65.91
 
-ETH
-PASC
 XMR
-reversed_USDT
-LTC
-XRP
+USDT
+ETH
 ETC
-MAID
-FCT
 DASH
-ZEC
+FCT
+MAID
 
+XRP
+ZEC
+LTC
+PASC
+
+
+["XMR","USDT","ETH","ETC","DASH","FCT","MAID","XRP","ZEC","LTC","PASC",]
 
 ## Pico (try to increase perf on best JBT)
 ## Nano (try to increase perf on best JBT)

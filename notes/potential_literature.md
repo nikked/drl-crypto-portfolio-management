@@ -4,3 +4,8 @@
 * William F Sharpe. The sharpe ratio, 1994
 * J. Moody, M. Saffell, Learning to trade via direct reinforcement, 2001
 * Yue Deng, Feng Bao, Youyong Kong, Zhiquan Ren, Qionghai Dai, Deep Direct Reinforcement Learning for Financial Signal Representation and Trading, 2016
+
+
+https://arxiv.org/abs/1808.09940
+https://dl.acm.org/citation.cfm?id=3291831
+https://ieeexplore.ieee.org/abstract/document/8628791
