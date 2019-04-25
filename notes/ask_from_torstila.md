@@ -28,3 +28,11 @@ two table of contents
 
 * keskihajonnan annualisointi sharpe ratiost
 how to calculate annualized volatility
+
+
+####
+
+
+last
+
+is it okay to use pics from the interwebs

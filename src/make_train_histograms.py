@@ -91,24 +91,24 @@ def make_train_histograms(session_name):
     )
 
     _plot_histogram(axes[1][0], dynamic_pf_values,
-                    "Dynamic portfolio values", "Portfolio value")
+                    "Dynamic agent: Distribution of Portfolio Values", "Portfolio value")
     _plot_histogram(axes[1][1], static_pf_values,
-                    "Static portfolio values", "Portfolio value")
+                    "Static agent: Distribution of Portfolio Values", "Portfolio value")
 
     _plot_histogram(axes[2][0], dynamic_sharpe_ratios,
-                    "Dynamic Sharpe ratios", "Sharpe ratio")
+                    "Dynamic agent: Distribution of Sharpe Ratios", "Sharpe ratio")
     _plot_histogram(axes[2][1], static_sharpe_ratios,
-                    "Static Sharpe ratios", "Sharpe ratio")
+                    "Static agent: Distribution of Sharpe Ratios", "Sharpe ratio")
 
     _plot_histogram(axes[3][0], dynamic_mdds,
-                    "Dynamic Maximum drawdowns", "Maximum drawdown")
+                    "Dynamic agent: Distribution of Maximum Drawdowns", "Maximum drawdown")
     _plot_histogram(axes[3][1], static_mdds,
-                    "Static Maximum drawdowns", "Maximum drawdown")
+                    "Static agent: Distribution of Maximum Drawdowns", "Maximum drawdown")
 
     _plot_histogram(axes[4][0], crypto_weight_std_devs,
-                    "Std. dev of weights", "Std. dev of weights")
+                    "Stdev of weights", "Stdev of weights")
     _plot_histogram(axes[4][1], cash_investments,
-                    "BTC (cash) weights", "BTC weight")
+                    "BTC weight", "BTC weight")
 
     output_path = os.path.join(HISTOGRAM_OUTPUT_DIR, f"histogram_{session_name}.png")
     plt.subplots_adjust(hspace=0.5)
@@ -146,7 +146,7 @@ def _plot_histogram_metadata_table(
         horizontalalignment="left",
     )
 
-    dynamic_columns = ("Dynamic agent", "Average", "Std. dev")
+    dynamic_columns = ("Dynamic agent", "Average", "Stdev")
     dynamic_data = [
         ["Ptf. value", round(np.mean(dynamic_pf_values), 4),
          round(np.std(dynamic_pf_values), 4)],
@@ -154,27 +154,27 @@ def _plot_histogram_metadata_table(
             np.std(dynamic_sharpe_ratios), 4)],
         ["MDD", round(np.mean(dynamic_mdds), 4),
          round(np.std(dynamic_mdds), 4)],
-        ["BTC wgt, %", round(np.mean(cash_investments), 4),
-         round(np.std(cash_investments), 4)],
-        ["Weight std devs", round(np.mean(crypto_weight_std_devs), 4), round(
+        ["Stdev of weights", round(np.mean(crypto_weight_std_devs), 4), round(
             np.std(crypto_weight_std_devs), 4)],
+        ["BTC weight", round(np.mean(cash_investments), 4),
+         round(np.std(cash_investments), 4)],
     ]
 
     dynamic_table = axis.table(
         cellText=dynamic_data, colLabels=dynamic_columns, loc="center", cellLoc="center")
     _format_table(dynamic_table)
 
-    static_columns = ("Static agent", "Average", "Std. dev")
+    static_columns = ("Static agent", "Average", "Stdev")
     static_data = [
         ["Ptf. value", round(np.mean(static_pf_values), 4),
          round(np.std(static_pf_values), 4)],
         ["Sharpe ratio", round(np.mean(static_sharpe_ratios), 4), round(
             np.std(static_sharpe_ratios), 4)],
         ["MDD", round(np.mean(static_mdds), 4), round(np.std(static_mdds), 4)],
-        ["BTC wgt, %", round(np.mean(cash_investments), 4),
-         round(np.std(cash_investments), 4)],
-        ["Weight std devs", round(np.mean(crypto_weight_std_devs), 4), round(
+        ["Stdev of weights", round(np.mean(crypto_weight_std_devs), 4), round(
             np.std(crypto_weight_std_devs), 4)],
+        ["BTC weight", round(np.mean(cash_investments), 4),
+         round(np.std(cash_investments), 4)],
     ]
 
     axis1 = divider.append_axes("right", size="100%", pad=0.3, sharex=axis)
@@ -230,7 +230,7 @@ def _plot_histogram(axis, data, title, xlabel):
         bins=num_bins,
         ax=axis,
         rug=True,
-        kde=False
+        kde=False,
     )
     # axis.hist(data, num_bins, alpha=0.95)
     axis.grid(alpha=0.3)

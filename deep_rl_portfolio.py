@@ -32,7 +32,7 @@ TRAIN_BASE_PARAMS = {
     "plot_results": False,
     "n_episodes": 2,
     "n_batches": 10,
-    "window_length": 50,
+    "window_length": 70,
     "batch_size": 50,
     "portfolio_value": 1,
     "validate_during_training": False,

@@ -225,7 +225,7 @@ def _plot_backtest_perf_metadata(
             round(max_drawdowns["p_list_static"], 4),
         ],
         [
-            "Eq. weighted",
+            "Equal weighted",
             portfolio_eq_final_value,
             round(sharpe_ratios["p_list_eq"], 4),
             _annualize_sharpe_ratio(
@@ -362,7 +362,7 @@ def _plot_portfolio_value_progress_test(axis, test_performance_lists, btc_price_
 
     axis.plot(p_list_series, label="Dynamic agent")
     axis.plot(p_list_static_series, label="Static agent")
-    axis.plot(p_list_eq_series, label="Equally weighted")
+    axis.plot(p_list_eq_series, label="Equal weighted")
 
     axis.set_ylabel("Price performance vs BTC")
 
