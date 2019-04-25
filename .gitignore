@@ -18,3 +18,4 @@ local_data/
 .coverage
 crypto_data/*
 train_graphs/
+train_jsons/

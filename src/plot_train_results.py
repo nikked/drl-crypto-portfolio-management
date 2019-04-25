@@ -1,4 +1,6 @@
+import time
 import pytz
+import json
 import math
 import os
 from pprint import pprint
@@ -22,11 +24,15 @@ from src.params import (
 )
 
 DATA_DIR = "crypto_data/"
-OUTPUT_DIR = "train_graphs/"
+GRAPH_OUTPUT_DIR = "train_graphs/"
+JSON_OUTPUT_DIR = "train_jsons/"
 CASH_NAME = "BTC"
 
-if not os.path.exists(OUTPUT_DIR):
-    os.mkdir(OUTPUT_DIR)
+if not os.path.exists(GRAPH_OUTPUT_DIR):
+    os.mkdir(GRAPH_OUTPUT_DIR)
+
+if not os.path.exists(JSON_OUTPUT_DIR):
+    os.mkdir(JSON_OUTPUT_DIR)
 
 # move crypto price above weights
 # test and train times
@@ -92,14 +98,16 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
 
     output_fn = None
 
+    session_name = train_configs['train_session_name']
+
     if "test_mode" in train_configs:
         if train_configs["test_mode"]:
-            output_fn = f"{train_configs['train_session_name']}"
+            output_fn = f"{session_name}"
 
     if not output_fn:
-        output_fn = f"{train_configs['train_session_name']}_{timestamp_now}"
+        output_fn = f"{session_name}_{timestamp_now}"
 
-    output_path = os.path.join(OUTPUT_DIR, f"train_results_{output_fn}.png")
+    output_path = os.path.join(GRAPH_OUTPUT_DIR, f"train_results_{output_fn}.png")
     plt.subplots_adjust(hspace=0.5)
     print(f"Saving plot to path: {output_path}")
     plt.savefig(output_path, bbox_inches="tight")
@@ -107,7 +115,54 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     if train_configs["plot_results"]:
         plt.show()
 
-    pprint("Exiting")
+    json_path = os.path.join(JSON_OUTPUT_DIR, f"train_history_{session_name}.json")
+    print(f"\nWriting simulation data to filepath: {json_path}")
+
+    # LATER
+    # histogram of sharperatios
+    # histogram of pf values
+    # histogram of mdds
+
+    start_time = time.time()
+
+    try:
+        with open(json_path, 'r') as file:
+            history_dict = json.load(file)
+
+    except FileNotFoundError:
+        history_dict = {}
+
+    history_dict[timestamp_now] = {
+
+        "dynamic": {
+            "pf_value": test_performance_lists["p_list"][-1],
+            "std_dev": test_performance_lists["std_devs"]["p_list"],
+            "sharpe_ratio": test_performance_lists["sharpe_ratios"]["p_list"],
+            "mdd": test_performance_lists["max_drawdowns"]["p_list"],
+        },
+        "static": {
+            "pf_value": test_performance_lists["p_list_static"][-1],
+            "std_dev": test_performance_lists["std_devs"]["p_list_static"],
+            "sharpe_ratio": test_performance_lists["sharpe_ratios"]["p_list_static"],
+            "mdd": test_performance_lists["max_drawdowns"]["p_list_static"],
+        },
+        "eq_weight": {
+            "pf_value": test_performance_lists["p_list_eq"][-1],
+            "std_dev": test_performance_lists["std_devs"]["p_list_eq"],
+            "sharpe_ratio": test_performance_lists["sharpe_ratios"]["p_list_eq"],
+            "mdd": test_performance_lists["max_drawdowns"]["p_list_eq"],
+        },
+        "initial_weights": list(test_performance_lists["w_list"][1]),
+        "asset_list": asset_list
+    }
+
+    with open(json_path, 'w') as file:
+        json.dump(history_dict, file)
+
+    end_time = time.time()
+    train_time_secs = round(end_time - start_time, 4)
+
+    print(f"JSON was open for {train_time_secs} seconds\n")
 
 
 def _annualize_sharpe_ratio(days_between, sharpe_ratio):
@@ -146,7 +201,6 @@ def _plot_backtest_perf_metadata(
 
     back_test_day_count = (
         btc_price_data.index[-1] - back_test_start_timestamp).days
-
 
     train_start_dt = datetime.strptime(train_configs["start_date"], "%Y%m%d")
     train_start_dt = train_start_dt.replace(tzinfo=pytz.UTC)

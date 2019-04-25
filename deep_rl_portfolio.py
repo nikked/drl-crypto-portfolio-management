@@ -78,6 +78,8 @@ def main(**train_configs):
         train_test_val_steps,
     )
 
+    pprint("Exiting")
+
 
 def _initialize_trade_envs(train_configs):
 

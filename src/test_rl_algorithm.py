@@ -133,6 +133,11 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
             "p_list_static": _get_max_draw_down(p_list_static),
             "p_list_eq": _get_max_draw_down(p_list_eq),
         },
+        "std_devs":{
+            "p_list": np.std(p_list),
+            "p_list_static": np.std(p_list_static),
+            "p_list_eq": np.std(p_list_eq),        
+        }
     }
 
     return test_performance_lists
