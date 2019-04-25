@@ -16,6 +16,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from src.params import (
     EPSILON_GREEDY_THRESHOLD,
+    TRADING_COST,
     LEARNING_RATE,
     KERNEL1_SIZE,
     N_FILTER_1,
@@ -307,14 +308,16 @@ def _plot_backtest_perf_metadata(
         ["No. batches", train_configs["n_batches"]],
         ["No. episodes", train_configs["n_episodes"]],
         ["Batch size", train_configs["batch_size"]],
+        ["Trading fee", f"{TRADING_COST*100}%"],
         ["Trading period", trading_period],
         ["Window length", train_configs["window_length"]],
         ["Conv Filters, 1", N_FILTER_1],
         ["Conv Filters, 2", N_FILTER_2],
         ["Kernel size", KERNEL1_SIZE],
+        ["ε greedy thld", EPSILON_GREEDY_THRESHOLD],
     ]
 
-    config_table_columns = ("Statistic", "Value")
+    config_table_columns = ("Parameter", "Value")
 
     config_table = axis2.table(
         cellText=config_table_data,
