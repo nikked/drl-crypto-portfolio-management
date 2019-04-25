@@ -1,3 +1,4 @@
+import math
 import os
 from pprint import pprint
 from datetime import datetime, timedelta
@@ -108,6 +109,17 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     pprint("Exiting")
 
 
+def _annualize_sharpe_ratio(start_dt, end_dt, sharpe_ratio):
+
+    days_between = (end_dt - start_dt).days
+
+    ratio_of_full_year = 365 / days_between
+
+    annualized_sharpe = sharpe_ratio * math.sqrt(ratio_of_full_year)
+
+    return round(annualized_sharpe, 4)
+
+
 def _plot_backtest_perf_metadata(
     axis,
     test_performance_lists,
@@ -119,7 +131,7 @@ def _plot_backtest_perf_metadata(
 ):
 
     # axis.set_ylim(-3, 2)
-    columns = ("Strategy", "Ptf value", "Sharpe", "MDD")
+    columns = ("Strategy", "Ptf value", "Sharpe", "Sharpe (ann.)", "MDD")
 
     sharpe_ratios = test_performance_lists["sharpe_ratios"]
     max_drawdowns = test_performance_lists["max_drawdowns"]
@@ -138,24 +150,27 @@ def _plot_backtest_perf_metadata(
             "Dynamic agent",
             portfolio_final_value,
             round(sharpe_ratios["p_list"], 4),
+            _annualize_sharpe_ratio(back_test_start_timestamp, btc_price_data.index[-1] , sharpe_ratios["p_list"]),
             round(max_drawdowns["p_list"], 4),
         ],
         [
             "Static agent",
             portfolio_static_final_value,
             round(sharpe_ratios["p_list_static"], 4),
+            _annualize_sharpe_ratio(back_test_start_timestamp, btc_price_data.index[-1] , sharpe_ratios["p_list_static"]),
             round(max_drawdowns["p_list_static"], 4),
         ],
         [
             "Eq. weighted",
             portfolio_eq_final_value,
             round(sharpe_ratios["p_list_eq"], 4),
+            _annualize_sharpe_ratio(back_test_start_timestamp, btc_price_data.index[-1] , sharpe_ratios["p_list_eq"]),
             round(max_drawdowns["p_list_eq"], 4),
         ],
     ]
 
     train_time_table_columns = (
-        "Dataset", "Start date", "End date", "No. of steps")
+        "Dataset", "Start date", "End date", "Steps")
 
     train_time_table_clust_data = [
         [
@@ -199,7 +214,7 @@ def _plot_backtest_perf_metadata(
     perf_table.set_fontsize(10)
     perf_table.scale(1.0, 2)
 
-    axis1 = divider.append_axes("right", size="80%", pad=0.6, sharex=axis)
+    axis1 = divider.append_axes("right", size="57%", pad=0.6, sharex=axis)
     axis1.set_axis_off()
     date_table = axis1.table(
         cellText=train_time_table_clust_data,
@@ -220,7 +235,7 @@ def _plot_backtest_perf_metadata(
             )
             cell.set_facecolor("gray")
 
-    axis2 = divider.append_axes("right", size="50%", pad=0.4, sharex=axis)
+    axis2 = divider.append_axes("right", size="40%", pad=0.35, sharex=axis)
 
     #     train_params_str = f"""
     # No. batches: {train_configs['n_batches']}
@@ -305,7 +320,8 @@ def _plot_crypto_price_test(axis, test_performance_lists, btc_price_data, asset_
     for i in range(len(asset_list)):
         crypto_price_series = pd.Series(
             p_list_fu[i], index=btc_price_data.index)
-        axis.plot(crypto_price_series, linestyle = linestyles[i % len(linestyles)], label="{}".format(asset_list[i]))
+        axis.plot(crypto_price_series, linestyle=linestyles[
+                  i % len(linestyles)], label="{}".format(asset_list[i]))
 
     axis.set_yscale("log")
 
