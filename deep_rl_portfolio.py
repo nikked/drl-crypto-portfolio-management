@@ -8,12 +8,7 @@ from src.plot_train_results import plot_train_results
 from src.make_train_histograms import make_train_histograms
 from src.environment import TradeEnv
 
-from src.params import (
-    PF_INITIAL_VALUE,
-    TRADING_COST,
-    INTEREST_RATE,
-    WINDOW_LENGTH,
-)
+from src.params import PF_INITIAL_VALUE, TRADING_COST, INTEREST_RATE, WINDOW_LENGTH
 
 from data_pipelines import get_crypto_price_tensors
 
@@ -50,9 +45,7 @@ def main(**train_configs):
     print("\n")
 
     # Creation of the trading environment
-    trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(
-        train_configs)
-
+    trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(train_configs)
 
     # Agent training
     agent, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
@@ -79,8 +72,8 @@ def main(**train_configs):
         train_test_val_steps,
     )
 
-    print('\nAggregating simulation statistics...')
-    make_train_histograms(train_configs['train_session_name'])
+    print("\nAggregating simulation statistics...")
+    make_train_histograms(train_configs["train_session_name"])
 
     pprint("Exiting")
 
@@ -92,11 +85,11 @@ def _initialize_trade_envs(train_configs):
         start_date=train_configs["start_date"],
         end_date=train_configs["end_date"],
         trading_period_length=train_configs["trading_period_length"],
-        train_session_name=train_configs['train_session_name']
+        train_session_name=train_configs["train_session_name"],
     )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
-    trade_env_args["train_size"] = train_configs['ratio_train']
+    trade_env_args["train_size"] = train_configs["ratio_train"]
     trade_env_args["data"] = dataset
     trade_env_args["window_length"] = train_configs["window_length"]
 
@@ -104,14 +97,12 @@ def _initialize_trade_envs(train_configs):
     print("Trading periods: {}".format(dataset.shape[2]))
 
     # Determine the step sizes of different datasets
-    train_test_val_steps = _get_train_val_test_steps(
-        trading_periods, train_configs)
+    train_test_val_steps = _get_train_val_test_steps(trading_periods, train_configs)
 
     print("Starting training for {} assets".format(len(asset_names)))
     print(asset_names)
 
-    train_envs = _get_train_environments(
-        train_configs["no_of_assets"], trade_env_args)
+    train_envs = _get_train_environments(train_configs["no_of_assets"], trade_env_args)
 
     return train_envs, asset_names, train_test_val_steps
 
@@ -154,10 +145,10 @@ def _get_train_environments(no_of_assets, trade_env_args):
 def _get_train_val_test_steps(trading_period, train_configs):
 
     # Total number of steps for pre-training in the training set
-    total_steps_train = int(train_configs['ratio_train'] * trading_period)
+    total_steps_train = int(train_configs["ratio_train"] * trading_period)
 
     # Total number of steps for pre-training in the validation set
-    total_steps_val = int(train_configs['ratio_val'] * trading_period)
+    total_steps_val = int(train_configs["ratio_val"] * trading_period)
 
     # Total number of steps for the test
     total_steps_test = trading_period - total_steps_train - total_steps_val
@@ -315,36 +306,13 @@ if __name__ == "__main__":
         action="store_true",
     )
 
+    PARSER.add_argument("-bear", "--bear_year_2018", default=False, action="store_true")
     PARSER.add_argument(
-        "-bear",
-        "--bear_year_2018",
-        default=False,
-        action="store_true",
+        "-recent", "--recent_yr_2019", default=False, action="store_true"
     )
-    PARSER.add_argument(
-        "-recent",
-        "--recent_yr_2019",
-        default=False,
-        action="store_true",
-    )
-    PARSER.add_argument(
-        "-long",
-        "--long_run",
-        default=False,
-        action="store_true",
-    )
-    PARSER.add_argument(
-        "-nano",
-        "--nano_run",
-        default=False,
-        action="store_true",
-    )
-    PARSER.add_argument(
-        "-pico",
-        "--pico_run",
-        default=False,
-        action="store_true",
-    )
+    PARSER.add_argument("-long", "--long_run", default=False, action="store_true")
+    PARSER.add_argument("-nano", "--nano_run", default=False, action="store_true")
+    PARSER.add_argument("-pico", "--pico_run", default=False, action="store_true")
 
     ARGS = PARSER.parse_args()
 
@@ -371,7 +339,7 @@ if __name__ == "__main__":
             trading_period_length="4h",
             test_mode=True,
             validate_during_training=ARGS.validate_during_training,
-            train_session_name="quick_test_run_with_long_name"
+            train_session_name="quick_test_run_with_long_name",
         )
 
     elif ARGS.test_mode:
@@ -394,17 +362,13 @@ if __name__ == "__main__":
             trading_period_length="2h",
             test_mode=True,
             validate_during_training=ARGS.validate_during_training,
-            train_session_name="test_run_with_long_name"
+            train_session_name="test_run_with_long_name",
         )
 
     elif ARGS.jbt1:
         print("\nRunning model for Jiang's back test 1 period")
 
-        OVERRIDE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "ratio_train": 0.916,
-            "ratio_val": 0,
-        }
+        OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
 
         main(
             **OVERRIDE_PARAMS,
@@ -416,11 +380,7 @@ if __name__ == "__main__":
     elif ARGS.jbt2:
         print("\nRunning model for Jiang's back test 2 period")
 
-        OVERRIDE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "ratio_train": 0.916,
-            "ratio_val": 0,
-        }
+        OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
 
         main(
             **OVERRIDE_PARAMS,
@@ -432,15 +392,10 @@ if __name__ == "__main__":
     elif ARGS.jbt3:
         print("\nRunning model for Jiang's back test 2 period")
 
-        OVERRIDE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "ratio_train": 0.916,
-            "ratio_val": 0,
-        }
+        OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
 
         main(
             **OVERRIDE_PARAMS,
-
             start_date="20150905",
             end_date="20170427",
             train_session_name="Jiang_et_al._backtest:_#3",
@@ -496,7 +451,6 @@ if __name__ == "__main__":
         }
 
         main(**BASE_PARAMS)
-
 
     elif ARGS.long_run:
 

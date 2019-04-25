@@ -78,8 +78,12 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
             first_weights = np.copy(action)
 
         state, _, _ = trade_envs["policy_network"].step(action)
-        state_static, _, _ = trade_envs["policy_network_first_step_only"].step(first_weights, adjust_portfolio=first_step)
-        state_eq, _, _ = trade_envs["equal_weighted"].step(weights_equal, adjust_portfolio=first_step)
+        state_static, _, _ = trade_envs["policy_network_first_step_only"].step(
+            first_weights, adjust_portfolio=first_step
+        )
+        state_eq, _, _ = trade_envs["equal_weighted"].step(
+            weights_equal, adjust_portfolio=first_step
+        )
         state_s, _, _ = trade_envs["only_cash"].step(weights_single)
 
         for i in range(no_of_assets):
@@ -94,14 +98,13 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         w_current = state[1]
         pf_value_t = state[2]
 
-
         pf_value_t_eq = state_eq[2]
         pf_value_t_s = state_s[2]
         for i in range(no_of_assets):
             pf_value_t_fu[i] = state_fu[i][2]
 
         if k % 20 == 0:
-            print(f'\n{k}/{up_index}')
+            print(f"\n{k}/{up_index}")
             print("Ptf value: ", round(pf_value_previous, 2))
             print("Ptf weights: ", w_previous[0])
         p_list.append(pf_value_t)
@@ -115,7 +118,6 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         pf_value_t_static = state_static[2]
         p_list_static.append(pf_value_t_static)
 
-
     test_performance_lists = {
         "p_list_static": p_list_static,
         "p_list": p_list,
@@ -125,7 +127,8 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         "w_list": w_list,
         "sharpe_ratios": {
             "p_list": (p_list[-1] - p_list[0]) / np.std(p_list),
-            "p_list_static": (p_list_static[-1] - p_list_static[0]) / np.std(p_list_static),
+            "p_list_static": (p_list_static[-1] - p_list_static[0])
+            / np.std(p_list_static),
             "p_list_eq": (p_list_eq[-1] - p_list_eq[0]) / np.std(p_list_eq),
         },
         "max_drawdowns": {
@@ -133,11 +136,11 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
             "p_list_static": _get_max_draw_down(p_list_static),
             "p_list_eq": _get_max_draw_down(p_list_eq),
         },
-        "std_devs":{
+        "std_devs": {
             "p_list": np.std(p_list),
             "p_list_static": np.std(p_list_static),
-            "p_list_eq": np.std(p_list_eq),        
-        }
+            "p_list_eq": np.std(p_list_eq),
+        },
     }
 
     return test_performance_lists
