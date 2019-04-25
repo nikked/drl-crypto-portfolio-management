@@ -130,9 +130,9 @@ def make_train_histograms(session_name):
     )
 
     _plot_histogram(
-        axes[4][0], crypto_weight_std_devs, "Stdev of weights", "Stdev of weights"
+        axes[4][0], crypto_weight_std_devs, "Both agents: Distribution of the standard deviation of weights", "Stdev of weights"
     )
-    _plot_histogram(axes[4][1], cash_investments, "BTC weight", "BTC weight")
+    _plot_histogram(axes[4][1], cash_investments, "Both agents: Distribution of BTC weights", "BTC weight")
 
     output_path = os.path.join(HISTOGRAM_OUTPUT_DIR, f"histogram_{session_name}.png")
     plt.subplots_adjust(hspace=0.5)
