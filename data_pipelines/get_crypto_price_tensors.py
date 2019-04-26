@@ -37,28 +37,27 @@ def main(
     cryptos_dict = {}
 
     # Final backtest lists
-    if train_session_name == "Calm_before_the_storm":
+    if train_session_name.startswith("Calm_before_the_storm"):
         print(f"Using assets for session {train_session_name}")
         chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'LTC', 'ETC', 'FCT', 'MAID', 'LSK', 'BTS', 'STEEM'][:no_of_cryptos]
-    elif train_session_name == "Awakening":
+    elif train_session_name.startswith("Awakening"):
         print(f"Using assets for session {train_session_name}")
         chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'ETC', 'ZEC', 'FCT', 'REP', 'STEEM', 'MAID'][:no_of_cryptos]
-    elif train_session_name == "Ripple_bullrun":
+    elif train_session_name.startswith("Ripple_bullrun"):
         print(f"Using assets for session {train_session_name}")
         chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'MAID', 'FCT', 'GNT', 'ZEC'][:no_of_cryptos]
-    elif train_session_name == "Ethereum_valley":
+    elif train_session_name.startswith("Ethereum_valley"):
         print(f"Using assets for session {train_session_name}")
         chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'STR', 'XEM', 'DGB', 'ZEC'][:no_of_cryptos]
-    elif train_session_name == "All-time_high":
+    elif train_session_name.startswith("All-time_high"):
         print(f"Using assets for session {train_session_name}")
         chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'BCH', 'STR', 'VTC', 'LSK'][:no_of_cryptos]
-    elif train_session_name == "Rock_bottom":
+    elif train_session_name.startswith("Rock_bottom"):
         print(f"Using assets for session {train_session_name}")
         chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'BCH', 'STR', 'BCHSV', 'ZRX', 'ZEC'][:no_of_cryptos]
-    elif train_session_name == "Recent":
+    elif train_session_name.startswith("Recent"):
         print(f"Using assets for session {train_session_name}")
         chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'STR', 'BCHABC', 'BCHSV', 'EOS', 'DGB'][:no_of_cryptos]
-
 
     else:
         print("\nWARNING USING DEFAULT ASSETS. Please ensure this is a test session")

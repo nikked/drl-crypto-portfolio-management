@@ -1,3 +1,5 @@
+import sys
+from datetime import datetime, timedelta
 import time
 import argparse
 from pprint import pprint
@@ -31,7 +33,7 @@ TRAIN_BASE_PARAMS = {
     "batch_size": 50,
     "portfolio_value": 1,
     "validate_during_training": False,
-    "trading_period_length": "30min",
+    "ratio_val": 0,
 }
 
 
@@ -165,6 +167,30 @@ def _get_train_val_test_steps(trading_period, train_configs):
     return train_test_val_steps
 
 
+def _calculate_start_date_and_ratio_train(end_date, trading_period_length):
+
+    if trading_period_length == "30min":
+        start_date = (datetime.strptime(end_date, "%Y%m%d") -
+                      timedelta(600)).strftime("%Y%m%d")
+        ratio_train = 0.916
+
+    elif trading_period_length == "15min":
+        start_date = (datetime.strptime(end_date, "%Y%m%d") -
+                      timedelta(300)).strftime("%Y%m%d")
+        ratio_train = 0.832
+
+    elif trading_period_length == "5min":
+        start_date = (datetime.strptime(end_date, "%Y%m%d") -
+                      timedelta(100)).strftime("%Y%m%d")
+        ratio_train = 0.496
+
+    else:
+        print("Valid periods: 5min, 15min and 30min. Exiting")
+        sys.exit(0)
+
+    return start_date, ratio_train
+
+
 if __name__ == "__main__":
 
     PARSER = argparse.ArgumentParser()
@@ -282,7 +308,7 @@ if __name__ == "__main__":
     )
     PARSER.add_argument(
         "-cbts",
-        "--calm_before_the_strom",
+        "--calm_before_the_storm",
         default=False,
         action="store_true",
     )
@@ -294,7 +320,7 @@ if __name__ == "__main__":
     )
     PARSER.add_argument(
         "-xrp",
-        "--ripple_bullrun",
+        "--ripple_bull_run",
         default=False,
         action="store_true",
     )
@@ -372,104 +398,116 @@ if __name__ == "__main__":
             train_session_name="test_run_with_long_name",
         )
 
-    elif ARGS.calm_before_the_strom:
+    elif ARGS.calm_before_the_storm:
         print("\nRunning model: Calm_before_the_storm")
 
-        OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
-
+        end_date = "20161028"
+        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+            end_date, ARGS.trading_period_length)
         main(
-            **OVERRIDE_PARAMS,
-            start_date="20150308",
-            end_date="20161028",
-            train_session_name="Calm_before_the_storm",
+            **TRAIN_BASE_PARAMS,
+            start_date=start_date,
+            end_date=end_date,
+            ratio_train=ratio_train,
+            trading_period_length=ARGS.trading_period_length,
+            train_session_name="Calm_before_the_storm_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
         )
     elif ARGS.awakening:
         print("\nRunning model: Awakening")
 
-        OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
-
+        end_date = "20170128"
+        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+            end_date, ARGS.trading_period_length)
         main(
-            **OVERRIDE_PARAMS,
-            start_date="20150609",
-            end_date="20170128",
-            train_session_name="Awakening",
+            **TRAIN_BASE_PARAMS,
+            start_date=start_date,
+            end_date=end_date,
+            ratio_train=ratio_train,
+            trading_period_length=ARGS.trading_period_length,
+            train_session_name="Awakening_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
         )
-    elif ARGS.ripple_bullrun:
+    elif ARGS.ripple_bull_run:
         print("\nRunning model: Ripple bullrun")
 
-        OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
-
+        end_date = "20170427"
+        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+            end_date, ARGS.trading_period_length)
         main(
-            **OVERRIDE_PARAMS,
-            start_date="20150905",
-            end_date="20170427",
-            train_session_name="Ripple_bullrun",
+            **TRAIN_BASE_PARAMS,
+            start_date=start_date,
+            end_date=end_date,
+            ratio_train=ratio_train,
+            trading_period_length=ARGS.trading_period_length,
+            train_session_name="Ripple_bull_run_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
         )
     elif ARGS.ethereum_valley:
         print("\nRunning model ethereum_valley")
 
-        OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
-
+        end_date = "20170718"
+        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+            end_date, ARGS.trading_period_length)
         main(
-            **OVERRIDE_PARAMS,
-            start_date="20151126",
-            end_date="20170718",
-            train_session_name="Ethereum_valley",
+            **TRAIN_BASE_PARAMS,
+            start_date=start_date,
+            end_date=end_date,
+            ratio_train=ratio_train,
+            trading_period_length=ARGS.trading_period_length,
+            train_session_name="Ethereum_valley_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
         )
     elif ARGS.all_time_high:
         print("\nRunning All time high")
 
-        BASE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "no_of_assets": 7,
-            "start_date": "20160815",
-            "end_date": "20180113",
-            "train_session_name": "All-time_high",
-            "gpu_device": ARGS.gpu_device,
-            "ratio_train": 0.9,
-            "ratio_val": 0.0,
-            "trading_period_length": "30min",
-        }
+        end_date = "20180113"
 
-        main(**BASE_PARAMS)
+        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+            end_date, ARGS.trading_period_length)
+        main(
+            **TRAIN_BASE_PARAMS,
+            start_date=start_date,
+            end_date=end_date,
+            ratio_train=ratio_train,
+            trading_period_length=ARGS.trading_period_length,
+            train_session_name="All-time_high_{}".format(ARGS.trading_period_length),
+            gpu_device=ARGS.gpu_device,
+        )
 
     elif ARGS.rock_bottom:
         print("\nRunning Rock Bottom")
 
-        BASE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "no_of_assets": 7,
-            "start_date": "20170601",
-            "end_date": "20181231",
-            "train_session_name": "Rock_bottom",
-            "gpu_device": ARGS.gpu_device,
-            "ratio_train": 0.9,
-            "ratio_val": 0.0,
-            "trading_period_length": "30min",
-        }
+        end_date = "20181231"
 
-        main(**BASE_PARAMS)
+        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+            end_date, ARGS.trading_period_length)
+        main(
+            **TRAIN_BASE_PARAMS,
+            start_date=start_date,
+            end_date=end_date,
+            ratio_train=ratio_train,
+            trading_period_length=ARGS.trading_period_length,
+            train_session_name="Rock_bottom_{}".format(ARGS.trading_period_length),
+            gpu_device=ARGS.gpu_device,
+        )
 
     elif ARGS.recent:
         print("\nRunning recent year 2019")
 
-        BASE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "no_of_assets": 7,
-            "start_date": "20180101",
-            "end_date": "20190426",
-            "train_session_name": "Recent",
-            "gpu_device": ARGS.gpu_device,
-            "ratio_train": 0.9,
-            "ratio_val": 0.0,
-            "trading_period_length": "30min",
-        }
+        end_date = "20190426"
 
-        main(**BASE_PARAMS)
+        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+            end_date, ARGS.trading_period_length)
+        main(
+            **TRAIN_BASE_PARAMS,
+            start_date=start_date,
+            end_date=end_date,
+            ratio_train=ratio_train,
+            trading_period_length=ARGS.trading_period_length,
+            train_session_name="Recent_{}".format(ARGS.trading_period_length),
+            gpu_device=ARGS.gpu_device,
+        )
 
     else:
         main(
