@@ -109,10 +109,12 @@ def aggregate_backtest_stats(filtered_history):
     dynamic_pf_values = []
     dynamic_mdds = []
     dynamic_sharpe_ratios = []
+    dynamic_sharpe_ratios_ann = []
 
     static_pf_values = []
     static_mdds = []
     static_sharpe_ratios = []
+    static_sharpe_ratios_ann = []
 
     cash_investments = []
     crypto_weight_averages = []
@@ -123,6 +125,7 @@ def aggregate_backtest_stats(filtered_history):
     eq_pf_value = filtered_history[first_key]["eq_weight"]["pf_value"]
     eq_sharpe_ratio = filtered_history[first_key]["eq_weight"]["sharpe_ratio"]
     eq_mdd = filtered_history[first_key]["eq_weight"]["mdd"]
+    eq_sharpe_ratio_ann = 0
 
     test_start = "NA"
     test_end = "NA"
@@ -136,6 +139,8 @@ def aggregate_backtest_stats(filtered_history):
             test_end = session_stats["test_end"]
         if "trading_period_length" in session_stats:
             trading_period_length = session_stats["trading_period_length"]
+        if "sharpe_ratio_ann" in session_stats["eq_weight"]:
+            eq_sharpe_ratio_ann = session_stats["eq_weight"]["sharpe_ratio_ann"]
 
         dynamic = session_stats["dynamic"]
         static = session_stats["static"]
@@ -146,9 +151,19 @@ def aggregate_backtest_stats(filtered_history):
         dynamic_mdds.append(dynamic["mdd"])
         dynamic_sharpe_ratios.append(dynamic["sharpe_ratio"])
 
+        try:
+            dynamic_sharpe_ratios_ann.append(dynamic["sharpe_ratio_ann"])
+        except KeyError:
+            pass
+
         static_pf_values.append(static["pf_value"])
         static_mdds.append(static["mdd"])
         static_sharpe_ratios.append(static["sharpe_ratio"])
+
+        try:
+            static_sharpe_ratios_ann.append(static["sharpe_ratio_ann"])
+        except KeyError:
+            pass
 
         cash_investments.append(initial_weights[0])
 
@@ -160,9 +175,11 @@ def aggregate_backtest_stats(filtered_history):
         "dynamic_pf_values": dynamic_pf_values,
         "dynamic_mdds": dynamic_mdds,
         "dynamic_sharpe_ratios": dynamic_sharpe_ratios,
+        "dynamic_sharpe_ratios_ann": dynamic_sharpe_ratios_ann if dynamic_sharpe_ratios_ann else [42],
         "static_pf_values": static_pf_values,
         "static_mdds": static_mdds,
         "static_sharpe_ratios": static_sharpe_ratios,
+        "static_sharpe_ratios_ann": static_sharpe_ratios_ann if static_sharpe_ratios_ann else [42],
         "cash_investments": cash_investments,
         "crypto_weight_averages": crypto_weight_averages,
         "crypto_weight_std_devs": crypto_weight_std_devs,
@@ -170,6 +187,7 @@ def aggregate_backtest_stats(filtered_history):
         "asset_list": asset_list,
         "eq_pf_value": eq_pf_value,
         "eq_sharpe_ratio": eq_sharpe_ratio,
+        "eq_sharpe_ratio_ann": eq_sharpe_ratio_ann if eq_sharpe_ratio_ann else 42,
         "eq_mdd": eq_mdd,
         "test_start": test_start,
         "test_end": test_end,
@@ -207,7 +225,7 @@ def _plot_histogram_metadata_table(axis, n_simulations, session_name, backtest_s
 
     axis.set_title(
         f"[Simulation statistics] {session_name.replace('_', ' ')}",
-        fontdict={"fontsize": 20, "position": (0.0, 0.92)},  # x, y
+        fontdict={"fontsize": 20, "position": (0.0, 0.95)},  # x, y
         horizontalalignment="left",
     )
 
@@ -222,6 +240,11 @@ def _plot_histogram_metadata_table(axis, n_simulations, session_name, backtest_s
             "Sharpe ratio",
             round(np.mean(backtest_stats["dynamic_sharpe_ratios"]), 4),
             round(np.std(backtest_stats["dynamic_sharpe_ratios"]), 4),
+        ],
+        [
+            "Sharpe ratio (ann)",
+            round(np.mean(backtest_stats["dynamic_sharpe_ratios_ann"]), 4),
+            round(np.std(backtest_stats["dynamic_sharpe_ratios_ann"]), 4),
         ],
         [
             "MDD",
@@ -267,6 +290,11 @@ def _plot_histogram_metadata_table(axis, n_simulations, session_name, backtest_s
             round(np.std(backtest_stats["static_sharpe_ratios"]), 4),
         ],
         [
+            "Sharpe ratio (ann)",
+            round(np.mean(backtest_stats["static_sharpe_ratios_ann"]), 4),
+            round(np.std(backtest_stats["static_sharpe_ratios_ann"]), 4),
+        ],
+        [
             "MDD",
             round(np.mean(backtest_stats["static_mdds"]), 4),
             round(np.std(backtest_stats["static_mdds"]), 4),
@@ -307,6 +335,7 @@ def _plot_histogram_metadata_table(axis, n_simulations, session_name, backtest_s
     eq_data = [
         ["Ptf. value", round(backtest_stats["eq_pf_value"], 4)],
         ["Sharpe ratio", round(backtest_stats["eq_sharpe_ratio"], 4)],
+        ["Sharpe ratio (ann)", round(backtest_stats["eq_sharpe_ratio_ann"], 4)],
         ["MDD", round(backtest_stats["eq_mdd"], 4)],
     ]
 
