@@ -26,6 +26,8 @@ def make_backtest_aggregation_table():
 
         csv_writer.writerow([
             'Backtest name'.replace("_", " "),
+            'Test period',
+            'Trading period',
             'PF value (dynamic)',
             'PF value (static)',
             'PF value (eq)',
@@ -49,21 +51,21 @@ def _extract_key_stats(backtest_dict):
 
     filtered_history = filter_history_dict(backtest_dict)
 
-    n_simulations = len(filtered_history)
-
-    dynamic_pf_values, dynamic_mdds, dynamic_sharpe_ratios, static_pf_values, static_mdds, static_sharpe_ratios, cash_investments, crypto_weight_averages, crypto_weight_std_devs, first_key, asset_list, eq_pf_value, eq_sharpe_ratio, eq_mdd = aggregate_backtest_stats(
+    backtest_stats = aggregate_backtest_stats(
         filtered_history)
 
     return [
-        np.round(np.mean(dynamic_pf_values), 4),
-        np.round(np.mean(static_pf_values), 4),
-        np.round(eq_pf_value, 4),
-        np.round(np.mean(dynamic_mdds), 4),
-        np.round(np.mean(static_mdds), 4),
-        np.round(eq_mdd, 4),
-        np.round(np.mean(dynamic_sharpe_ratios), 4),
-        np.round(np.mean(static_sharpe_ratios), 4),
-        np.round(eq_sharpe_ratio, 4),
+        f"{backtest_stats['test_start']}-{backtest_stats['test_end']}",
+        backtest_stats["trading_period_length"],
+        np.round(np.mean(backtest_stats["dynamic_pf_values"]), 4),
+        np.round(np.mean(backtest_stats["static_pf_values"]), 4),
+        np.round(backtest_stats["eq_pf_value"], 4),
+        np.round(np.mean(backtest_stats["dynamic_mdds"]), 4),
+        np.round(np.mean(backtest_stats["static_mdds"]), 4),
+        np.round(backtest_stats["eq_mdd"], 4),
+        np.round(np.mean(backtest_stats["dynamic_sharpe_ratios"]), 4),
+        np.round(np.mean(backtest_stats["static_sharpe_ratios"]), 4),
+        np.round(backtest_stats["eq_sharpe_ratio"], 4),
     ]
 
 

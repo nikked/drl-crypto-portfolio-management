@@ -24,8 +24,7 @@ def make_train_histograms(session_name):
     filtered_history = filter_history_dict(history_dict)
 
     n_simulations = len(filtered_history)
-    dynamic_pf_values, dynamic_mdds, dynamic_sharpe_ratios, static_pf_values, static_mdds, static_sharpe_ratios, cash_investments, crypto_weight_averages, crypto_weight_std_devs, first_key, asset_list, eq_pf_value, eq_sharpe_ratio, eq_mdd = aggregate_backtest_stats(
-        filtered_history)
+    backtest_stats = aggregate_backtest_stats(filtered_history)
 
     fig, axes = plt.subplots(nrows=5, ncols=2)
 
@@ -39,78 +38,63 @@ def make_train_histograms(session_name):
     table_ax = fig.add_subplot(gs[0:2])
 
     _plot_histogram_metadata_table(
-        table_ax,
-        n_simulations,
-        session_name,
-        asset_list,
-        dynamic_pf_values,
-        dynamic_mdds,
-        dynamic_sharpe_ratios,
-        static_pf_values,
-        static_mdds,
-        static_sharpe_ratios,
-        cash_investments,
-        crypto_weight_averages,
-        crypto_weight_std_devs,
-        eq_pf_value,
-        eq_sharpe_ratio,
-        eq_mdd,
+        table_ax, n_simulations, session_name, backtest_stats
     )
 
     _plot_histogram(
         axes[1][0],
-        dynamic_pf_values,
+        backtest_stats["dynamic_pf_values"],
         "Dynamic agent: Distribution of Portfolio Values",
         "Portfolio value",
     )
     _plot_histogram(
         axes[1][1],
-        static_pf_values,
+        backtest_stats["static_pf_values"],
         "Static agent: Distribution of Portfolio Values",
         "Portfolio value",
     )
 
     _plot_histogram(
         axes[2][0],
-        dynamic_sharpe_ratios,
+        backtest_stats["dynamic_sharpe_ratios"],
         "Dynamic agent: Distribution of Sharpe Ratios",
         "Sharpe ratio",
     )
     _plot_histogram(
         axes[2][1],
-        static_sharpe_ratios,
+        backtest_stats["static_sharpe_ratios"],
         "Static agent: Distribution of Sharpe Ratios",
         "Sharpe ratio",
     )
 
     _plot_histogram(
         axes[3][0],
-        dynamic_mdds,
+        backtest_stats["dynamic_mdds"],
         "Dynamic agent: Distribution of Maximum Drawdowns",
         "Maximum drawdown",
     )
     _plot_histogram(
         axes[3][1],
-        static_mdds,
+        backtest_stats["static_mdds"],
         "Static agent: Distribution of Maximum Drawdowns",
         "Maximum drawdown",
     )
 
     _plot_histogram(
         axes[4][0],
-        crypto_weight_averages,
+        backtest_stats["crypto_weight_averages"],
         "Both agents: Distribution of the average of weights",
         "Average weight",
     )
     _plot_histogram(
         axes[4][1],
-        crypto_weight_std_devs,
+        backtest_stats["crypto_weight_std_devs"],
         "Both agents: Distribution of the standard deviation of weights",
         "Stdev of weights",
     )
     # _plot_histogram(
     #     axes[5][0],
-    #     cash_investments,
+    #     backtest_stats["cash_investments"],
     #     "Both agents: Distribution of BTC weights",
     #     "BTC weight",
     # )
@@ -140,7 +124,18 @@ def aggregate_backtest_stats(filtered_history):
     eq_sharpe_ratio = filtered_history[first_key]["eq_weight"]["sharpe_ratio"]
     eq_mdd = filtered_history[first_key]["eq_weight"]["mdd"]
 
+    test_start = "NA"
+    test_end = "NA"
+    trading_period_length = "NA"
+
     for timestamp, session_stats in filtered_history.items():
+
+        if "test_start" in session_stats:
+            test_start = session_stats["test_start"]
+        if "test_end" in session_stats:
+            test_end = session_stats["test_end"]
+        if "trading_period_length" in session_stats:
+            trading_period_length = session_stats["trading_period_length"]
 
         dynamic = session_stats["dynamic"]
         static = session_stats["static"]
@@ -161,22 +156,25 @@ def aggregate_backtest_stats(filtered_history):
         crypto_weight_averages.append(np.mean(crypto_weights))
         crypto_weight_std_devs.append(np.std(crypto_weights))
 
-    return (
-        dynamic_pf_values,
-        dynamic_mdds,
-        dynamic_sharpe_ratios,
-        static_pf_values,
-        static_mdds,
-        static_sharpe_ratios,
-        cash_investments,
-        crypto_weight_averages,
-        crypto_weight_std_devs,
-        first_key,
-        asset_list,
-        eq_pf_value,
-        eq_sharpe_ratio,
-        eq_mdd,
-    )
+    return {
+        "dynamic_pf_values": dynamic_pf_values,
+        "dynamic_mdds": dynamic_mdds,
+        "dynamic_sharpe_ratios": dynamic_sharpe_ratios,
+        "static_pf_values": static_pf_values,
+        "static_mdds": static_mdds,
+        "static_sharpe_ratios": static_sharpe_ratios,
+        "cash_investments": cash_investments,
+        "crypto_weight_averages": crypto_weight_averages,
+        "crypto_weight_std_devs": crypto_weight_std_devs,
+        "first_key": first_key,
+        "asset_list": asset_list,
+        "eq_pf_value": eq_pf_value,
+        "eq_sharpe_ratio": eq_sharpe_ratio,
+        "eq_mdd": eq_mdd,
+        "test_start": test_start,
+        "test_end": test_end,
+        "trading_period_length": trading_period_length,
+    }
 
 
 def filter_history_dict(history_dict):
@@ -199,24 +197,7 @@ def filter_history_dict(history_dict):
     return filtered_history
 
 
-def _plot_histogram_metadata_table(
-    axis,
-    n_simulations,
-    session_name,
-    asset_list,
-    dynamic_pf_values,
-    dynamic_mdds,
-    dynamic_sharpe_ratios,
-    static_pf_values,
-    static_mdds,
-    static_sharpe_ratios,
-    cash_investments,
-    crypto_weight_averages,
-    crypto_weight_std_devs,
-    eq_pf_value,
-    eq_sharpe_ratio,
-    eq_mdd,
-):
+def _plot_histogram_metadata_table(axis, n_simulations, session_name, backtest_stats):
 
     divider = make_axes_locatable(axis)
 
@@ -234,30 +215,33 @@ def _plot_histogram_metadata_table(
     dynamic_data = [
         [
             "Ptf. value",
-            round(np.mean(dynamic_pf_values), 4),
-            round(np.std(dynamic_pf_values), 4),
+            round(np.mean(backtest_stats["dynamic_pf_values"]), 4),
+            round(np.std(backtest_stats["dynamic_pf_values"]), 4),
         ],
         [
             "Sharpe ratio",
-            round(np.mean(dynamic_sharpe_ratios), 4),
-            round(np.std(dynamic_sharpe_ratios), 4),
+            round(np.mean(backtest_stats["dynamic_sharpe_ratios"]), 4),
+            round(np.std(backtest_stats["dynamic_sharpe_ratios"]), 4),
         ],
-        ["MDD", round(np.mean(dynamic_mdds), 4),
-         round(np.std(dynamic_mdds), 4)],
+        [
+            "MDD",
+            round(np.mean(backtest_stats["dynamic_mdds"]), 4),
+            round(np.std(backtest_stats["dynamic_mdds"]), 4),
+        ],
         [
             "Average of weights",
-            round(np.mean(crypto_weight_averages), 4),
-            round(np.std(crypto_weight_averages), 4),
+            round(np.mean(backtest_stats["crypto_weight_averages"]), 4),
+            round(np.std(backtest_stats["crypto_weight_averages"]), 4),
         ],
         [
             "Stdev of weights",
-            round(np.mean(crypto_weight_std_devs), 4),
-            round(np.std(crypto_weight_std_devs), 4),
+            round(np.mean(backtest_stats["crypto_weight_std_devs"]), 4),
+            round(np.std(backtest_stats["crypto_weight_std_devs"]), 4),
         ],
         [
             "Cash weight (BTC)",
-            round(np.mean(cash_investments), 4),
-            round(np.std(cash_investments), 4),
+            round(np.mean(backtest_stats["cash_investments"]), 4),
+            round(np.std(backtest_stats["cash_investments"]), 4),
         ],
     ]
 
@@ -274,33 +258,37 @@ def _plot_histogram_metadata_table(
     static_data = [
         [
             "Ptf. value",
-            round(np.mean(static_pf_values), 4),
-            round(np.std(static_pf_values), 4),
+            round(np.mean(backtest_stats["static_pf_values"]), 4),
+            round(np.std(backtest_stats["static_pf_values"]), 4),
         ],
         [
             "Sharpe ratio",
-            round(np.mean(static_sharpe_ratios), 4),
-            round(np.std(static_sharpe_ratios), 4),
+            round(np.mean(backtest_stats["static_sharpe_ratios"]), 4),
+            round(np.std(backtest_stats["static_sharpe_ratios"]), 4),
         ],
-        ["MDD", round(np.mean(static_mdds), 4), round(np.std(static_mdds), 4)],
+        [
+            "MDD",
+            round(np.mean(backtest_stats["static_mdds"]), 4),
+            round(np.std(backtest_stats["static_mdds"]), 4),
+        ],
         [
             "Average of weights",
-            round(np.mean(crypto_weight_averages), 4),
-            round(np.std(crypto_weight_averages), 4),
+            round(np.mean(backtest_stats["crypto_weight_averages"]), 4),
+            round(np.std(backtest_stats["crypto_weight_averages"]), 4),
         ],
         [
             "Stdev of weights",
-            round(np.mean(crypto_weight_std_devs), 4),
-            round(np.std(crypto_weight_std_devs), 4),
+            round(np.mean(backtest_stats["crypto_weight_std_devs"]), 4),
+            round(np.std(backtest_stats["crypto_weight_std_devs"]), 4),
         ],
         [
             "Cash weight (BTC)",
-            round(np.mean(cash_investments), 4),
-            round(np.std(cash_investments), 4),
+            round(np.mean(backtest_stats["cash_investments"]), 4),
+            round(np.std(backtest_stats["cash_investments"]), 4),
         ],
     ]
 
-    axis1 = divider.append_axes("right", size="100%", pad=0.2, sharex=axis)
+    axis1 = divider.append_axes("right", size="100%", pad=0.15, sharex=axis)
     axis1.set_axis_off()
 
     static_table = axis1.table(
@@ -312,14 +300,14 @@ def _plot_histogram_metadata_table(
     )
     _format_table(static_table)
 
-    axis2 = divider.append_axes("right", size="66%", pad=0.2, sharex=axis)
+    axis2 = divider.append_axes("right", size="55%", pad=0.15, sharex=axis)
     axis2.set_axis_off()
 
     eq_columns = ("Equal weighted", "Average")
     eq_data = [
-        ["Ptf. value", round(eq_pf_value, 4)],
-        ["Sharpe ratio", round(eq_sharpe_ratio, 4)],
-        ["MDD", round(eq_mdd, 4)],
+        ["Ptf. value", round(backtest_stats["eq_pf_value"], 4)],
+        ["Sharpe ratio", round(backtest_stats["eq_sharpe_ratio"], 4)],
+        ["MDD", round(backtest_stats["eq_mdd"], 4)],
     ]
 
     eq_table = axis2.table(
@@ -327,17 +315,20 @@ def _plot_histogram_metadata_table(
         colLabels=eq_columns,
         loc="center",
         cellLoc="center",
-        colWidths=[0.5, 0.4],
+        colWidths=[0.6, 0.4],
     )
     _format_table(eq_table)
 
-    axis3 = divider.append_axes("right", size="50%", pad=0.1, sharex=axis)
+    axis3 = divider.append_axes("right", size="55%", pad=0.15, sharex=axis)
     axis3.set_axis_off()
 
     crypto_columns = ("Parameter", "Value")
     crypto_table_data = [
         ["No. of simulations", n_simulations],
-        ["No. of assets", len(asset_list)],
+        ["No. of assets", len(backtest_stats["asset_list"])],
+        ["Start date", backtest_stats["test_start"]],
+        ["End date", backtest_stats["test_end"]],
+        ["Trading period", backtest_stats["trading_period_length"]],
     ]
 
     crypto_table = axis3.table(
@@ -345,7 +336,7 @@ def _plot_histogram_metadata_table(
         colLabels=crypto_columns,
         loc="center",
         cellLoc="center",
-        colWidths=[0.7, 0.3],
+        colWidths=[0.6, 0.4],
     )
     _format_table(crypto_table)
 
