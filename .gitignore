@@ -20,3 +20,6 @@ crypto_data/*
 train_graphs/
 train_jsons/
 train_histograms/
+.~lock*
+backtest_aggregated.csv
+backtest_aggregated.txt

@@ -6,3 +6,6 @@
 * the longer I train it and deeper NW, more risk averse (eq weight)
 
 * stop loss mechanism
+
+
+* make dist of weights chart
