@@ -9,3 +9,6 @@
 
 
 * make dist of weights chart
+
+
+* ath does not work. sells ripple position, too conservative. works best when mean reversal
