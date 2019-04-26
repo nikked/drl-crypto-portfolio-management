@@ -21,6 +21,8 @@ def make_train_histograms(session_name):
     with open(json_path, "r") as file:
         history_dict = json.load(file)
 
+    filtered_history = _filter_history_dict(history_dict)
+
     dynamic_pf_values = []
     dynamic_mdds = []
     dynamic_sharpe_ratios = []
@@ -32,16 +34,16 @@ def make_train_histograms(session_name):
     cash_investments = []
     crypto_weight_std_devs = []
 
-    n_simulations = len(history_dict)
+    n_simulations = len(filtered_history)
 
-    first_key = list(history_dict.keys())[0]
+    first_key = list(filtered_history.keys())[0]
 
-    asset_list = history_dict[first_key]["asset_list"]
-    eq_pf_value = history_dict[first_key]["eq_weight"]["pf_value"]
-    eq_sharpe_ratio = history_dict[first_key]["eq_weight"]["sharpe_ratio"]
-    eq_mdd = history_dict[first_key]["eq_weight"]["mdd"]
+    asset_list = filtered_history[first_key]["asset_list"]
+    eq_pf_value = filtered_history[first_key]["eq_weight"]["pf_value"]
+    eq_sharpe_ratio = filtered_history[first_key]["eq_weight"]["sharpe_ratio"]
+    eq_mdd = filtered_history[first_key]["eq_weight"]["mdd"]
 
-    for timestamp, session_stats in history_dict.items():
+    for timestamp, session_stats in filtered_history.items():
 
         dynamic = session_stats["dynamic"]
         static = session_stats["static"]
@@ -132,12 +134,33 @@ def make_train_histograms(session_name):
     _plot_histogram(
         axes[4][0], crypto_weight_std_devs, "Both agents: Distribution of the standard deviation of weights", "Stdev of weights"
     )
-    _plot_histogram(axes[4][1], cash_investments, "Both agents: Distribution of BTC weights", "BTC weight")
+    _plot_histogram(axes[4][1], cash_investments,
+                    "Both agents: Distribution of BTC weights", "BTC weight")
 
     output_path = os.path.join(HISTOGRAM_OUTPUT_DIR, f"histogram_{session_name}.png")
     plt.subplots_adjust(hspace=0.5)
     print(f"Saving plot to path: {output_path}")
     plt.savefig(output_path, bbox_inches="tight")
+
+
+def _filter_history_dict(history_dict):
+
+    filtered_history = {}
+    for timestamp, train_data in history_dict.items():
+
+        initial_weights = train_data['initial_weights']
+
+        # Ignore train runs with negative weight
+        if any(value < 0 for value in initial_weights):
+            continue
+
+        # Ignore train runs with huge weight
+        if any(value > 0.7 for value in initial_weights):
+            continue
+
+        filtered_history[timestamp] = train_data
+
+    return filtered_history
 
 
 def _plot_histogram_metadata_table(
@@ -182,7 +205,8 @@ def _plot_histogram_metadata_table(
             round(np.mean(dynamic_sharpe_ratios), 4),
             round(np.std(dynamic_sharpe_ratios), 4),
         ],
-        ["MDD", round(np.mean(dynamic_mdds), 4), round(np.std(dynamic_mdds), 4)],
+        ["MDD", round(np.mean(dynamic_mdds), 4),
+         round(np.std(dynamic_mdds), 4)],
         [
             "Stdev of weights",
             round(np.mean(crypto_weight_std_devs), 4),
@@ -277,7 +301,7 @@ def _format_table(table):
 
 
 def _plot_histogram(axis, data, title, xlabel):
-    num_bins = 20
+    num_bins = 15
 
     sns.distplot(data, bins=num_bins, ax=axis, rug=True, kde=False)
     # axis.hist(data, num_bins, alpha=0.95)
@@ -289,7 +313,11 @@ def _plot_histogram(axis, data, title, xlabel):
 
 if __name__ == "__main__":
 
-    session_name = "test_run_with_long_name"
-    # session_name = "Jiang_et_al._backtest_period_3"
+    # session_name = "test_run_with_long_name"
+    session_name = "Jiang_et_al._backtest__#1"
+    session_name2 = "Jiang_et_al._backtest__#2"
+    session_name3 = "Jiang_et_al._backtest__#3"
 
     make_train_histograms(session_name)
+    make_train_histograms(session_name2)
+    make_train_histograms(session_name3)
