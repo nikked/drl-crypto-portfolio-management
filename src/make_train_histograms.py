@@ -309,15 +309,22 @@ def _plot_histogram(axis, data, title, xlabel):
     axis.set_xlabel(xlabel)
     axis.set_ylabel("Count")
     axis.set_title(title)
+    axis.ticklabel_format(axis="x", style='sci', scilimits=(-3, 3))
 
 
 if __name__ == "__main__":
 
-    # session_name = "test_run_with_long_name"
-    session_name = "Jiang_et_al._backtest__#1"
-    session_name2 = "Jiang_et_al._backtest__#2"
-    session_name3 = "Jiang_et_al._backtest__#3"
+    session_names = [
+        "All_Time_High__2017",
+        # "Long_run:_2015-2019",
+        "15_minute_trade_interval",
+        "5_minute_trade_interval",
+        "Recent_year__2019",
+        "Bear_year__2018",
+        "Jiang_et_al._backtest__#1",
+        "Jiang_et_al._backtest__#2",
+        "Jiang_et_al._backtest__#3"
+    ]
 
-    make_train_histograms(session_name)
-    make_train_histograms(session_name2)
-    make_train_histograms(session_name3)
+    for name in session_names:
+        make_train_histograms(name)
