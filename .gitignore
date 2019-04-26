@@ -24,3 +24,4 @@ train_histograms/
 backtest_aggregated.csv
 backtest_aggregated.txt
 *~$*.xlsx
+/venv
