@@ -26,7 +26,7 @@ def make_backtest_aggregation_table():
 
         csv_writer.writerow([
             'Backtest name'.replace("_", " "),
-            'Test period',
+            'Date range',
             'Trading period',
             'PF value (dynamic)',
             'PF value (static)',
@@ -37,6 +37,9 @@ def make_backtest_aggregation_table():
             'Sharpe (dynamic)',
             'Sharpe (static)',
             'Sharpe (eq)',
+            'Sharpe, ann. (dynamic)',
+            'Sharpe, ann. (static)',
+            'Sharpe, ann. (eq)',
         ])
 
         for backtest_name, backtest_dict in backtest_dicts.items():
@@ -55,7 +58,7 @@ def _extract_key_stats(backtest_dict):
         filtered_history)
 
     return [
-        f"{backtest_stats['test_start']}-{backtest_stats['test_end']}",
+        f"{backtest_stats['test_start']} to {backtest_stats['test_end']}",
         backtest_stats["trading_period_length"],
         np.round(np.mean(backtest_stats["dynamic_pf_values"]), 4),
         np.round(np.mean(backtest_stats["static_pf_values"]), 4),
@@ -66,6 +69,9 @@ def _extract_key_stats(backtest_dict):
         np.round(np.mean(backtest_stats["dynamic_sharpe_ratios"]), 4),
         np.round(np.mean(backtest_stats["static_sharpe_ratios"]), 4),
         np.round(backtest_stats["eq_sharpe_ratio"], 4),
+        np.round(np.mean(backtest_stats["dynamic_sharpe_ratios_ann"]), 4),
+        np.round(np.mean(backtest_stats["static_sharpe_ratios_ann"]), 4),
+        np.round(backtest_stats["eq_sharpe_ratio_ann"], 4),
     ]
 
 
