@@ -21,49 +21,11 @@ def make_train_histograms(session_name):
     with open(json_path, "r") as file:
         history_dict = json.load(file)
 
-    filtered_history = _filter_history_dict(history_dict)
-
-    dynamic_pf_values = []
-    dynamic_mdds = []
-    dynamic_sharpe_ratios = []
-
-    static_pf_values = []
-    static_mdds = []
-    static_sharpe_ratios = []
-
-    cash_investments = []
-    crypto_weight_averages = []
-    crypto_weight_std_devs = []
+    filtered_history = filter_history_dict(history_dict)
 
     n_simulations = len(filtered_history)
-
-    first_key = list(filtered_history.keys())[0]
-
-    asset_list = filtered_history[first_key]["asset_list"]
-    eq_pf_value = filtered_history[first_key]["eq_weight"]["pf_value"]
-    eq_sharpe_ratio = filtered_history[first_key]["eq_weight"]["sharpe_ratio"]
-    eq_mdd = filtered_history[first_key]["eq_weight"]["mdd"]
-
-    for timestamp, session_stats in filtered_history.items():
-
-        dynamic = session_stats["dynamic"]
-        static = session_stats["static"]
-
-        initial_weights = session_stats["initial_weights"]
-
-        dynamic_pf_values.append(dynamic["pf_value"])
-        dynamic_mdds.append(dynamic["mdd"])
-        dynamic_sharpe_ratios.append(dynamic["sharpe_ratio"])
-
-        static_pf_values.append(static["pf_value"])
-        static_mdds.append(static["mdd"])
-        static_sharpe_ratios.append(static["sharpe_ratio"])
-
-        cash_investments.append(initial_weights[0])
-
-        crypto_weights = initial_weights[1:]
-        crypto_weight_averages.append(np.mean(crypto_weights))
-        crypto_weight_std_devs.append(np.std(crypto_weights))
+    dynamic_pf_values, dynamic_mdds, dynamic_sharpe_ratios, static_pf_values, static_mdds, static_sharpe_ratios, cash_investments, crypto_weight_averages, crypto_weight_std_devs, first_key, asset_list, eq_pf_value, eq_sharpe_ratio, eq_mdd = aggregate_backtest_stats(
+        filtered_history)
 
     fig, axes = plt.subplots(nrows=5, ncols=2)
 
@@ -159,7 +121,65 @@ def make_train_histograms(session_name):
     plt.savefig(output_path, bbox_inches="tight")
 
 
-def _filter_history_dict(history_dict):
+def aggregate_backtest_stats(filtered_history):
+    dynamic_pf_values = []
+    dynamic_mdds = []
+    dynamic_sharpe_ratios = []
+
+    static_pf_values = []
+    static_mdds = []
+    static_sharpe_ratios = []
+
+    cash_investments = []
+    crypto_weight_averages = []
+    crypto_weight_std_devs = []
+
+    first_key = list(filtered_history.keys())[0]
+    asset_list = filtered_history[first_key]["asset_list"]
+    eq_pf_value = filtered_history[first_key]["eq_weight"]["pf_value"]
+    eq_sharpe_ratio = filtered_history[first_key]["eq_weight"]["sharpe_ratio"]
+    eq_mdd = filtered_history[first_key]["eq_weight"]["mdd"]
+
+    for timestamp, session_stats in filtered_history.items():
+
+        dynamic = session_stats["dynamic"]
+        static = session_stats["static"]
+
+        initial_weights = session_stats["initial_weights"]
+
+        dynamic_pf_values.append(dynamic["pf_value"])
+        dynamic_mdds.append(dynamic["mdd"])
+        dynamic_sharpe_ratios.append(dynamic["sharpe_ratio"])
+
+        static_pf_values.append(static["pf_value"])
+        static_mdds.append(static["mdd"])
+        static_sharpe_ratios.append(static["sharpe_ratio"])
+
+        cash_investments.append(initial_weights[0])
+
+        crypto_weights = initial_weights[1:]
+        crypto_weight_averages.append(np.mean(crypto_weights))
+        crypto_weight_std_devs.append(np.std(crypto_weights))
+
+    return (
+        dynamic_pf_values,
+        dynamic_mdds,
+        dynamic_sharpe_ratios,
+        static_pf_values,
+        static_mdds,
+        static_sharpe_ratios,
+        cash_investments,
+        crypto_weight_averages,
+        crypto_weight_std_devs,
+        first_key,
+        asset_list,
+        eq_pf_value,
+        eq_sharpe_ratio,
+        eq_mdd,
+    )
+
+
+def filter_history_dict(history_dict):
 
     filtered_history = {}
     for timestamp, train_data in history_dict.items():
@@ -222,7 +242,8 @@ def _plot_histogram_metadata_table(
             round(np.mean(dynamic_sharpe_ratios), 4),
             round(np.std(dynamic_sharpe_ratios), 4),
         ],
-        ["MDD", round(np.mean(dynamic_mdds), 4), round(np.std(dynamic_mdds), 4)],
+        ["MDD", round(np.mean(dynamic_mdds), 4),
+         round(np.std(dynamic_mdds), 4)],
         [
             "Average of weights",
             round(np.mean(crypto_weight_averages), 4),

@@ -72,7 +72,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         train_configs, train_test_val_steps
     )
 
-    dynamic_annualized_sharpe, static_annualized_sharpe, eq_annualized_sharpe = _plot_backtest_perf_metadata(
+    dynamic_annualized_sharpe, static_annualized_sharpe, eq_annualized_sharpe, test_start, test_end = _plot_backtest_perf_metadata(
         axes[0],
         test_performance_lists,
         btc_price_sharpe,
@@ -152,6 +152,8 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         },
         "initial_weights": list(test_performance_lists["w_list"][1]),
         "asset_list": asset_list,
+        "test_start": test_start,
+        "test_end": test_end,
     }
 
     with open(json_path, "w") as file:
@@ -237,6 +239,10 @@ def _plot_backtest_perf_metadata(
 
     train_time_table_columns = ("Dataset", "Start date", "End date", "Days", "Steps")
 
+
+    test_start = back_test_start_timestamp.strftime("%Y-%m-%d")
+    test_end = datetime.strptime(train_configs["end_date"], "%Y%m%d").strftime("%Y-%m-%d")
+
     train_time_table_clust_data = [
         [
             "Train period",
@@ -249,8 +255,8 @@ def _plot_backtest_perf_metadata(
         ],
         [
             "Test period",
-            back_test_start_timestamp.strftime("%Y-%m-%d"),
-            datetime.strptime(train_configs["end_date"], "%Y%m%d").strftime("%Y-%m-%d"),
+            test_start,
+            test_end,
             back_test_day_count,
             train_test_val_steps["test"],
         ],
@@ -339,7 +345,7 @@ def _plot_backtest_perf_metadata(
 
     _format_table(config_table)
 
-    return (dynamic_annualized_sharpe, static_annualized_sharpe, eq_annualized_sharpe)
+    return (dynamic_annualized_sharpe, static_annualized_sharpe, eq_annualized_sharpe, test_start, test_end)
 
 
 def _format_table(table):
