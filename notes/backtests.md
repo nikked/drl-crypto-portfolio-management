@@ -58,3 +58,14 @@ PASC
 
 ## Pico (try to increase perf on best JBT)
 ## Nano (try to increase perf on best JBT)
+
+
+
+[['XMR', 'ETH', 'USDT', 'DASH', 'LTC', 'ETC',  'FCT',  'MAID', 'LSK',  'BTS', 'STEEM'],
+['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'ETC', 'ZEC', 'FCT',  'REP',  'STEEM', 'MAID'],
+['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC',  'MAID', 'FCT', 'GNT', 'ZEC' ],
+['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC',  'STR', 'XEM',  'DGB',  'ZEC'],
+['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'BCH', 'STR',    'VTC', 'LSK'],
+['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'BCH',  'STR',   'BCHSV', 'ZRX', 'ZEC'],
+['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC',   'STR', 'BCHABC', 'BCHSV',  'EOS', 'DGB'] ,
+]
