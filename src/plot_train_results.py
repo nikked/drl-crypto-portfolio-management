@@ -72,7 +72,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         train_configs, train_test_val_steps
     )
 
-    _plot_backtest_perf_metadata(
+    dynamic_annualized_sharpe, static_annualized_sharpe, eq_annualized_sharpe = _plot_backtest_perf_metadata(
         axes[0],
         test_performance_lists,
         btc_price_sharpe,
@@ -119,11 +119,6 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     json_path = os.path.join(JSON_OUTPUT_DIR, f"train_history_{session_name}.json")
     print(f"\nWriting simulation data to filepath: {json_path}")
 
-    # LATER
-    # histogram of sharperatios
-    # histogram of pf values
-    # histogram of mdds
-
     start_time = time.time()
 
     try:
@@ -138,18 +133,21 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
             "pf_value": test_performance_lists["p_list"][-1],
             "std_dev": test_performance_lists["std_devs"]["p_list"],
             "sharpe_ratio": test_performance_lists["sharpe_ratios"]["p_list"],
+            "sharpe_ratio_ann": dynamic_annualized_sharpe,
             "mdd": test_performance_lists["max_drawdowns"]["p_list"],
         },
         "static": {
             "pf_value": test_performance_lists["p_list_static"][-1],
             "std_dev": test_performance_lists["std_devs"]["p_list_static"],
             "sharpe_ratio": test_performance_lists["sharpe_ratios"]["p_list_static"],
+            "sharpe_ratio_ann": static_annualized_sharpe,
             "mdd": test_performance_lists["max_drawdowns"]["p_list_static"],
         },
         "eq_weight": {
             "pf_value": test_performance_lists["p_list_eq"][-1],
             "std_dev": test_performance_lists["std_devs"]["p_list_eq"],
             "sharpe_ratio": test_performance_lists["sharpe_ratios"]["p_list_eq"],
+            "sharpe_ratio_ann": eq_annualized_sharpe,
             "mdd": test_performance_lists["max_drawdowns"]["p_list_eq"],
         },
         "initial_weights": list(test_performance_lists["w_list"][1]),
@@ -203,28 +201,36 @@ def _plot_backtest_perf_metadata(
     train_start_dt = train_start_dt.replace(tzinfo=pytz.UTC)
     train_day_count = (train_end_timestamp.to_pydatetime() - train_start_dt).days
 
+    dynamic_annualized_sharpe = _annualize_sharpe_ratio(
+        back_test_day_count, sharpe_ratios["p_list"]
+    )
+    static_annualized_sharpe = _annualize_sharpe_ratio(
+        back_test_day_count, sharpe_ratios["p_list_static"]
+    )
+    eq_annualized_sharpe = _annualize_sharpe_ratio(
+        back_test_day_count, sharpe_ratios["p_list_eq"]
+    )
+
     clust_data = [
         [
             "Dynamic agent",
             portfolio_final_value,
             round(sharpe_ratios["p_list"], 4),
-            _annualize_sharpe_ratio(back_test_day_count, sharpe_ratios["p_list"]),
+            dynamic_annualized_sharpe,
             round(max_drawdowns["p_list"], 4),
         ],
         [
             "Static agent",
             portfolio_static_final_value,
             round(sharpe_ratios["p_list_static"], 4),
-            _annualize_sharpe_ratio(
-                back_test_day_count, sharpe_ratios["p_list_static"]
-            ),
+            static_annualized_sharpe,
             round(max_drawdowns["p_list_static"], 4),
         ],
         [
             "Equal weighted",
             portfolio_eq_final_value,
             round(sharpe_ratios["p_list_eq"], 4),
-            _annualize_sharpe_ratio(back_test_day_count, sharpe_ratios["p_list_eq"]),
+            eq_annualized_sharpe,
             round(max_drawdowns["p_list_eq"], 4),
         ],
     ]
@@ -332,6 +338,8 @@ def _plot_backtest_perf_metadata(
     config_table.scale(0.8, 1.6)
 
     _format_table(config_table)
+
+    return (dynamic_annualized_sharpe, static_annualized_sharpe, eq_annualized_sharpe)
 
 
 def _format_table(table):
