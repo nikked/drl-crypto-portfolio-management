@@ -171,18 +171,18 @@ def _calculate_start_date_and_ratio_train(end_date, trading_period_length):
 
     if trading_period_length == "30min":
         start_date = (datetime.strptime(end_date, "%Y%m%d") -
-                      timedelta(600)).strftime("%Y%m%d")
-        ratio_train = 0.916
+                      timedelta(599)).strftime("%Y%m%d")
+        ratio_train = 0.919
 
     elif trading_period_length == "15min":
         start_date = (datetime.strptime(end_date, "%Y%m%d") -
-                      timedelta(300)).strftime("%Y%m%d")
-        ratio_train = 0.832
+                      timedelta(299)).strftime("%Y%m%d")
+        ratio_train = 0.837
 
     elif trading_period_length == "5min":
         start_date = (datetime.strptime(end_date, "%Y%m%d") -
-                      timedelta(100)).strftime("%Y%m%d")
-        ratio_train = 0.496
+                      timedelta(99)).strftime("%Y%m%d")
+        ratio_train = 0.51
 
     else:
         print("Valid periods: 5min, 15min and 30min. Exiting")
@@ -429,7 +429,7 @@ if __name__ == "__main__":
             gpu_device=ARGS.gpu_device,
         )
     elif ARGS.ripple_bull_run:
-        print("\nRunning model: Ripple bullrun")
+        print("\nRunning model: Ripple bull run")
 
         end_date = "20170427"
         start_date, ratio_train = _calculate_start_date_and_ratio_train(

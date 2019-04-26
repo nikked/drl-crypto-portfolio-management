@@ -43,7 +43,7 @@ def main(
     elif train_session_name.startswith("Awakening"):
         print(f"Using assets for session {train_session_name}")
         chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'ETC', 'ZEC', 'FCT', 'REP', 'STEEM', 'MAID'][:no_of_cryptos]
-    elif train_session_name.startswith("Ripple_bullrun"):
+    elif train_session_name.startswith("Ripple_bull_run"):
         print(f"Using assets for session {train_session_name}")
         chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'MAID', 'FCT', 'GNT', 'ZEC'][:no_of_cryptos]
     elif train_session_name.startswith("Ethereum_valley"):
