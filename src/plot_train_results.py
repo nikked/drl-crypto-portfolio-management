@@ -154,6 +154,7 @@ def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
         "asset_list": asset_list,
         "test_start": test_start,
         "test_end": test_end,
+        "train_configs": train_configs["trading_period_length"]
     }
 
     with open(json_path, "w") as file:
