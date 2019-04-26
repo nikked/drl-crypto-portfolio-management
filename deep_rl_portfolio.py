@@ -45,7 +45,8 @@ def main(**train_configs):
     print("\n")
 
     # Creation of the trading environment
-    trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(train_configs)
+    trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(
+        train_configs)
 
     # Agent training
     agent, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
@@ -97,12 +98,14 @@ def _initialize_trade_envs(train_configs):
     print("Trading periods: {}".format(dataset.shape[2]))
 
     # Determine the step sizes of different datasets
-    train_test_val_steps = _get_train_val_test_steps(trading_periods, train_configs)
+    train_test_val_steps = _get_train_val_test_steps(
+        trading_periods, train_configs)
 
     print("Starting training for {} assets".format(len(asset_names)))
     print(asset_names)
 
-    train_envs = _get_train_environments(train_configs["no_of_assets"], trade_env_args)
+    train_envs = _get_train_environments(
+        train_configs["no_of_assets"], trade_env_args)
 
     return train_envs, asset_names, train_test_val_steps
 
@@ -278,41 +281,45 @@ if __name__ == "__main__":
         help="Trade period length (5min, 15min, 30min, 2h, 4h, 1d)",
     )
     PARSER.add_argument(
-        "-jbt1",
-        "--jbt1",
-        help="Run model in Jiang's backtest period",
+        "-cbts",
+        "--calm_before_the_strom",
         default=False,
         action="store_true",
     )
     PARSER.add_argument(
-        "-jbt2",
-        "--jbt2",
-        help="Run model in Jiang's backtest period",
+        "-awake",
+        "--awakening",
         default=False,
         action="store_true",
     )
     PARSER.add_argument(
-        "-jbt3",
-        "--jbt3",
-        help="Run model in Jiang's backtest period",
+        "-xrp",
+        "--ripple_bullrun",
         default=False,
         action="store_true",
     )
     PARSER.add_argument(
-        "-bull",
-        "--bull_run_year_2017",
-        help="Sita fattii erikoissettii jota on harvoin tarjol; fatimpaa saa edelleen ettii!",
+        "-eth",
+        "--ethereum_valley",
+        default=False,
+        action="store_true",
+    )
+    PARSER.add_argument(
+        "-ath",
+        "--all_time_high",
         default=False,
         action="store_true",
     )
 
-    PARSER.add_argument("-bear", "--bear_year_2018", default=False, action="store_true")
+    PARSER.add_argument("-rock", "--rock_bottom",
+                        default=False, action="store_true")
     PARSER.add_argument(
-        "-recent", "--recent_yr_2019", default=False, action="store_true"
+        "-recent", "--recent", default=False, action="store_true"
     )
-    PARSER.add_argument("-long", "--long_run", default=False, action="store_true")
-    PARSER.add_argument("-nano", "--nano_run", default=False, action="store_true")
-    PARSER.add_argument("-pico", "--pico_run", default=False, action="store_true")
+    PARSER.add_argument("-nano", "--nano_run",
+                        default=False, action="store_true")
+    PARSER.add_argument("-pico", "--pico_run",
+                        default=False, action="store_true")
 
     ARGS = PARSER.parse_args()
 
@@ -365,20 +372,20 @@ if __name__ == "__main__":
             train_session_name="test_run_with_long_name",
         )
 
-    elif ARGS.jbt1:
-        print("\nRunning model for Jiang's back test 1 period")
+    elif ARGS.calm_before_the_strom:
+        print("\nRunning model: Calm_before_the_storm")
 
         OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
 
         main(
             **OVERRIDE_PARAMS,
-            start_date="2015038",
+            start_date="20150308",
             end_date="20161028",
-            train_session_name="Jiang_et_al._backtest:_#1",
+            train_session_name="Calm_before_the_storm",
             gpu_device=ARGS.gpu_device,
         )
-    elif ARGS.jbt2:
-        print("\nRunning model for Jiang's back test 2 period")
+    elif ARGS.awakening:
+        print("\nRunning model: Awakening")
 
         OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
 
@@ -386,11 +393,11 @@ if __name__ == "__main__":
             **OVERRIDE_PARAMS,
             start_date="20150609",
             end_date="20170128",
-            train_session_name="Jiang_et_al._backtest:_#2",
+            train_session_name="Awakening",
             gpu_device=ARGS.gpu_device,
         )
-    elif ARGS.jbt3:
-        print("\nRunning model for Jiang's back test 2 period")
+    elif ARGS.ripple_bullrun:
+        print("\nRunning model: Ripple bullrun")
 
         OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
 
@@ -398,18 +405,30 @@ if __name__ == "__main__":
             **OVERRIDE_PARAMS,
             start_date="20150905",
             end_date="20170427",
-            train_session_name="Jiang_et_al._backtest:_#3",
+            train_session_name="Ripple_bullrun",
             gpu_device=ARGS.gpu_device,
         )
-    elif ARGS.bull_run_year_2017:
-        print("\nRunning Fattii Erikois Settii")
+    elif ARGS.ethereum_valley:
+        print("\nRunning model ethereum_valley")
+
+        OVERRIDE_PARAMS = {**TRAIN_BASE_PARAMS, "ratio_train": 0.916, "ratio_val": 0}
+
+        main(
+            **OVERRIDE_PARAMS,
+            start_date="20151126",
+            end_date="20170718",
+            train_session_name="Ethereum_valley",
+            gpu_device=ARGS.gpu_device,
+        )
+    elif ARGS.all_time_high:
+        print("\nRunning All time high")
 
         BASE_PARAMS = {
             **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
             "start_date": "20160815",
             "end_date": "20180113",
-            "train_session_name": "All_Time_High:_2017",
+            "train_session_name": "All-time_high",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,
@@ -418,15 +437,15 @@ if __name__ == "__main__":
 
         main(**BASE_PARAMS)
 
-    elif ARGS.bear_year_2018:
-        print("\nRunning bear year 2018")
+    elif ARGS.rock_bottom:
+        print("\nRunning Rock Bottom")
 
         BASE_PARAMS = {
             **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
             "start_date": "20170601",
             "end_date": "20181231",
-            "train_session_name": "Bear_year:_2018",
+            "train_session_name": "Rock_bottom",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,
@@ -435,67 +454,19 @@ if __name__ == "__main__":
 
         main(**BASE_PARAMS)
 
-    elif ARGS.recent_yr_2019:
+    elif ARGS.recent:
         print("\nRunning recent year 2019")
 
         BASE_PARAMS = {
             **TRAIN_BASE_PARAMS,
             "no_of_assets": 7,
             "start_date": "20180101",
-            "end_date": "20190418",
-            "train_session_name": "Recent_year:_2019",
+            "end_date": "20190426",
+            "train_session_name": "Recent",
             "gpu_device": ARGS.gpu_device,
             "ratio_train": 0.9,
             "ratio_val": 0.0,
             "trading_period_length": "30min",
-        }
-
-        main(**BASE_PARAMS)
-
-    elif ARGS.long_run:
-
-        BASE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "no_of_assets": 7,
-            "start_date": "20150220",
-            "end_date": "20190418",
-            "train_session_name": "Long_run:_2015-2019",
-            "gpu_device": ARGS.gpu_device,
-            "ratio_train": 0.9,
-            "ratio_val": 0.0,
-            "trading_period_length": "4h",
-        }
-
-        main(**BASE_PARAMS)
-
-    elif ARGS.nano_run:
-
-        BASE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "no_of_assets": 7,
-            "start_date": "20160801",
-            "end_date": "20170427",
-            "train_session_name": "15_minute_trade_interval",
-            "gpu_device": ARGS.gpu_device,
-            "ratio_train": 0.9,
-            "ratio_val": 0.0,
-            "trading_period_length": "15min",
-        }
-
-        main(**BASE_PARAMS)
-
-    elif ARGS.pico_run:
-
-        BASE_PARAMS = {
-            **TRAIN_BASE_PARAMS,
-            "no_of_assets": 6,
-            "start_date": "20170115",
-            "end_date": "20170415",
-            "train_session_name": "5_minute_trade_interval",
-            "gpu_device": ARGS.gpu_device,
-            "ratio_train": 0.9,
-            "ratio_val": 0.0,
-            "trading_period_length": "5min",
         }
 
         main(**BASE_PARAMS)

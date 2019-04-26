@@ -36,26 +36,32 @@ def main(
 
     cryptos_dict = {}
 
-    # 11 workable
-    # chosen_cryptos = ["XMR", "XRP", "LTC", "DASH", "DOGE", "NMC", "BTS", "NXT", "PPC", "MAID", "XCP", "ETH", "ETC"][:no_of_cryptos]
+    # Final backtest lists
+    if train_session_name == "Calm_before_the_storm":
+        print(f"Using assets for session {train_session_name}")
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'LTC', 'ETC', 'FCT', 'MAID', 'LSK', 'BTS', 'STEEM'][:no_of_cryptos]
+    elif train_session_name == "Awakening":
+        print(f"Using assets for session {train_session_name}")
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'ETC', 'ZEC', 'FCT', 'REP', 'STEEM', 'MAID'][:no_of_cryptos]
+    elif train_session_name == "Ripple_bullrun":
+        print(f"Using assets for session {train_session_name}")
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'MAID', 'FCT', 'GNT', 'ZEC'][:no_of_cryptos]
+    elif train_session_name == "Ethereum_valley":
+        print(f"Using assets for session {train_session_name}")
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'STR', 'XEM', 'DGB', 'ZEC'][:no_of_cryptos]
+    elif train_session_name == "All-time_high":
+        print(f"Using assets for session {train_session_name}")
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'BCH', 'STR', 'VTC', 'LSK'][:no_of_cryptos]
+    elif train_session_name == "Rock_bottom":
+        print(f"Using assets for session {train_session_name}")
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'BCH', 'STR', 'BCHSV', 'ZRX', 'ZEC'][:no_of_cryptos]
+    elif train_session_name == "Recent":
+        print(f"Using assets for session {train_session_name}")
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'STR', 'BCHABC', 'BCHSV', 'EOS', 'DGB'][:no_of_cryptos]
 
-    if train_session_name == "long_run":
-        chosen_cryptos = ["LTC", "XRP", "DASH", "DOGE", "NMC",
-                          "BTS", "PPC", "MAID"][:no_of_cryptos]
-
-    if train_session_name == "Jiang_et_al._backtest_period_1":
-        chosen_cryptos = ["XMR", "USDT", "ETH", "ETC", "DASH", "FCT",
-                          "MAID", "LSK", "LTC", "STEEM", "BTS"][:no_of_cryptos]
-
-    if train_session_name == "Jiang_et_al._backtest_period_2":
-        chosen_cryptos = ["XMR", "USDT", "ETH", "ETC", "DASH", "FCT",
-                          "MAID", "XRP", "ZEC", "STEEM", "REP"][:no_of_cryptos]
-
-    if train_session_name == "Jiang_et_al._backtest_period_3":
-        chosen_cryptos = ["XMR", "USDT", "ETH", "ETC", "DASH",
-                          "FCT", "MAID", "XRP", "ZEC", "LTC", "PASC"][:no_of_cryptos]
 
     else:
+        print("\nWARNING USING DEFAULT ASSETS. Please ensure this is a test session")
         chosen_cryptos = ["XMR", "USDT", "XRP", "LTC", "DASH", "ETH",
                           "MAID", "ETC",  "NMC", "BTS", "PPC", ][:no_of_cryptos]
 
@@ -92,7 +98,6 @@ def main(
     crypto_tensor = _make_crypto_tensor(chosen_crypto_fps, no_of_cryptos)
 
     print("Returning dataset")
-    print(chosen_cryptos)
     pprint(crypto_tensor.shape)
     print()
 
