@@ -174,7 +174,7 @@ def _get_train_val_test_steps(trading_period, train_configs, ratio_train):
 
 def _calculate_start_date(end_date, trading_period_length):
 
-    if trading_period_length in ["2h", "4h", "1d"]:
+    if trading_period_length in ["2h", "4h", "1d", "30min"]:
         start_date = (datetime.strptime(end_date, "%Y%m%d") -
                       timedelta(599)).strftime("%Y%m%d")
 
