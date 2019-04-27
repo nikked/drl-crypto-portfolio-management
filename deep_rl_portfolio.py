@@ -172,28 +172,21 @@ def _get_train_val_test_steps(trading_period, train_configs, ratio_train):
     return train_test_val_steps
 
 
-def _calculate_start_date_and_ratio_train(end_date, trading_period_length):
+def _calculate_start_date(end_date, trading_period_length):
 
-    if trading_period_length == "30min":
+    if trading_period_length in ["2h", "4h", "1d"]:
         start_date = (datetime.strptime(end_date, "%Y%m%d") -
                       timedelta(599)).strftime("%Y%m%d")
-        ratio_train = 0.919
 
     elif trading_period_length == "15min":
         start_date = (datetime.strptime(end_date, "%Y%m%d") -
                       timedelta(299)).strftime("%Y%m%d")
-        ratio_train = 0.837
 
     elif trading_period_length == "5min":
         start_date = (datetime.strptime(end_date, "%Y%m%d") -
                       timedelta(99)).strftime("%Y%m%d")
-        ratio_train = 0.51
 
-    else:
-        print("Valid periods: 5min, 15min and 30min. Exiting")
-        sys.exit(0)
-
-    return start_date, ratio_train
+    return start_date
 
 
 if __name__ == "__main__":
@@ -407,7 +400,7 @@ if __name__ == "__main__":
         print("\nRunning model: Calm_before_the_storm")
 
         end_date = "20161028"
-        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+        start_date = _calculate_start_date(
             end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
@@ -422,7 +415,7 @@ if __name__ == "__main__":
         print("\nRunning model: Awakening")
 
         end_date = "20170128"
-        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+        start_date = _calculate_start_date(
             end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
@@ -437,7 +430,7 @@ if __name__ == "__main__":
         print("\nRunning model: Ripple bull run")
 
         end_date = "20170427"
-        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+        start_date = _calculate_start_date(
             end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
@@ -452,7 +445,7 @@ if __name__ == "__main__":
         print("\nRunning model ethereum_valley")
 
         end_date = "20170718"
-        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+        start_date = _calculate_start_date(
             end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
@@ -468,13 +461,13 @@ if __name__ == "__main__":
 
         end_date = "20180113"
 
-        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+        start_date = _calculate_start_date(
             end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             end_date=end_date,
-            test_start_date="20171122",
+            test_start_date="20171123",
             trading_period_length=ARGS.trading_period_length,
             train_session_name="All-time_high_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
@@ -485,13 +478,13 @@ if __name__ == "__main__":
 
         end_date = "20181231"
 
-        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+        start_date = _calculate_start_date(
             end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             end_date=end_date,
-            test_start_date="20181112",
+            test_start_date="20181110",
             trading_period_length=ARGS.trading_period_length,
             train_session_name="Rock_bottom_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
@@ -502,13 +495,13 @@ if __name__ == "__main__":
 
         end_date = "20190426"
 
-        start_date, ratio_train = _calculate_start_date_and_ratio_train(
+        start_date = _calculate_start_date(
             end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             end_date=end_date,
-            test_start_date="20180308",
+            test_start_date="20190306",
             trading_period_length=ARGS.trading_period_length,
             train_session_name="Recent_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,

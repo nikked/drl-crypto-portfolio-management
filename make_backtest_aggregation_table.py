@@ -86,6 +86,7 @@ def make_backtest_aggregation_table():
         ])
 
         for backtest_name, backtest_dict in backtest_dicts.items():
+            print(backtest_name)
 
             key_stats = _extract_key_stats(backtest_name, backtest_dict)
 

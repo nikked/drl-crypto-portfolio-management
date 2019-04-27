@@ -408,4 +408,6 @@ if __name__ == "__main__":
         session_name = backtest_json_fn.replace(
             'train_history_', "").replace(".json", "")
 
+        print(session_name)
+
         make_train_histograms(session_name)
