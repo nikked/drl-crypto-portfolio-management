@@ -22,8 +22,12 @@ def make_train_histograms(session_name):
         history_dict = json.load(file)
 
     filtered_history = filter_history_dict(history_dict)
-
     n_simulations = len(filtered_history)
+
+    if not n_simulations:
+        print(f'\nWARNING: Could not create histogram for session {session_name}. No valid test runs found from total {len(history_dict)}\n')
+        return
+
     backtest_stats = aggregate_backtest_stats(filtered_history)
 
     fig, axes = plt.subplots(nrows=5, ncols=2)
@@ -121,6 +125,7 @@ def aggregate_backtest_stats(filtered_history):
     crypto_weight_std_devs = []
 
     first_key = list(filtered_history.keys())[0]
+
     asset_list = filtered_history[first_key]["asset_list"]
     eq_pf_value = filtered_history[first_key]["eq_weight"]["pf_value"]
     eq_sharpe_ratio = filtered_history[first_key]["eq_weight"]["sharpe_ratio"]
@@ -335,7 +340,8 @@ def _plot_histogram_metadata_table(axis, n_simulations, session_name, backtest_s
     eq_data = [
         ["Ptf. value", round(backtest_stats["eq_pf_value"], 4)],
         ["Sharpe ratio", round(backtest_stats["eq_sharpe_ratio"], 4)],
-        ["Sharpe ratio (ann)", round(backtest_stats["eq_sharpe_ratio_ann"], 4)],
+        ["Sharpe ratio (ann)", round(
+            backtest_stats["eq_sharpe_ratio_ann"], 4)],
         ["MDD", round(backtest_stats["eq_mdd"], 4)],
     ]
 
@@ -397,17 +403,9 @@ def _plot_histogram(axis, data, title, xlabel):
 
 if __name__ == "__main__":
 
-    session_names = [
-        "All_Time_High__2017",
-        # "Long_run:_2015-2019",
-        "15_minute_trade_interval",
-        "5_minute_trade_interval",
-        "Recent_year__2019",
-        "Bear_year__2018",
-        "Jiang_et_al._backtest__#1",
-        "Jiang_et_al._backtest__#2",
-        "Jiang_et_al._backtest__#3",
-    ]
+    for backtest_json_fn in os.listdir(JSON_OUTPUT_DIR):
 
-    for name in session_names:
-        make_train_histograms(name)
+        session_name = backtest_json_fn.replace(
+            'train_history_', "").replace(".json", "")
+
+        make_train_histograms(session_name)
