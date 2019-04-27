@@ -466,7 +466,7 @@ if __name__ == "__main__":
 
         start_date = _calculate_start_date(end_date, ARGS.trading_period_length)
 
-        train_params = {**TRAIN_BASE_PARAMS, "max_pf_weight_penalty": 0.9}
+        train_params = {**TRAIN_BASE_PARAMS, "max_pf_weight_penalty": 1.1}
         main(
             **train_params,
             start_date=start_date,
@@ -483,7 +483,7 @@ if __name__ == "__main__":
         end_date = "20181231"
 
         start_date = _calculate_start_date(end_date, ARGS.trading_period_length)
-        train_params = {**TRAIN_BASE_PARAMS, "max_pf_weight_penalty": 0.7}
+        train_params = {**TRAIN_BASE_PARAMS, "max_pf_weight_penalty": 0.9}
         main(
             **train_params,
             start_date=start_date,
