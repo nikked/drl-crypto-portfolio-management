@@ -83,16 +83,17 @@ def main(**train_configs):
 
 def _initialize_trade_envs(train_configs):
 
-    dataset, asset_names = get_crypto_price_tensors.main(
+    dataset, asset_names, ratio_train = get_crypto_price_tensors.main(
         no_of_cryptos=train_configs["no_of_assets"],
         start_date=train_configs["start_date"],
+        test_start_date=train_configs["test_start_date"],
         end_date=train_configs["end_date"],
         trading_period_length=train_configs["trading_period_length"],
         train_session_name=train_configs["train_session_name"],
     )
 
     trade_env_args = DEFAULT_TRADE_ENV_ARGS
-    trade_env_args["train_size"] = train_configs["ratio_train"]
+    trade_env_args["train_size"] = ratio_train
     trade_env_args["data"] = dataset
     trade_env_args["window_length"] = train_configs["window_length"]
 
@@ -101,7 +102,7 @@ def _initialize_trade_envs(train_configs):
 
     # Determine the step sizes of different datasets
     train_test_val_steps = _get_train_val_test_steps(
-        trading_periods, train_configs)
+        trading_periods, train_configs, ratio_train)
 
     print("Starting training for {} assets".format(len(asset_names)))
     print(asset_names)
@@ -147,10 +148,10 @@ def _get_train_environments(no_of_assets, trade_env_args):
     return trade_envs
 
 
-def _get_train_val_test_steps(trading_period, train_configs):
+def _get_train_val_test_steps(trading_period, train_configs, ratio_train):
 
     # Total number of steps for pre-training in the training set
-    total_steps_train = int(train_configs["ratio_train"] * trading_period)
+    total_steps_train = int(ratio_train* trading_period) + 3
 
     # Total number of steps for pre-training in the validation set
     total_steps_val = int(train_configs["ratio_val"] * trading_period)
@@ -163,6 +164,10 @@ def _get_train_val_test_steps(trading_period, train_configs):
         "test": total_steps_test,
         "validation": total_steps_val,
     }
+
+    test_start_idx = train_test_val_steps["train"] + train_test_val_steps["validation"]
+
+    print(f"Test will start from idx: {train_test_val_steps['train'] + train_test_val_steps['validation']}")
 
     return train_test_val_steps
 
@@ -407,8 +412,8 @@ if __name__ == "__main__":
         main(
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
+            test_start_date="20160907",
             end_date=end_date,
-            ratio_train=ratio_train,
             trading_period_length=ARGS.trading_period_length,
             train_session_name="Calm_before_the_storm_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
@@ -423,7 +428,7 @@ if __name__ == "__main__":
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             end_date=end_date,
-            ratio_train=ratio_train,
+            test_start_date="20161208",
             trading_period_length=ARGS.trading_period_length,
             train_session_name="Awakening_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
@@ -438,7 +443,7 @@ if __name__ == "__main__":
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             end_date=end_date,
-            ratio_train=ratio_train,
+            test_start_date="20170307",
             trading_period_length=ARGS.trading_period_length,
             train_session_name="Ripple_bull_run_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
@@ -453,7 +458,7 @@ if __name__ == "__main__":
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             end_date=end_date,
-            ratio_train=ratio_train,
+            test_start_date="20170528",
             trading_period_length=ARGS.trading_period_length,
             train_session_name="Ethereum_valley_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
@@ -469,7 +474,7 @@ if __name__ == "__main__":
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             end_date=end_date,
-            ratio_train=ratio_train,
+            test_start_date="20171122",
             trading_period_length=ARGS.trading_period_length,
             train_session_name="All-time_high_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
@@ -486,7 +491,7 @@ if __name__ == "__main__":
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             end_date=end_date,
-            ratio_train=ratio_train,
+            test_start_date="20181112",
             trading_period_length=ARGS.trading_period_length,
             train_session_name="Rock_bottom_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,
@@ -503,7 +508,7 @@ if __name__ == "__main__":
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             end_date=end_date,
-            ratio_train=ratio_train,
+            test_start_date="20180308",
             trading_period_length=ARGS.trading_period_length,
             train_session_name="Recent_{}".format(ARGS.trading_period_length),
             gpu_device=ARGS.gpu_device,

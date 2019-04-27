@@ -19,9 +19,12 @@ We don't need to normalize the data since it's already of ratio of 2 prices clos
 
 import os
 from pprint import pprint
+import pytz
 
 import pandas as pd
 import numpy as np
+from datetime import datetime, timezone
+from dateutil import parser
 
 from data_pipelines.get_data_from_poloniex_api import download_crypto_data, DATA_DIR
 
@@ -29,6 +32,7 @@ from data_pipelines.get_data_from_poloniex_api import download_crypto_data, DATA
 def main(
     no_of_cryptos=5,
     start_date="20190101",
+    test_start_date="20190301",
     end_date="20190319",
     trading_period_length="2h",
     train_session_name="none"
@@ -39,30 +43,37 @@ def main(
     # Final backtest lists
     if train_session_name.startswith("Calm_before_the_storm"):
         print(f"Using assets for session {train_session_name}")
-        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'LTC', 'ETC', 'FCT', 'MAID', 'LSK', 'BTS', 'STEEM'][:no_of_cryptos]
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'LTC', 'ETC',
+                          'FCT', 'MAID', 'LSK', 'BTS', 'STEEM'][:no_of_cryptos]
     elif train_session_name.startswith("Awakening"):
         print(f"Using assets for session {train_session_name}")
-        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'ETC', 'ZEC', 'FCT', 'REP', 'STEEM', 'MAID'][:no_of_cryptos]
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'ETC',
+                          'ZEC', 'FCT', 'REP', 'STEEM', 'MAID'][:no_of_cryptos]
     elif train_session_name.startswith("Ripple_bull_run"):
         print(f"Using assets for session {train_session_name}")
-        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'MAID', 'FCT', 'GNT', 'ZEC'][:no_of_cryptos]
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP',
+                          'LTC', 'ETC', 'MAID', 'FCT', 'GNT', 'ZEC'][:no_of_cryptos]
     elif train_session_name.startswith("Ethereum_valley"):
         print(f"Using assets for session {train_session_name}")
-        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'STR', 'XEM', 'DGB', 'ZEC'][:no_of_cryptos]
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP',
+                          'LTC', 'ETC', 'STR', 'XEM', 'DGB', 'ZEC'][:no_of_cryptos]
     elif train_session_name.startswith("All-time_high"):
         print(f"Using assets for session {train_session_name}")
-        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'ETC', 'BCH', 'STR', 'VTC', 'LSK'][:no_of_cryptos]
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP',
+                          'LTC', 'ETC', 'BCH', 'STR', 'VTC', 'LSK'][:no_of_cryptos]
     elif train_session_name.startswith("Rock_bottom"):
         print(f"Using assets for session {train_session_name}")
-        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'BCH', 'STR', 'BCHSV', 'ZRX', 'ZEC'][:no_of_cryptos]
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP',
+                          'LTC', 'BCH', 'STR', 'BCHSV', 'ZRX', 'ZEC'][:no_of_cryptos]
     elif train_session_name.startswith("Recent"):
         print(f"Using assets for session {train_session_name}")
-        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC', 'STR', 'BCHABC', 'BCHSV', 'EOS', 'DGB'][:no_of_cryptos]
+        chosen_cryptos = ['XMR', 'ETH', 'USDT', 'DASH', 'XRP', 'LTC',
+                          'STR', 'BCHABC', 'BCHSV', 'EOS', 'DGB'][:no_of_cryptos]
 
     else:
         print("\nWARNING USING DEFAULT ASSETS. Please ensure this is a test session")
         chosen_cryptos = ["XMR", "USDT", "XRP", "LTC", "DASH", "ETH",
-                          "MAID", "ETC",  "NMC", "BTS", "PPC", ][:no_of_cryptos]
+                          "MAID", "ETC", "NMC", "BTS", "PPC", ][:no_of_cryptos]
 
     for crypto in chosen_cryptos:
         if crypto == "USDT":
@@ -94,16 +105,17 @@ def main(
         else:
             chosen_crypto_fps.append(cryptos_dict[crypto])
 
-    crypto_tensor = _make_crypto_tensor(chosen_crypto_fps, no_of_cryptos)
+    crypto_tensor, ratio_train = _make_crypto_tensor(
+        chosen_crypto_fps, no_of_cryptos, test_start_date)
 
     print("Returning dataset")
     pprint(crypto_tensor.shape)
     print()
 
-    return crypto_tensor, chosen_cryptos
+    return crypto_tensor, chosen_cryptos, ratio_train
 
 
-def _make_crypto_tensor(chosen_crypto_fps, no_of_cryptos):
+def _make_crypto_tensor(chosen_crypto_fps, no_of_cryptos, test_start_date):
     list_open = list()
     list_close = list()
     list_high = list()
@@ -121,6 +133,38 @@ def _make_crypto_tensor(chosen_crypto_fps, no_of_cryptos):
         data_fp = os.path.join(os.getcwd(), DATA_DIR, crypto_fp)
 
         data = pd.read_csv(data_fp).fillna("bfill").copy()
+
+        if idx == 0:
+
+            # calculate train ratio dynamically
+            dates = data[['date']]
+
+            # convert test_start_date to unix epoch
+            test_start_dt = datetime.strptime(
+                test_start_date, "%Y%m%d")
+
+            test_start_dt = datetime(
+                int(test_start_date[:4]),
+                int(test_start_date[4:6]),
+                int(test_start_date[6:8]),
+                0,
+                0,
+                0,
+                0,
+                pytz.UTC
+            )
+
+            test_start_epoch = int(test_start_dt.timestamp())
+
+            # Fetch idx where
+            idx = dates.index[dates['date'] == test_start_epoch]
+
+            print(f'\nTest will start from: {test_start_date} ({test_start_epoch})')
+
+            ratio_train = (idx / len(dates))[0]
+
+            print(f'Train ratio: {ratio_train}')
+
         data = data[["open", "close", "high", "low"]]
 
         if not first_crypto_list_len:
@@ -167,7 +211,7 @@ def _make_crypto_tensor(chosen_crypto_fps, no_of_cryptos):
         axes=(0, 2, 1),
     )
 
-    return crypto_tensor
+    return crypto_tensor, ratio_train
 
 
 if __name__ == "__main__":
