@@ -47,8 +47,7 @@ def main(**train_configs):
     print("\n")
 
     # Creation of the trading environment
-    trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(
-        train_configs)
+    trade_envs, asset_list, train_test_val_steps = _initialize_trade_envs(train_configs)
 
     # Agent training
     agent, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
@@ -102,13 +101,13 @@ def _initialize_trade_envs(train_configs):
 
     # Determine the step sizes of different datasets
     train_test_val_steps = _get_train_val_test_steps(
-        trading_periods, train_configs, ratio_train)
+        trading_periods, train_configs, ratio_train
+    )
 
     print("Starting training for {} assets".format(len(asset_names)))
     print(asset_names)
 
-    train_envs = _get_train_environments(
-        train_configs["no_of_assets"], trade_env_args)
+    train_envs = _get_train_environments(train_configs["no_of_assets"], trade_env_args)
 
     return train_envs, asset_names, train_test_val_steps
 
@@ -151,7 +150,7 @@ def _get_train_environments(no_of_assets, trade_env_args):
 def _get_train_val_test_steps(trading_period, train_configs, ratio_train):
 
     # Total number of steps for pre-training in the training set
-    total_steps_train = int(ratio_train* trading_period) + 3
+    total_steps_train = int(ratio_train * trading_period) + 3
 
     # Total number of steps for pre-training in the validation set
     total_steps_val = int(train_configs["ratio_val"] * trading_period)
@@ -167,7 +166,9 @@ def _get_train_val_test_steps(trading_period, train_configs, ratio_train):
 
     test_start_idx = train_test_val_steps["train"] + train_test_val_steps["validation"]
 
-    print(f"Test will start from idx: {train_test_val_steps['train'] + train_test_val_steps['validation']}")
+    print(
+        f"Test will start from idx: {train_test_val_steps['train'] + train_test_val_steps['validation']}"
+    )
 
     return train_test_val_steps
 
@@ -175,16 +176,19 @@ def _get_train_val_test_steps(trading_period, train_configs, ratio_train):
 def _calculate_start_date(end_date, trading_period_length):
 
     if trading_period_length in ["2h", "4h", "1d", "30min"]:
-        start_date = (datetime.strptime(end_date, "%Y%m%d") -
-                      timedelta(599)).strftime("%Y%m%d")
+        start_date = (datetime.strptime(end_date, "%Y%m%d") - timedelta(599)).strftime(
+            "%Y%m%d"
+        )
 
     elif trading_period_length == "15min":
-        start_date = (datetime.strptime(end_date, "%Y%m%d") -
-                      timedelta(299)).strftime("%Y%m%d")
+        start_date = (datetime.strptime(end_date, "%Y%m%d") - timedelta(299)).strftime(
+            "%Y%m%d"
+        )
 
     elif trading_period_length == "5min":
-        start_date = (datetime.strptime(end_date, "%Y%m%d") -
-                      timedelta(99)).strftime("%Y%m%d")
+        start_date = (datetime.strptime(end_date, "%Y%m%d") - timedelta(99)).strftime(
+            "%Y%m%d"
+        )
 
     return start_date
 
@@ -304,46 +308,19 @@ if __name__ == "__main__":
         default="1d",
         help="Trade period length (5min, 15min, 30min, 2h, 4h, 1d)",
     )
+    PARSER.add_argument("-demo", "--demo", default=False, action="store_true")
     PARSER.add_argument(
-        "-cbts",
-        "--calm_before_the_storm",
-        default=False,
-        action="store_true",
+        "-cbts", "--calm_before_the_storm", default=False, action="store_true"
     )
-    PARSER.add_argument(
-        "-awake",
-        "--awakening",
-        default=False,
-        action="store_true",
-    )
-    PARSER.add_argument(
-        "-xrp",
-        "--ripple_bull_run",
-        default=False,
-        action="store_true",
-    )
-    PARSER.add_argument(
-        "-eth",
-        "--ethereum_valley",
-        default=False,
-        action="store_true",
-    )
-    PARSER.add_argument(
-        "-ath",
-        "--all_time_high",
-        default=False,
-        action="store_true",
-    )
+    PARSER.add_argument("-awake", "--awakening", default=False, action="store_true")
+    PARSER.add_argument("-xrp", "--ripple_bull_run", default=False, action="store_true")
+    PARSER.add_argument("-eth", "--ethereum_valley", default=False, action="store_true")
+    PARSER.add_argument("-ath", "--all_time_high", default=False, action="store_true")
 
-    PARSER.add_argument("-rock", "--rock_bottom",
-                        default=False, action="store_true")
-    PARSER.add_argument(
-        "-recent", "--recent", default=False, action="store_true"
-    )
-    PARSER.add_argument("-nano", "--nano_run",
-                        default=False, action="store_true")
-    PARSER.add_argument("-pico", "--pico_run",
-                        default=False, action="store_true")
+    PARSER.add_argument("-rock", "--rock_bottom", default=False, action="store_true")
+    PARSER.add_argument("-recent", "--recent", default=False, action="store_true")
+    PARSER.add_argument("-nano", "--nano_run", default=False, action="store_true")
+    PARSER.add_argument("-pico", "--pico_run", default=False, action="store_true")
 
     ARGS = PARSER.parse_args()
 
@@ -366,8 +343,10 @@ if __name__ == "__main__":
             batch_size=1,
             portfolio_value=100,
             start_date="20190101",
+            test_start_date="20190201",
             end_date="20190301",
             trading_period_length="4h",
+            max_pf_weight_penalty=0.7,
             test_mode=True,
             validate_during_training=ARGS.validate_during_training,
             train_session_name="quick_test_run_with_long_name",
@@ -389,34 +368,60 @@ if __name__ == "__main__":
             batch_size=1,
             portfolio_value=100,
             start_date="20190101",
+            test_start_date="20190201",
             end_date="20190301",
             trading_period_length="2h",
+            max_pf_weight_penalty=0.7,
             test_mode=True,
             validate_during_training=ARGS.validate_during_training,
             train_session_name="test_run_with_long_name",
+        )
+
+    elif ARGS.demo:
+        print("\nRunning model: Ripple bull run")
+
+        end_date = "20170427"
+        test_start_date = "20170307"
+        start_date = "20170101"
+
+        demo_params = {
+            **TRAIN_BASE_PARAMS,
+            "no_of_assets": 3,
+            "n_batches": 10,
+            "n_episodes": 1,
+        }
+
+        main(
+            **demo_params,
+            start_date=start_date,
+            end_date=end_date,
+            test_start_date=test_start_date,
+            trading_period_length="4h",
+            train_session_name="Dynamic_agent_demo",
+            gpu_device=ARGS.gpu_device,
         )
 
     elif ARGS.calm_before_the_storm:
         print("\nRunning model: Calm_before_the_storm")
 
         end_date = "20161028"
-        start_date = _calculate_start_date(
-            end_date, ARGS.trading_period_length)
+        start_date = _calculate_start_date(end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
             test_start_date="20160907",
             end_date=end_date,
             trading_period_length=ARGS.trading_period_length,
-            train_session_name="Calm_before_the_storm_{}".format(ARGS.trading_period_length),
+            train_session_name="Calm_before_the_storm_{}".format(
+                ARGS.trading_period_length
+            ),
             gpu_device=ARGS.gpu_device,
         )
     elif ARGS.awakening:
         print("\nRunning model: Awakening")
 
         end_date = "20170128"
-        start_date = _calculate_start_date(
-            end_date, ARGS.trading_period_length)
+        start_date = _calculate_start_date(end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
@@ -430,8 +435,7 @@ if __name__ == "__main__":
         print("\nRunning model: Ripple bull run")
 
         end_date = "20170427"
-        start_date = _calculate_start_date(
-            end_date, ARGS.trading_period_length)
+        start_date = _calculate_start_date(end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
@@ -445,8 +449,7 @@ if __name__ == "__main__":
         print("\nRunning model ethereum_valley")
 
         end_date = "20170718"
-        start_date = _calculate_start_date(
-            end_date, ARGS.trading_period_length)
+        start_date = _calculate_start_date(end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
@@ -461,13 +464,9 @@ if __name__ == "__main__":
 
         end_date = "20180113"
 
-        start_date = _calculate_start_date(
-            end_date, ARGS.trading_period_length)
+        start_date = _calculate_start_date(end_date, ARGS.trading_period_length)
 
-        train_params = {
-            **TRAIN_BASE_PARAMS,
-            "max_pf_weight_penalty": 0.7
-        }
+        train_params = {**TRAIN_BASE_PARAMS, "max_pf_weight_penalty": 0.9}
         main(
             **train_params,
             start_date=start_date,
@@ -483,12 +482,8 @@ if __name__ == "__main__":
 
         end_date = "20181231"
 
-        start_date = _calculate_start_date(
-            end_date, ARGS.trading_period_length)
-        train_params = {
-            **TRAIN_BASE_PARAMS,
-            "max_pf_weight_penalty": 0.7
-        }
+        start_date = _calculate_start_date(end_date, ARGS.trading_period_length)
+        train_params = {**TRAIN_BASE_PARAMS, "max_pf_weight_penalty": 0.7}
         main(
             **train_params,
             start_date=start_date,
@@ -504,8 +499,7 @@ if __name__ == "__main__":
 
         end_date = "20190426"
 
-        start_date = _calculate_start_date(
-            end_date, ARGS.trading_period_length)
+        start_date = _calculate_start_date(end_date, ARGS.trading_period_length)
         main(
             **TRAIN_BASE_PARAMS,
             start_date=start_date,
