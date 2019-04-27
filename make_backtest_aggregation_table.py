@@ -13,37 +13,58 @@ BACKTEST_NROS = {
     "Calm_before_the_storm": {
         "5min": 1,
         "15min": 2,
-        "30min": 3
+        "30min": 3,
+        "2h": 4,
+        "4h": 5,
+        "1d": 6,
     },
     "Awakening": {
-        "5min": 4,
-        "15min": 5,
-        "30min": 6
-    },
-    "Ripple_bull_run": {
         "5min": 7,
         "15min": 8,
-        "30min": 9
+        "30min": 9,
+        "2h": 10,
+        "4h": 11,
+        "1d": 12,
     },
-    "Ethereum_valley": {
-        "5min": 10,
-        "15min": 11,
-        "30min": 12
-    },
-    "All-time_high": {
+    "Ripple_bull_run": {
         "5min": 13,
         "15min": 14,
-        "30min": 15
+        "30min": 15,
+        "2h": 16,
+        "4h": 17,
+        "1d": 18,
     },
-    "Rock_bottom": {
-        "5min": 16,
-        "15min": 17,
-        "30min": 18
-    },
-    "Recent": {
+    "Ethereum_valley": {
         "5min": 19,
         "15min": 20,
-        "30min": 21
+        "30min": 21,
+        "2h": 22,
+        "4h": 23,
+        "1d": 24,
+    },
+    "All-time_high": {
+        "5min": 25,
+        "15min": 26,
+        "30min": 27,
+        "2h": 28,
+        "4h": 29,
+        "1d": 30,
+    },
+    "Rock_bottom": {
+        "5min": 31,
+        "15min": 32,
+        "30min": 33,
+        "2h": 34,
+        "4h": 35,
+        "1d": 36,
+    },
+    "Recent": {
+        "5min": 37,
+        "15min": 38,
+        "30min": 39,
+        "2h": 40,
+        "4h": 41,
+        "1d": 42,
     }
 }
 

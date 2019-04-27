@@ -207,9 +207,9 @@ def filter_history_dict(history_dict):
 
         initial_weights = train_data["initial_weights"]
 
-        # Ignore train runs with negative weight
-        if any(value < 0 for value in initial_weights):
-            continue
+        # # Ignore train runs with negative weight
+        # if any(value < 0 for value in initial_weights):
+        #     continue
 
         # Ignore train runs with huge weight
         if any(value > 0.7 for value in initial_weights):
