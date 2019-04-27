@@ -72,7 +72,7 @@ def main(
 
     else:
         print("\nWARNING USING DEFAULT ASSETS. Please ensure this is a test session")
-        chosen_cryptos = ["XMR", "USDT", "XRP", "LTC", "DASH", "ETH",
+        chosen_cryptos = ["XRP", "XMR", "LTC", "USDT", "DASH", "ETH",
                           "MAID", "ETC", "NMC", "BTS", "PPC", ][:no_of_cryptos]
 
     for crypto in chosen_cryptos:
