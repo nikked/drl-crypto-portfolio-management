@@ -10,7 +10,7 @@ from src.plot_train_results import plot_train_results
 from src.make_train_histograms import make_train_histograms
 from src.environment import TradeEnv
 
-from src.params import PF_INITIAL_VALUE, TRADING_COST, INTEREST_RATE, WINDOW_LENGTH
+from src.params import PF_INITIAL_VALUE, TRADING_COST, INTEREST_RATE, WINDOW_LENGTH, MAX_PF_WEIGHT_PENALTY
 
 from data_pipelines import get_crypto_price_tensors
 
@@ -19,7 +19,7 @@ DEFAULT_TRADE_ENV_ARGS = {
     "window_length": WINDOW_LENGTH,
     "portfolio_value": PF_INITIAL_VALUE,
     "trading_cost": TRADING_COST,
-    "interest_rate": INTEREST_RATE,
+    "max_pf_weight_penalty": MAX_PF_WEIGHT_PENALTY,
 }
 
 TRAIN_BASE_PARAMS = {
@@ -34,6 +34,7 @@ TRAIN_BASE_PARAMS = {
     "portfolio_value": 1,
     "validate_during_training": False,
     "ratio_val": 0,
+    "max_pf_weight_penalty": 0.5,
 }
 
 
@@ -463,8 +464,13 @@ if __name__ == "__main__":
 
         start_date = _calculate_start_date(
             end_date, ARGS.trading_period_length)
-        main(
+
+        train_params = {
             **TRAIN_BASE_PARAMS,
+            "max_pf_weight_penalty": 0.7
+        }
+        main(
+            **train_params,
             start_date=start_date,
             end_date=end_date,
             test_start_date="20171123",
@@ -480,8 +486,12 @@ if __name__ == "__main__":
 
         start_date = _calculate_start_date(
             end_date, ARGS.trading_period_length)
-        main(
+        train_params = {
             **TRAIN_BASE_PARAMS,
+            "max_pf_weight_penalty": 0.7
+        }
+        main(
+            **train_params,
             start_date=start_date,
             end_date=end_date,
             test_start_date="20181110",

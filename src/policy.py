@@ -14,7 +14,6 @@ from src.params import (
     N_FILTER_2,
     KERNEL1_SIZE,
     CASH_BIAS_INIT,
-    MAX_PF_WEIGHT_PENALTY,
     LEARNING_RATE,
 )
 
@@ -40,12 +39,14 @@ class Policy:
         self.n_filter_1 = n_filter_1
         self.n_filter_2 = n_filter_2
         self.window_length = train_options["window_length"]
+        self.max_pf_weight_penalty = train_options["max_pf_weight_penalty"]
         self.no_of_assets = no_of_assets
         self.optimizer = OPTIMIZER
         self.sess = sess
 
         if train_options["gpu_device"] is not None:
-            self.tf_device = "/device:GPU:{}".format(train_options["gpu_device"])
+            self.tf_device = "/device:GPU:{}".format(
+                train_options["gpu_device"])
 
         else:
             self.tf_device = "/cpu:0"
@@ -71,16 +72,19 @@ class Policy:
     def _define_input_placeholders(self, nb_feature_map):
         # Price tensor
         self.x_current = tf.placeholder(
-            tf.float32, [None, nb_feature_map, self.no_of_assets, self.window_length]
+            tf.float32, [None, nb_feature_map,
+                         self.no_of_assets, self.window_length]
         )
 
         # weights at the previous time step
-        self.w_previous = tf.placeholder(tf.float32, [None, self.no_of_assets + 1])
+        self.w_previous = tf.placeholder(
+            tf.float32, [None, self.no_of_assets + 1])
         # portfolio value at the previous time step
         self.pf_value_previous = tf.placeholder(tf.float32, [None, 1])
 
         # vector of Open(t+1)/Open(t)
-        self.daily_return_t = tf.placeholder(tf.float32, [None, self.no_of_assets])
+        self.daily_return_t = tf.placeholder(
+            tf.float32, [None, self.no_of_assets])
 
     def _define_policy_layers(self):
         # variable of the cash bias
@@ -175,7 +179,8 @@ class Policy:
             cost = tf.expand_dims(cost, 1)
 
             zero = tf.constant(
-                np.array([0.0] * self.no_of_assets).reshape(1, self.no_of_assets),
+                np.array([0.0] * self.no_of_assets).reshape(1,
+                                                            self.no_of_assets),
                 shape=[1, self.no_of_assets],
                 dtype=tf.float32,
             )
@@ -218,7 +223,7 @@ class Policy:
             self.adjusted_reward = (
                 self.instantaneous_reward
                 - self.instantaneous_reward_eq
-                - MAX_PF_WEIGHT_PENALTY * self.max_weight
+                - self.max_pf_weight_penalty * self.max_weight
             )
 
     def compute_w(self, x_current, w_previous):
@@ -232,7 +237,8 @@ class Policy:
         with tf.device(self.tf_device):
             return self.sess.run(
                 tf.squeeze(self.action),
-                feed_dict={self.x_current: x_current, self.w_previous: w_previous},
+                feed_dict={self.x_current: x_current,
+                           self.w_previous: w_previous},
             )
 
     def train(self, x_current, w_previous, pf_value_previous, daily_return_t):
