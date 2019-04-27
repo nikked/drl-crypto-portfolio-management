@@ -10,7 +10,7 @@ from src.plot_train_results import plot_train_results
 from src.make_train_histograms import make_train_histograms
 from src.environment import TradeEnv
 
-from src.params import PF_INITIAL_VALUE, TRADING_COST, INTEREST_RATE, WINDOW_LENGTH, MAX_PF_WEIGHT_PENALTY
+from src.params import PF_INITIAL_VALUE, TRADING_COST, INTEREST_RATE, WINDOW_LENGTH
 
 from data_pipelines import get_crypto_price_tensors
 
@@ -19,7 +19,6 @@ DEFAULT_TRADE_ENV_ARGS = {
     "window_length": WINDOW_LENGTH,
     "portfolio_value": PF_INITIAL_VALUE,
     "trading_cost": TRADING_COST,
-    "max_pf_weight_penalty": MAX_PF_WEIGHT_PENALTY,
 }
 
 TRAIN_BASE_PARAMS = {
