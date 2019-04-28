@@ -150,7 +150,7 @@ def _get_train_environments(no_of_assets, trade_env_args):
 def _get_train_val_test_steps(trading_period, train_configs, ratio_train):
 
     # Total number of steps for pre-training in the training set
-    total_steps_train = int(ratio_train * trading_period) + 3
+    total_steps_train = int(ratio_train * trading_period) + 1
 
     # Total number of steps for pre-training in the validation set
     total_steps_val = int(train_configs["ratio_val"] * trading_period)

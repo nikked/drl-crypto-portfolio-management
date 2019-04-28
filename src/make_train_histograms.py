@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import numpy as np
 import seaborn as sns
@@ -21,7 +22,7 @@ def make_train_histograms(session_name):
     with open(json_path, "r") as file:
         history_dict = json.load(file)
 
-    filtered_history = filter_history_dict(history_dict)
+    filtered_history = filter_history_dict(history_dict, session_name)
     n_simulations = len(filtered_history)
 
     if not n_simulations:
@@ -145,7 +146,8 @@ def aggregate_backtest_stats(filtered_history):
         if "trading_period_length" in session_stats:
             trading_period_length = session_stats["trading_period_length"]
         if "sharpe_ratio_ann" in session_stats["eq_weight"]:
-            eq_sharpe_ratio_ann = session_stats["eq_weight"]["sharpe_ratio_ann"]
+            eq_sharpe_ratio_ann = session_stats[
+                "eq_weight"]["sharpe_ratio_ann"]
 
         dynamic = session_stats["dynamic"]
         static = session_stats["static"]
@@ -200,12 +202,51 @@ def aggregate_backtest_stats(filtered_history):
     }
 
 
-def filter_history_dict(history_dict):
+def filter_history_dict(history_dict, session_name):
+
+    test_start_dates = [
+        "2016-09-07",
+        "2016-12-08",
+        "2017-03-07",
+        "2017-05-28",
+        "2017-11-23",
+        "2018-11-10",
+        "2019-03-06",
+    ]
+
+    test_end_dates = [
+        "2016-10-28",
+        "2017-01-28",
+        "2017-04-27",
+        "2017-07-18",
+        "2018-01-13",
+        "2018-12-31",
+        "2019-04-26",
+    ]
 
     filtered_history = {}
     for timestamp, train_data in history_dict.items():
-
         initial_weights = train_data["initial_weights"]
+
+        timestamp_dt = datetime.strptime(timestamp, "%Y-%m-%d_%H%M%S")
+
+        threshold_dt = datetime(2019, 4, 27, 15, 30)
+
+        if timestamp_dt < threshold_dt:
+            continue
+
+        # else:
+        #     print(session_name)
+
+        test_start = train_data['test_start']
+        test_end = train_data['test_end']
+
+        # print(test_start)
+
+        if test_start not in test_start_dates:
+            continue
+        if test_end not in test_end_dates:
+            continue
 
         # # Ignore train runs with negative weight
         # if any(value < 0 for value in initial_weights):

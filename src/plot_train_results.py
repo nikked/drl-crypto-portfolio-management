@@ -196,6 +196,7 @@ def _plot_backtest_perf_metadata(
     portfolio_eq_final_value = round(test_performance_lists["p_list_eq"][-1], 4)
 
     back_test_start_timestamp = btc_price_data.index[0]
+    print(f'BTC PRICE INDEX: {back_test_start_timestamp}')
     train_end_timestamp = back_test_start_timestamp - timedelta(days=1)
 
     back_test_day_count = (btc_price_data.index[-1] - back_test_start_timestamp).days
@@ -441,9 +442,9 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
     )
     data = pd.read_csv(btc_price_fp).fillna("bfill").copy()
 
+
     # Set BTC price data index to real date
     data["datetime"] = pd.to_datetime(data["date"], unit="s", utc=True)
-    data["datetime"] = data["datetime"] + pd.Timedelta("02:00:00")
     data = data.set_index("datetime")
 
     btc_data_test_period = data.close[
