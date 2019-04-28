@@ -235,13 +235,8 @@ def filter_history_dict(history_dict, session_name):
         if timestamp_dt < threshold_dt:
             continue
 
-        # else:
-        #     print(session_name)
-
         test_start = train_data['test_start']
         test_end = train_data['test_end']
-
-        # print(test_start)
 
         if test_start not in test_start_dates:
             continue
@@ -253,7 +248,7 @@ def filter_history_dict(history_dict, session_name):
         #     continue
 
         # Ignore train runs with huge weight
-        if any(value > 0.7 for value in initial_weights):
+        if any(value > 0.5 for value in initial_weights):
             continue
 
         filtered_history[timestamp] = train_data
@@ -270,7 +265,7 @@ def _plot_histogram_metadata_table(axis, n_simulations, session_name, backtest_s
     axis.set_axis_off()
 
     axis.set_title(
-        f"[Simulation statistics] {session_name.replace('_', ' ')}",
+        f"[Simulation summary] {session_name.replace('_', ' ')}",
         fontdict={"fontsize": 20, "position": (0.0, 0.95)},  # x, y
         horizontalalignment="left",
     )
