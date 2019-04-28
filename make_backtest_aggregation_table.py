@@ -80,49 +80,68 @@ def make_backtest_aggregation_table():
                 ".json", "").replace("train_history_", "")
             backtest_dicts[backtest_name] = json.load(file)
 
+    mega_table_cols = [
+        'Backtest no.',
+        'Backtest name',
+        'Date range',
+        'Trading period',
+        'No. of simulations',
+
+        'PF value (dynamic)',
+        'MDD (dynamic)',
+        'Sharpe (dynamic)',
+        # 'Sharpe, ann. (dynamic)',
+
+        'PF value (static)',
+        'MDD (static)',
+        'Sharpe (static)',
+        # 'Sharpe, ann. (static)',
+
+        'PF value (eq)',
+        'MDD (eq)',
+        'Sharpe (eq)',
+        # 'Sharpe, ann. (eq)',
+    ]
+
     with open('backtest_aggregated.csv', 'w') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
 
-        csv_writer.writerow([
-            'Backtest no.',
-            'Backtest name'.replace("_", " "),
-            'Date range',
-            'Trading period',
-            'No. of simulations',
+        csv_writer.writerow(mega_table_cols)
 
-            'PF value (dynamic)',
-            'MDD (dynamic)',
-            'Sharpe (dynamic)',
-            'Sharpe, ann. (dynamic)',
-
-            'PF value (static)',
-            'MDD (static)',
-            'Sharpe (static)',
-            'Sharpe, ann. (static)',
-
-            'PF value (eq)',
-            'MDD (eq)',
-            'Sharpe (eq)',
-            'Sharpe, ann. (eq)',
-        ])
+        collected_backtests = {}
 
         for backtest_name, backtest_dict in backtest_dicts.items():
-            print(backtest_name)
+
+            if "Dynamic_agent" in backtest_name:
+                continue
 
             key_stats = _extract_key_stats(backtest_name, backtest_dict)
 
             if key_stats:
-                backtest_name = " ".join(backtest_name.split("_")[:-1])
-                backtest_nro = BACKTEST_NROS[backtest_name.replace(
+                backtest_name_nice = " ".join(backtest_name.split("_")[:-1])
+                trading_period_length = key_stats[1]
+
+                if backtest_name_nice in collected_backtests:
+                    collected_backtests[backtest_name_nice][
+                        trading_period_length] = key_stats
+
+                else:
+                    collected_backtests[backtest_name_nice] = {
+                        trading_period_length: key_stats
+                    }
+
+                backtest_nro = BACKTEST_NROS[backtest_name_nice.replace(
                     " ", '_')][key_stats[1]]
-                csv_writer.writerow([backtest_nro, backtest_name, *key_stats])
+                csv_writer.writerow([backtest_nro, backtest_name_nice, *key_stats])
+
+    _make_individual_tables_for_backtests(collected_backtests, mega_table_cols)
 
     return backtest_dicts
 
 
 def _extract_key_stats(backtest_name, backtest_dict):
 
-    filtered_history = filter_history_dict(backtest_dict)
+    filtered_history = filter_history_dict(backtest_dict, backtest_name)
 
     n_simulations = len(filtered_history)
 
@@ -140,20 +159,50 @@ def _extract_key_stats(backtest_name, backtest_dict):
         np.round(np.mean(backtest_stats["dynamic_pf_values"]), 4),
         np.round(np.mean(backtest_stats["dynamic_mdds"]), 4),
         np.round(np.mean(backtest_stats["dynamic_sharpe_ratios"]), 4),
-        np.round(np.mean(backtest_stats["dynamic_sharpe_ratios_ann"]), 4),
+        # np.round(np.mean(backtest_stats["dynamic_sharpe_ratios_ann"]), 4),
 
 
         np.round(np.mean(backtest_stats["static_pf_values"]), 4),
         np.round(np.mean(backtest_stats["static_mdds"]), 4),
         np.round(np.mean(backtest_stats["static_sharpe_ratios"]), 4),
-        np.round(np.mean(backtest_stats["static_sharpe_ratios_ann"]), 4),
+        # np.round(np.mean(backtest_stats["static_sharpe_ratios_ann"]), 4),
 
 
         np.round(backtest_stats["eq_pf_value"], 4),
         np.round(backtest_stats["eq_mdd"], 4),
         np.round(backtest_stats["eq_sharpe_ratio"], 4),
-        np.round(backtest_stats["eq_sharpe_ratio_ann"], 4),
+        # np.round(backtest_stats["eq_sharpe_ratio_ann"], 4),
     ]
+
+def _make_individual_tables_for_backtests(collected_backtests, mega_table_cols):
+
+    comparable_stats = {}
+
+    for backtest_name, aggr_stats in collected_backtests.items():
+
+        baktest_stats = {
+            "mdds"
+            "sharpe_ratios"
+            "pf_values"
+        }
+        for time_period, time_period_stats in aggr_stats.items():
+            pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # import pdb; pdb.set_trace()
+    pass
 
 
 if __name__ == "__main__":
