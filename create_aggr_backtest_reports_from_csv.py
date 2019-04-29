@@ -287,7 +287,7 @@ def _format_table(table):
 
 def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
 
-    axis.plot(data)
+    axis.plot(data, label=label)
 
     axis.grid(alpha=0.3)
     axis.set_xlabel(xlabel)
@@ -297,6 +297,7 @@ def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
         tick.label.set_fontsize(9)
     for tick in axis.xaxis.get_major_ticks():
         tick.label.set_fontsize(9)
+    axis.legend()
 
 
 def _make_backtest_dict(hack_equal):
