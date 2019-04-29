@@ -1,3 +1,4 @@
+from shutil import copyfile
 from datetime import datetime
 import os
 import numpy as np
@@ -11,6 +12,10 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 JSON_OUTPUT_DIR = "train_jsons/"
 
 HISTOGRAM_OUTPUT_DIR = "train_histograms/"
+
+VALID_GRAPH_DIR = "valid_graphs/"
+
+TRAIN_GRAPHS_DIR = "train_graphs/"
 
 if not os.path.exists(HISTOGRAM_OUTPUT_DIR):
     os.mkdir(HISTOGRAM_OUTPUT_DIR)
@@ -202,7 +207,7 @@ def aggregate_backtest_stats(filtered_history):
     }
 
 
-def filter_history_dict(history_dict, session_name):
+def filter_history_dict(history_dict, session_name, move_valid_to_own_dir=False):
 
     test_start_dates = [
         "2016-09-07",
@@ -248,7 +253,8 @@ def filter_history_dict(history_dict, session_name):
         if timestamp_dt < sun_threshold_dt:
             trading_period_length = train_data['trading_period_length']
             if trading_period_length in ["15min", "30min", "2h", "4h", "1d"]:
-            # if trading_period_length in ["5min", "15min", "30min", "2h", "4h", "1d"]:
+                # if trading_period_length in ["5min", "15min", "30min", "2h",
+                # "4h", "1d"]:
                 continue
 
         # # Ignore train runs with negative weight
@@ -260,6 +266,36 @@ def filter_history_dict(history_dict, session_name):
             continue
 
         filtered_history[timestamp] = train_data
+
+        if move_valid_to_own_dir:
+            # calculate target filepath
+            # os move path
+            # each backtest name to own
+
+            train_graph_fn = "train_results_" + session_name + "_" + timestamp + ".png"
+
+            train_graph_fp = os.path.join(
+                TRAIN_GRAPHS_DIR,
+                train_graph_fn
+            )
+
+            if not os.path.exists(train_graph_fp):
+                continue
+
+            target_dir = os.path.join(
+                VALID_GRAPH_DIR,
+                session_name,
+            )
+
+            target_fp = os.path.join(
+                target_dir,
+                train_graph_fn
+            )
+            if not os.path.exists(target_dir):
+                os.makedirs(target_dir)
+
+            elif not os.path.exists(target_fp):
+                copyfile(train_graph_fp, target_fp)
 
     return filtered_history
 

@@ -142,7 +142,7 @@ def make_backtest_aggregation_table():
 
 def _extract_key_stats(backtest_name, backtest_dict):
 
-    filtered_history = filter_history_dict(backtest_dict, backtest_name)
+    filtered_history = filter_history_dict(backtest_dict, backtest_name, move_valid_to_own_dir = True)
 
     n_simulations = len(filtered_history)
 
