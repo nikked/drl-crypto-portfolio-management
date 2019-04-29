@@ -1,3 +1,5 @@
+import argparse
+
 import os
 import csv
 import pandas as pd
@@ -51,14 +53,15 @@ if not os.path.exists(BACKTEST_AGGR_PLOTS_FP):
     os.mkdir(BACKTEST_AGGR_PLOTS_FP)
 
 
-def main():
+def main(hack_equal):
 
-    backtest_dict = _make_backtest_dict()
+    backtest_dict = _make_backtest_dict(hack_equal)
 
     # Make report for each backtest
     for backtest_name, backtest_stats in backtest_dict.items():
 
         fig, axes = plt.subplots(nrows=2, ncols=3)
+
         # width, height
         # fig.set_size_inches(16.6, 8)
         fig.set_size_inches(14.5, 7)
@@ -81,7 +84,7 @@ def main():
             "Average Portfolio values",
             "Period lengths",
             "Portfolio value",
-            "Dynamic"
+            "Dynamic",
         )
         _plot_line(
             axes[1][0],
@@ -89,7 +92,7 @@ def main():
             "Average Portfolio values",
             "Period lengths",
             "Portfolio value",
-            "Static"
+            "Static",
         )
         _plot_line(
             axes[1][0],
@@ -97,7 +100,7 @@ def main():
             "Average Portfolio values",
             "Period lengths",
             "Portfolio value",
-            "Equal"
+            "Equal",
         )
 
         _plot_line(
@@ -106,7 +109,7 @@ def main():
             "Average Maximum drawdowns",
             "Period lengths",
             "Maximum drawdown",
-            "Dynamic"
+            "Dynamic",
         )
         _plot_line(
             axes[1][1],
@@ -131,8 +134,7 @@ def main():
             "Average Sharpe ratios",
             "Period lengths",
             "Sharpe ratio",
-            "Dynamic"
-
+            "Dynamic",
         )
 
         _plot_line(
@@ -287,7 +289,7 @@ def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
 
     sns.lineplot(data=data,
                  ax=axis, legend="full", label=label)
-    # axis.hist(data, num_bins, alpha=0.95)
+
     axis.grid(alpha=0.3)
     axis.set_xlabel(xlabel)
     axis.set_ylabel(ylabel)
@@ -300,7 +302,7 @@ def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
         tick.label.set_fontsize(9)
 
 
-def _make_backtest_dict():
+def _make_backtest_dict(hack_equal):
 
     aggr_backtest_dict = {}
 
@@ -365,6 +367,8 @@ def _make_backtest_dict():
                 }
             )
 
+            backtest_stats["no_of_simulations"][period_idx] = row[4]
+
             backtest_stats["dynamic"]["pf_value"][period_idx] = row[5]
             backtest_stats["dynamic"]["mdd"][period_idx] = row[6]
             backtest_stats["dynamic"]["sharpe"][period_idx] = row[7]
@@ -373,17 +377,22 @@ def _make_backtest_dict():
             backtest_stats["static"]["mdd"][period_idx] = row[9]
             backtest_stats["static"]["sharpe"][period_idx] = row[10]
 
-            backtest_stats["no_of_simulations"][period_idx] = row[4]
+            if not hack_equal:
 
-            # Take the 2h values for equal weight
-            for sess_name_part in SESSION_NAME_EQ_INDECES.keys():
-                if sess_name_part in backtest_name.lower():
-                    eq_period_idx = SESSION_NAME_EQ_INDECES[sess_name_part]
+                backtest_stats["equal"]["pf_value"][period_idx] = row[11]
+                backtest_stats["equal"]["mdd"][period_idx] = row[12]
+                backtest_stats["equal"]["sharpe"][period_idx] = row[13]
 
-            if eq_period_idx == period_idx:
-                backtest_stats["equal"]["pf_value"] = [row[11]] * 6
-                backtest_stats["equal"]["mdd"] = [row[12]] * 6
-                backtest_stats["equal"]["sharpe"] = [row[13]] * 6
+            else:
+                # Take the 2h values for equal weight
+                for sess_name_part in SESSION_NAME_EQ_INDECES.keys():
+                    if sess_name_part in backtest_name.lower():
+                        eq_period_idx = SESSION_NAME_EQ_INDECES[sess_name_part]
+
+                if eq_period_idx == period_idx:
+                    backtest_stats["equal"]["pf_value"] = [row[11]] * 6
+                    backtest_stats["equal"]["mdd"] = [row[12]] * 6
+                    backtest_stats["equal"]["sharpe"] = [row[13]] * 6
 
             aggr_backtest_dict[backtest_name] = backtest_stats
 
@@ -411,4 +420,19 @@ def _make_backtest_dict():
 
 
 if __name__ == "__main__":
-    main()
+
+    PARSER = argparse.ArgumentParser()
+
+    PARSER.add_argument("-he", "--hack_equal",
+                        action="store_true", default=False)
+    ARGS = PARSER.parse_args()
+
+    if not ARGS.hack_equal:
+        print(
+            '\nWARNING: Equal weights is not hacked! Please ensure this is not document build!\n')
+
+    else:
+        print(
+            '\nUsing hacky document build! Please ensure correct thresholds\n')
+
+    main(ARGS.hack_equal)
