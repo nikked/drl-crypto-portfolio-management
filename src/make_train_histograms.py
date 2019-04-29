@@ -253,16 +253,15 @@ def filter_history_dict(history_dict, session_name, move_valid_to_own_dir=False)
         if timestamp_dt < sun_threshold_dt:
             trading_period_length = train_data['trading_period_length']
             if trading_period_length in ["15min", "30min", "2h", "4h", "1d"]:
-                # if trading_period_length in ["5min", "15min", "30min", "2h",
-                # "4h", "1d"]:
+            # if trading_period_length in ["5min", "15min", "30min", "2h",  "4h", "1d"]:
                 continue
 
-        # # Ignore train runs with negative weight
-        # if any(value < 0 for value in initial_weights):
-        #     continue
+        # Ignore train runs with negative weight
+        if any(value < 0 for value in initial_weights):
+            continue
 
         # Ignore train runs with huge weight
-        if any(value > 0.5 for value in initial_weights):
+        if any(value > 0.2 for value in initial_weights):
             continue
 
         filtered_history[timestamp] = train_data

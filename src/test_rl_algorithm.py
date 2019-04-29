@@ -77,8 +77,12 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
         # Exit if there is a mega large weight in the 10th index
         if idx == 10:
-            if any([True for val in action if val > 0.9]):
+            if any([True for val in action if val > 0.2]):
                 sys.exit(0)
+
+        # Exit if negative weight
+        if any([True for val in action if val < 0.0]):
+            sys.exit(0)
 
         if not len(first_weights):
             first_weights = np.copy(action)

@@ -37,13 +37,13 @@ SESSION_NAME_START_INDECES = {
 
 # Choose which eq weight hour to use for each backtest, default 2h
 SESSION_NAME_EQ_INDECES = {
-    "calm": 3,
+    "calm": 0,
     "awake": 3,
-    "ripple": 3,
-    "ether": 3,
-    "high": 3,
-    "rock": 3,
-    "recent": 3,
+    "ripple": 2,
+    "ether": 1,
+    "high": 2,
+    "rock": 4,
+    "recent": 1,
 }
 
 
