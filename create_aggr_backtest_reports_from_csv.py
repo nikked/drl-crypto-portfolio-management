@@ -287,15 +287,12 @@ def _format_table(table):
 
 def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
 
-    sns.lineplot(data=data,
-                 ax=axis, legend="full", label=label)
+    axis.plot(data)
 
     axis.grid(alpha=0.3)
     axis.set_xlabel(xlabel)
     axis.set_ylabel(ylabel)
     axis.set_title(title)
-    # axis.ticklabel_format(axis="x", style="sci", scilimits=(-3, 3))
-    axis.set_xticklabels(data.index)
     for tick in axis.yaxis.get_major_ticks():
         tick.label.set_fontsize(9)
     for tick in axis.xaxis.get_major_ticks():
