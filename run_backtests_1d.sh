@@ -1,6 +1,34 @@
-bash run_cbts.sh > /dev/null 2>&1 &
-bash run_awake.sh > /dev/null 2>&1 &
-bash run_ripple.sh > /dev/null 2>&1 &
-bash run_eth.sh > /dev/null 2>&1 &
+#!/bin/bash
 
+while true;
+    do
+        python deep_rl_portfolio.py --all_time_high --trading_period_length 1d
+        python deep_rl_portfolio.py --all_time_high --trading_period_length 1d
+        python deep_rl_portfolio.py --all_time_high --trading_period_length 1d
+        python deep_rl_portfolio.py --all_time_high --trading_period_length 1d
+
+        python deep_rl_portfolio.py --rock_bottom --trading_period_length 1d
+        python deep_rl_portfolio.py --rock_bottom --trading_period_length 1d
+        python deep_rl_portfolio.py --rock_bottom --trading_period_length 1d
+
+        python deep_rl_portfolio.py --awakening --trading_period_length 1d
+        python deep_rl_portfolio.py --awakening --trading_period_length 1d
+
+
+        python deep_rl_portfolio.py --calm_before_the_storm --trading_period_length 1d
+        python deep_rl_portfolio.py --ripple_bull_run --trading_period_length 1d
+        python deep_rl_portfolio.py --ethereum_valley --trading_period_length 1d        
+        python deep_rl_portfolio.py --recent --trading_period_length 1d
+    done
+
+# while true;
+#     do
+#         python deep_rl_portfolio.py --calm_before_the_storm --trading_period_length 1d
+#         python deep_rl_portfolio.py --awakening --trading_period_length 1d
+#         python deep_rl_portfolio.py --ripple_bull_run --trading_period_length 1d
+#         python deep_rl_portfolio.py --ethereum_valley --trading_period_length 1d        
+#         python deep_rl_portfolio.py --all_time_high --trading_period_length 1d
+#         python deep_rl_portfolio.py --recent --trading_period_length 1d
+#         python deep_rl_portfolio.py --rock_bottom --trading_period_length 1d
+#     done
 
