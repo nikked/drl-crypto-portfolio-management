@@ -1,12 +1,29 @@
+# Collected hacks
+CBTS 5min
+Awake 2h
+Ripple 30min
+Eth 15min
+ATH 30 min
+Rock 4h
+Recent 15 min
+
+
+
 # Discussion:
 * Random choice by DL network: We should use same asset allocation on each on each backtest
 * this should be controlled 
 * if another test setting, would control with same weights across periods. however wasnted to test DL strategy
 * cannot replicate JIang
 
+
+
 # Results
 
-
+## Overall
+* Best strategy: mean reversion seems to work on 15 min - 4h
+* Sweet spot 30min -2h
+* hard to say. depends on conditions.
+* 15 min and 1 day did not seem to work so great
 
 
 ## Calm before the storm
@@ -86,8 +103,7 @@
 
 ### Hack
 * EQ
-    * 2h 4h all fine ( 2h preferred)
-
+    * 2h  (4h okay)
 
 
 ## Ripple bullrun 
