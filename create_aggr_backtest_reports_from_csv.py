@@ -6,6 +6,9 @@ import seaborn as sns
 
 from pprint import pprint
 
+from matplotlib.font_manager import FontProperties
+
+
 from make_backtest_aggregation_table import BACKTEST_AGGR_CSV_FP
 
 PERIOD_INDECES = {
@@ -129,19 +132,13 @@ def main():
 
         output_path = os.path.join(BACKTEST_AGGR_PLOTS_FP, f"backtest_aggr_plot_{backtest_name}.png")
         print(f"Saving plot to path: {output_path}")
+        plt.subplots_adjust(wspace=0.28)
         plt.savefig(output_path, bbox_inches="tight")
-
         break
 
 
 def _make_backtest_summary_table(axis, session_name):
     axis.set_axis_off()
-
-    axis.set_title(
-        session_name,
-        fontdict={"fontsize": 20, "position": (0.0, 0.88)},  # x, y
-        horizontalalignment="left",
-    )
 
     summary_columns = (
         "Ptf. value", "MDD", "Sharpe", "Ptf. value", "MDD", "Sharpe",  "Ptf. value", "MDD", "Sharpe")
@@ -167,32 +164,91 @@ def _make_backtest_summary_table(axis, session_name):
 
     # add extra header for agent types
 
-    header = axis.table(cellText=[[''] * 3],
-                        colLabels=['Dynamic agent',
-                                   'Static agent', "Equal weighted"],
-                        loc='center',
-                        bbox=[
-        0,
-        0.54,
-        1.0,  # width
-        0.3  # height
-    ],
+    summary_header = axis.table(
+        cellText=[[''] * 3],
+        colLabels=['Dynamic agent',
+                   'Static agent', "Equal weighted"],
+        loc='center',
+        bbox=[
+            0.2,  # x offset
+            0.54,  # y offset
+            0.8,  # width
+            0.3  # height
+        ],
     )
 
-    the_table = plt.table(cellText=summary_data,
-                          rowLabels=PERIODS,
-                          # rowColours=colors,
-                          colLabels=summary_columns,
-                          loc='center',
-                          bbox=[
-                              0,
-                              0,  # -0.35,
-                              1.0,
-                              0.7
-                          ],
-                          cellLoc="center"
+    color = "#4C72B0"
 
-                          )
+    summary_table = plt.table(
+        cellText=summary_data,
+        colLabels=summary_columns,
+        loc='center',
+        bbox=[
+            0.2,
+            0,  # -0.35,
+            0.8,
+            0.7
+        ],
+        cellLoc="center"
+
+    )
+
+    _format_table(summary_header)
+    _format_table(summary_table)
+
+    meta_header = axis.table(
+        cellText=[['']],
+        colLabels=[session_name],
+        loc='center',
+        bbox=[
+            0.0,  # x offset
+            0.54,  # y offset
+            0.2,  # width
+            0.3  # height
+        ],
+    )
+
+
+    meta_table_data = [
+        [0] * 3,
+        [0] * 3,
+        [0] * 3,
+        [0] * 3,
+        [0] * 3,
+        [0] * 3,
+    ]
+
+    meta_columns = ("#", "Period", "Simulations")
+
+    meta_table = plt.table(
+        cellText=meta_table_data,
+        colLabels=meta_columns,
+        loc='center',
+        bbox=[
+            0.0,
+            0,  # -0.35,
+            0.2,
+            0.7
+        ],
+        cellLoc="center",
+        colWidths=[0.2, 0.3, 0.5]
+
+    )
+    meta_table.auto_set_font_size(False)
+    meta_table.set_fontsize(10)
+
+    _format_table(meta_table)
+    _format_table(meta_header)
+
+
+def _format_table(table):
+    for (row, col), cell in table.get_celld().items():
+        if row == 0:
+            cell.set_text_props(
+                fontproperties=FontProperties(weight="bold"), color="white",
+
+            )
+            cell.set_facecolor("#4C72B0")
 
 
 def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
@@ -207,6 +263,10 @@ def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
     axis.set_title(title)
     # axis.ticklabel_format(axis="x", style="sci", scilimits=(-3, 3))
     axis.set_xticklabels(data.index)
+    for tick in axis.yaxis.get_major_ticks():
+        tick.label.set_fontsize(9)
+    for tick in axis.xaxis.get_major_ticks():
+        tick.label.set_fontsize(9)
 
 
 def _make_backtest_dict():
