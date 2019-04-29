@@ -230,9 +230,9 @@ def filter_history_dict(history_dict, session_name):
 
         timestamp_dt = datetime.strptime(timestamp, "%Y-%m-%d_%H%M%S")
 
-        threshold_dt = datetime(2019, 4, 27, 15, 30)
+        sat_threshold_dt = datetime(2019, 4, 27, 15, 30)
 
-        if timestamp_dt < threshold_dt:
+        if timestamp_dt < sat_threshold_dt:
             continue
 
         test_start = train_data['test_start']
@@ -242,6 +242,14 @@ def filter_history_dict(history_dict, session_name):
             continue
         if test_end not in test_end_dates:
             continue
+
+        sun_threshold_dt = datetime(2019, 4, 28, 18, 0)
+
+        if timestamp_dt < sun_threshold_dt:
+            trading_period_length = train_data['trading_period_length']
+            if trading_period_length in ["15min", "30min", "2h", "4h", "1d"]:
+            # if trading_period_length in ["5min", "15min", "30min", "2h", "4h", "1d"]:
+                continue
 
         # # Ignore train runs with negative weight
         # if any(value < 0 for value in initial_weights):

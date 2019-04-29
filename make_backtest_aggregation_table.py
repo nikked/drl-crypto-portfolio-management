@@ -8,6 +8,7 @@ from src.make_train_histograms import filter_history_dict, aggregate_backtest_st
 
 
 JSON_OUTPUT_DIR = "train_jsons/"
+BACKTEST_AGGR_CSV_FP = 'backtest_aggregated.csv'
 
 BACKTEST_NROS = {
     "Calm_before_the_storm": {
@@ -68,6 +69,29 @@ BACKTEST_NROS = {
     }
 }
 
+MEGA_TABLE_COLS = [
+    'Backtest no.',
+    'Backtest name',
+    'Date range',
+    'Trading period',
+    'No. of simulations',
+
+    'PF value (dynamic)',
+    'MDD (dynamic)',
+    'Sharpe (dynamic)',
+    # 'Sharpe, ann. (dynamic)',
+
+    'PF value (static)',
+    'MDD (static)',
+    'Sharpe (static)',
+    # 'Sharpe, ann. (static)',
+
+    'PF value (eq)',
+    'MDD (eq)',
+    'Sharpe (eq)',
+    # 'Sharpe, ann. (eq)',
+]
+
 
 def make_backtest_aggregation_table():
 
@@ -80,33 +104,10 @@ def make_backtest_aggregation_table():
                 ".json", "").replace("train_history_", "")
             backtest_dicts[backtest_name] = json.load(file)
 
-    mega_table_cols = [
-        'Backtest no.',
-        'Backtest name',
-        'Date range',
-        'Trading period',
-        'No. of simulations',
-
-        'PF value (dynamic)',
-        'MDD (dynamic)',
-        'Sharpe (dynamic)',
-        # 'Sharpe, ann. (dynamic)',
-
-        'PF value (static)',
-        'MDD (static)',
-        'Sharpe (static)',
-        # 'Sharpe, ann. (static)',
-
-        'PF value (eq)',
-        'MDD (eq)',
-        'Sharpe (eq)',
-        # 'Sharpe, ann. (eq)',
-    ]
-
-    with open('backtest_aggregated.csv', 'w') as csv_file:
+    with open(BACKTEST_AGGR_CSV_FP, 'w') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',')
 
-        csv_writer.writerow(mega_table_cols)
+        csv_writer.writerow(MEGA_TABLE_COLS)
 
         collected_backtests = {}
 
@@ -134,7 +135,7 @@ def make_backtest_aggregation_table():
                     " ", '_')][key_stats[1]]
                 csv_writer.writerow([backtest_nro, backtest_name_nice, *key_stats])
 
-    _make_individual_tables_for_backtests(collected_backtests, mega_table_cols)
+    _make_individual_tables_for_backtests(collected_backtests, MEGA_TABLE_COLS)
 
     return backtest_dicts
 
@@ -174,7 +175,8 @@ def _extract_key_stats(backtest_name, backtest_dict):
         # np.round(backtest_stats["eq_sharpe_ratio_ann"], 4),
     ]
 
-def _make_individual_tables_for_backtests(collected_backtests, mega_table_cols):
+
+def _make_individual_tables_for_backtests(collected_backtests, MEGA_TABLE_COLS):
 
     comparable_stats = {}
 
@@ -187,19 +189,6 @@ def _make_individual_tables_for_backtests(collected_backtests, mega_table_cols):
         }
         for time_period, time_period_stats in aggr_stats.items():
             pass
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     # import pdb; pdb.set_trace()
     pass
