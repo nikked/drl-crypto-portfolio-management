@@ -23,6 +23,28 @@ PERIOD_INDECES = {
 PERIODS = ["5min", "15min", "30min", "2h", "4h", "1d"]
 
 
+SESSION_NAME_START_INDECES = {
+    "calm": 1,
+    "awake": 7,
+    "ripple": 13,
+    "ether": 19,
+    "high": 25,
+    "rock": 31,
+    "recent": 37,
+}
+
+# Choose which eq weight hour to use for each backtest, default 2h
+SESSION_NAME_EQ_INDECES = {
+    "calm": 3,
+    "awake": 3,
+    "ripple": 3,
+    "ether": 3,
+    "high": 3,
+    "rock": 3,
+    "recent": 3,
+}
+
+
 BACKTEST_AGGR_PLOTS_FP = 'backtest_aggr_plots/'
 
 if not os.path.exists(BACKTEST_AGGR_PLOTS_FP):
@@ -50,7 +72,7 @@ def main():
         # pf value variance
         table_ax = fig.add_subplot(gs[0:3])
 
-        _make_backtest_summary_table(table_ax, backtest_name)
+        _make_backtest_summary_table(table_ax, backtest_name, backtest_stats)
 
         # make plots 3 x 2 (indicators x [static, dynamic]
         _plot_line(
@@ -134,23 +156,79 @@ def main():
         print(f"Saving plot to path: {output_path}")
         plt.subplots_adjust(wspace=0.28)
         plt.savefig(output_path, bbox_inches="tight")
-        break
 
 
-def _make_backtest_summary_table(axis, session_name):
+def _make_backtest_summary_table(axis, session_name, backtest_stats):
     axis.set_axis_off()
+
+    for key in SESSION_NAME_START_INDECES.keys():
+        if key in session_name.lower():
+            start_idx = SESSION_NAME_START_INDECES[key]
+
+    simulation_nos = list(range(start_idx, start_idx + 6))
+
+    meta_header = axis.table(
+        cellText=[['']],
+        colLabels=[session_name],
+        loc='center',
+        bbox=[
+            0.0,  # x offset
+            0.54,  # y offset
+            0.2,  # width
+            0.3  # height
+        ],
+    )
+
+    meta_table_data = [
+        [simulation_nos[0], "5min", backtest_stats["no_of_simulations"][0]],
+        [simulation_nos[1], "15min", backtest_stats["no_of_simulations"][1]],
+        [simulation_nos[2], "30min", backtest_stats["no_of_simulations"][2]],
+        [simulation_nos[3], "2h", backtest_stats["no_of_simulations"][3]],
+        [simulation_nos[4], "4h", backtest_stats["no_of_simulations"][4]],
+        [simulation_nos[5], "1d", backtest_stats["no_of_simulations"][5]],
+    ]
+
+    meta_columns = ("#", "Period", "Simulations")
+
+    meta_table = plt.table(
+        cellText=meta_table_data,
+        colLabels=meta_columns,
+        loc='center',
+        bbox=[
+            0.0,
+            0,  # -0.35,
+            0.2,
+            0.7
+        ],
+        cellLoc="center",
+        colWidths=[0.2, 0.3, 0.5]
+
+    )
+    meta_table.auto_set_font_size(False)
+    meta_table.set_fontsize(10)
+
+    _format_table(meta_table)
+    _format_table(meta_header)
 
     summary_columns = (
         "Ptf. value", "MDD", "Sharpe", "Ptf. value", "MDD", "Sharpe",  "Ptf. value", "MDD", "Sharpe")
 
-    summary_data = [
-        [0] * 9,
-        [0] * 9,
-        [0] * 9,
-        [0] * 9,
-        [0] * 9,
-        [0] * 9,
-    ]
+    summary_data = []
+
+    for i in range(6):
+        summary_data.append(
+            [
+                backtest_stats["dynamic"]["pf_value"][i],
+                backtest_stats["dynamic"]["mdd"][i],
+                backtest_stats["dynamic"]["sharpe"][i],
+                backtest_stats["static"]["pf_value"][i],
+                backtest_stats["static"]["mdd"][i],
+                backtest_stats["static"]["sharpe"][i],
+                backtest_stats["equal"]["pf_value"][i],
+                backtest_stats["equal"]["mdd"][i],
+                backtest_stats["equal"]["sharpe"][i],
+            ]
+        )
 
     # Create custom widths for cells
     no_width = 0.03
@@ -177,8 +255,6 @@ def _make_backtest_summary_table(axis, session_name):
         ],
     )
 
-    color = "#4C72B0"
-
     summary_table = plt.table(
         cellText=summary_data,
         colLabels=summary_columns,
@@ -196,50 +272,6 @@ def _make_backtest_summary_table(axis, session_name):
     _format_table(summary_header)
     _format_table(summary_table)
 
-    meta_header = axis.table(
-        cellText=[['']],
-        colLabels=[session_name],
-        loc='center',
-        bbox=[
-            0.0,  # x offset
-            0.54,  # y offset
-            0.2,  # width
-            0.3  # height
-        ],
-    )
-
-
-    meta_table_data = [
-        [0] * 3,
-        [0] * 3,
-        [0] * 3,
-        [0] * 3,
-        [0] * 3,
-        [0] * 3,
-    ]
-
-    meta_columns = ("#", "Period", "Simulations")
-
-    meta_table = plt.table(
-        cellText=meta_table_data,
-        colLabels=meta_columns,
-        loc='center',
-        bbox=[
-            0.0,
-            0,  # -0.35,
-            0.2,
-            0.7
-        ],
-        cellLoc="center",
-        colWidths=[0.2, 0.3, 0.5]
-
-    )
-    meta_table.auto_set_font_size(False)
-    meta_table.set_fontsize(10)
-
-    _format_table(meta_table)
-    _format_table(meta_header)
-
 
 def _format_table(table):
     for (row, col), cell in table.get_celld().items():
@@ -252,7 +284,6 @@ def _format_table(table):
 
 
 def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
-    num_bins = 15
 
     sns.lineplot(data=data,
                  ax=axis, legend="full", label=label)
@@ -329,7 +360,8 @@ def _make_backtest_dict():
                         "pf_value": [0] * 6,
                         "mdd": [0] * 6,
                         "sharpe": [0] * 6,
-                    }
+                    },
+                    "no_of_simulations": [0] * 6
                 }
             )
 
@@ -341,8 +373,14 @@ def _make_backtest_dict():
             backtest_stats["static"]["mdd"][period_idx] = row[9]
             backtest_stats["static"]["sharpe"][period_idx] = row[10]
 
+            backtest_stats["no_of_simulations"][period_idx] = row[4]
+
             # Take the 2h values for equal weight
-            if period_idx == 3:
+            for sess_name_part in SESSION_NAME_EQ_INDECES.keys():
+                if sess_name_part in backtest_name.lower():
+                    eq_period_idx = SESSION_NAME_EQ_INDECES[sess_name_part]
+
+            if eq_period_idx == period_idx:
                 backtest_stats["equal"]["pf_value"] = [row[11]] * 6
                 backtest_stats["equal"]["mdd"] = [row[12]] * 6
                 backtest_stats["equal"]["sharpe"] = [row[13]] * 6
