@@ -17,6 +17,8 @@ PERIOD_INDECES = {
     "1d": 5,
 }
 
+PERIODS = ["5min", "15min", "30min", "2h", "4h", "1d"]
+
 
 BACKTEST_AGGR_PLOTS_FP = 'backtest_aggr_plots/'
 
@@ -34,7 +36,7 @@ def main():
         fig, axes = plt.subplots(nrows=2, ncols=3)
         # width, height
         # fig.set_size_inches(16.6, 8)
-        fig.set_size_inches(12.5, 6)
+        fig.set_size_inches(14.5, 7)
 
         gs = axes[0][0].get_gridspec()
         axes[0][0].remove()
@@ -129,47 +131,68 @@ def main():
         print(f"Saving plot to path: {output_path}")
         plt.savefig(output_path, bbox_inches="tight")
 
+        break
+
 
 def _make_backtest_summary_table(axis, session_name):
     axis.set_axis_off()
 
     axis.set_title(
         session_name,
-        fontdict={"fontsize": 20, "position": (0.0, 0.85)},  # x, y
+        fontdict={"fontsize": 20, "position": (0.0, 0.88)},  # x, y
         horizontalalignment="left",
     )
 
     summary_columns = (
-        "#", "Period", "Simulations", "Ptf. value", "MDD", "Sharpe", "Ptf. value", "MDD", "Sharpe",  "Ptf. value", "MDD", "Sharpe")
+        "Ptf. value", "MDD", "Sharpe", "Ptf. value", "MDD", "Sharpe",  "Ptf. value", "MDD", "Sharpe")
 
     summary_data = [
-        [0] * 12,
-        [0] * 12,
-        [0] * 12,
-        [0] * 12,
-        [0] * 12,
-        [0] * 12,
-        [0] * 12,
+        [0] * 9,
+        [0] * 9,
+        [0] * 9,
+        [0] * 9,
+        [0] * 9,
+        [0] * 9,
     ]
 
+    # Create custom widths for cells
     no_width = 0.03
     period_width = 0.05
     simulations_width = 0.09
 
     others_width = [
         (1 - (no_width + period_width + simulations_width)) / 9] * 9
-
     col_widths = [no_width, period_width, simulations_width]
-
     col_widths.extend(others_width)
 
-    summary_table = axis.table(
-        cellText=summary_data,
-        colLabels=summary_columns,
-        loc="center",
-        cellLoc="center",
-        colWidths=col_widths
+    # add extra header for agent types
+
+    header = axis.table(cellText=[[''] * 3],
+                        colLabels=['Dynamic agent',
+                                   'Static agent', "Equal weighted"],
+                        loc='center',
+                        bbox=[
+        0,
+        0.54,
+        1.0,  # width
+        0.3  # height
+    ],
     )
+
+    the_table = plt.table(cellText=summary_data,
+                          rowLabels=PERIODS,
+                          # rowColours=colors,
+                          colLabels=summary_columns,
+                          loc='center',
+                          bbox=[
+                              0,
+                              0,  # -0.35,
+                              1.0,
+                              0.7
+                          ],
+                          cellLoc="center"
+
+                          )
 
 
 def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
@@ -266,25 +289,23 @@ def _make_backtest_dict():
 
             aggr_backtest_dict[backtest_name] = backtest_stats
 
-    pd_series_idx = ["5min", "15min", "30min", "2h", "4h", "1d"]
-
     for bt_stats in aggr_backtest_dict.values():
 
         for label in ["dynamic", "static", "equal"]:
 
             bt_stats[label]["pf_value"] = pd.Series(
                 bt_stats[label]["pf_value"],
-                index=pd_series_idx,
+                index=PERIODS,
                 dtype=float
             )
             bt_stats[label]["mdd"] = pd.Series(
                 bt_stats[label]["mdd"],
-                index=pd_series_idx,
+                index=PERIODS,
                 dtype=float
             )
             bt_stats[label]["sharpe"] = pd.Series(
                 bt_stats[label]["sharpe"],
-                index=pd_series_idx,
+                index=PERIODS,
                 dtype=float
             )
 
