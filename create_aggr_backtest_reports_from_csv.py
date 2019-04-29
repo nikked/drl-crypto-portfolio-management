@@ -33,7 +33,8 @@ def main():
 
         fig, axes = plt.subplots(nrows=2, ncols=3)
         # width, height
-        fig.set_size_inches(16.6, 8)
+        # fig.set_size_inches(16.6, 8)
+        fig.set_size_inches(12.5, 6)
 
         gs = axes[0][0].get_gridspec()
         axes[0][0].remove()
@@ -136,6 +137,38 @@ def _make_backtest_summary_table(axis, session_name):
         session_name,
         fontdict={"fontsize": 20, "position": (0.0, 0.85)},  # x, y
         horizontalalignment="left",
+    )
+
+    summary_columns = (
+        "#", "Period", "Simulations", "Ptf. value", "MDD", "Sharpe", "Ptf. value", "MDD", "Sharpe",  "Ptf. value", "MDD", "Sharpe")
+
+    summary_data = [
+        [0] * 12,
+        [0] * 12,
+        [0] * 12,
+        [0] * 12,
+        [0] * 12,
+        [0] * 12,
+        [0] * 12,
+    ]
+
+    no_width = 0.03
+    period_width = 0.05
+    simulations_width = 0.09
+
+    others_width = [
+        (1 - (no_width + period_width + simulations_width)) / 9] * 9
+
+    col_widths = [no_width, period_width, simulations_width]
+
+    col_widths.extend(others_width)
+
+    summary_table = axis.table(
+        cellText=summary_data,
+        colLabels=summary_columns,
+        loc="center",
+        cellLoc="center",
+        colWidths=col_widths
     )
 
 
