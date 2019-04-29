@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 
 
@@ -66,13 +67,18 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
     first_step = True
 
-    for k in range(low_index, up_index):
+    for idx, k in enumerate(range(low_index, up_index)):
         x_current = state[0].reshape([-1] + list(state[0].shape))
         w_previous = state[1].reshape([-1] + list(state[1].shape))
         pf_value_previous = state[2]
         # compute the action
         action = agent.compute_w(x_current, w_previous)
         # step forward environment
+
+        # Exit if there is a mega large weight in the 10th index
+        if idx == 10:
+            if any([True for val in action if val > 0.9]):
+                sys.exit(0)
 
         if not len(first_weights):
             first_weights = np.copy(action)
