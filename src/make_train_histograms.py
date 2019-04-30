@@ -259,7 +259,8 @@ def filter_history_dict(history_dict, session_name, move_valid_to_own_dir=False)
         if timestamp_dt < sun_threshold_dt:
             trading_period_length = train_data['trading_period_length']
             if trading_period_length in ["15min", "30min", "2h", "4h", "1d"]:
-            # if trading_period_length in ["5min", "15min", "30min", "2h",  "4h", "1d"]:
+                # if trading_period_length in ["5min", "15min", "30min", "2h",
+                # "4h", "1d"]:
                 continue
 
         # Ignore train runs with negative weight
@@ -267,8 +268,20 @@ def filter_history_dict(history_dict, session_name, move_valid_to_own_dir=False)
             continue
 
         # Ignore train runs with huge weight
-        if any(value > 0.2 for value in initial_weights):
+        if any(value > 0.11 for value in initial_weights):
             continue
+
+        # static_profit = train_data["static"]["pf_value"]
+
+        # eq_profit = train_data["eq_weight"]["pf_value"]
+
+        # while True:
+        #     if eq_profit > 1 and static_profit > 1:
+        #         if eq_profit > static_profit:
+        #             continue
+        #     if eq_profit < 1 and static_profit < 1:
+        #         if eq_profit < static_profit:
+        #             continue
 
         filtered_history[timestamp] = train_data
 
@@ -314,7 +327,7 @@ def _plot_histogram_metadata_table(axis, n_simulations, session_name, backtest_s
     axis.set_axis_off()
 
     axis.set_title(
-        f"[Simulation summary] {session_name.replace('_', ' ')}",
+        f"[Simulation stability] {session_name.replace('_', ' ')}",
         fontdict={"fontsize": 20, "position": (0.0, 0.95)},  # x, y
         horizontalalignment="left",
     )
