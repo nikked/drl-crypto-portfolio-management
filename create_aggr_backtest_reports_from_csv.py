@@ -9,7 +9,7 @@ import seaborn as sns
 from pprint import pprint
 
 from matplotlib.font_manager import FontProperties
-
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from make_backtest_aggregation_table import BACKTEST_AGGR_CSV_FP
 
@@ -60,11 +60,11 @@ def main(hack_equal):
     # Make report for each backtest
     for backtest_name, backtest_stats in backtest_dict.items():
 
-        fig, axes = plt.subplots(nrows=2, ncols=3)
+        fig, axes = plt.subplots(nrows=3, ncols=3)
 
         # width, height
         # fig.set_size_inches(16.6, 8)
-        fig.set_size_inches(14.5, 7)
+        fig.set_size_inches(14.5, 10)
 
         gs = axes[0][0].get_gridspec()
         axes[0][0].remove()
@@ -82,7 +82,7 @@ def main(hack_equal):
             axes[1][0],
             backtest_stats["dynamic"]["pf_value"],
             "Average Portfolio values",
-            "Period lengths",
+            None,
             "Portfolio value",
             "Dynamic",
         )
@@ -90,7 +90,7 @@ def main(hack_equal):
             axes[1][0],
             backtest_stats["static"]["pf_value"],
             "Average Portfolio values",
-            "Period lengths",
+            None,
             "Portfolio value",
             "Static",
         )
@@ -98,7 +98,7 @@ def main(hack_equal):
             axes[1][0],
             backtest_stats["equal"]["pf_value"],
             "Average Portfolio values",
-            "Period lengths",
+            None,
             "Portfolio value",
             "Equal",
         )
@@ -107,7 +107,7 @@ def main(hack_equal):
             axes[1][1],
             backtest_stats["dynamic"]["mdd"],
             "Average Maximum drawdowns",
-            "Period lengths",
+            None,
             "Maximum drawdown",
             "Dynamic",
         )
@@ -115,7 +115,7 @@ def main(hack_equal):
             axes[1][1],
             backtest_stats["static"]["mdd"],
             "Average Maximum drawdowns",
-            "Period lengths",
+            None,
             "Maximum drawdown",
             "Static",
         )
@@ -123,7 +123,7 @@ def main(hack_equal):
             axes[1][1],
             backtest_stats["equal"]["mdd"],
             "Average Maximum drawdowns",
-            "Period lengths",
+            None,
             "Maximum drawdown",
             "Equal",
         )
@@ -132,7 +132,7 @@ def main(hack_equal):
             axes[1][2],
             backtest_stats["dynamic"]["sharpe"],
             "Average Sharpe ratios",
-            "Period lengths",
+            None,
             "Sharpe ratio",
             "Dynamic",
         )
@@ -141,7 +141,7 @@ def main(hack_equal):
             axes[1][2],
             backtest_stats["static"]["sharpe"],
             "Average Sharpe ratios",
-            "Period lengths",
+            None,
             "Sharpe ratio",
             "Static",
         )
@@ -149,14 +149,31 @@ def main(hack_equal):
             axes[1][2],
             backtest_stats["equal"]["sharpe"],
             "Average Sharpe ratios",
-            "Period lengths",
+            None,
             "Sharpe ratio",
             "Equal",
+        )
+        _plot_line(
+            axes[2][0],
+            backtest_stats["dynamic_over_static"]["pf_value"],
+            "Impact of trading action: Ptf. value",
+            None,
+            None,
+            "Relative ptf. value",
+        )
+
+        _plot_line(
+            axes[2][1],
+            backtest_stats["dynamic_over_static"]["std_dev"],
+            "Impact of trading action: Stdev",
+            None,
+            None,
+            "Relative stdev",
         )
 
         output_path = os.path.join(BACKTEST_AGGR_PLOTS_FP, f"backtest_aggr_plot_{backtest_name}.png")
         print(f"Saving plot to path: {output_path}")
-        plt.subplots_adjust(wspace=0.28)
+        plt.subplots_adjust(hspace=0.35)
         plt.savefig(output_path, bbox_inches="tight")
 
 
@@ -285,7 +302,7 @@ def _format_table(table):
             cell.set_facecolor("#4C72B0")
 
 
-def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
+def _plot_line(axis, data, title, xlabel, ylabel, label=None):
 
     axis.plot(data, label=label)
 
@@ -297,7 +314,9 @@ def _plot_line(axis, data, title, xlabel, ylabel, label="makkispekkis"):
         tick.label.set_fontsize(9)
     for tick in axis.xaxis.get_major_ticks():
         tick.label.set_fontsize(9)
-    axis.legend()
+
+    if label:
+        axis.legend()
 
 
 def _make_backtest_dict(hack_equal):
@@ -361,6 +380,10 @@ def _make_backtest_dict(hack_equal):
                         "mdd": [0] * 6,
                         "sharpe": [0] * 6,
                     },
+                    "dynamic_over_static": {
+                        "pf_value": [0] * 6,
+                        "std_dev": [0] * 6,
+                    },
                     "no_of_simulations": [0] * 6
                 }
             )
@@ -374,6 +397,15 @@ def _make_backtest_dict(hack_equal):
             backtest_stats["static"]["pf_value"][period_idx] = row[8]
             backtest_stats["static"]["mdd"][period_idx] = row[9]
             backtest_stats["static"]["sharpe"][period_idx] = row[10]
+
+            dyn_stdev = float(row[14])
+            stat_stdev = float(row[15])
+
+            backtest_stats['dynamic_over_static']["pf_value"][
+                period_idx] = float(row[5]) / float(row[8])
+
+            backtest_stats['dynamic_over_static'][
+                "std_dev"][period_idx] = dyn_stdev / stat_stdev
 
             if not hack_equal:
 
@@ -413,6 +445,17 @@ def _make_backtest_dict(hack_equal):
                 index=PERIODS,
                 dtype=float
             )
+
+        bt_stats["dynamic_over_static"]["pf_value"] = pd.Series(
+            bt_stats["dynamic_over_static"]["pf_value"],
+            index=PERIODS,
+            dtype=float
+        )
+        bt_stats["dynamic_over_static"]["std_dev"] = pd.Series(
+            bt_stats["dynamic_over_static"]["std_dev"],
+            index=PERIODS,
+            dtype=float
+        )
 
     return aggr_backtest_dict
 

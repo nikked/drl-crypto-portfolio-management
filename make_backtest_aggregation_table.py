@@ -90,6 +90,9 @@ MEGA_TABLE_COLS = [
     'MDD (eq)',
     'Sharpe (eq)',
     # 'Sharpe, ann. (eq)',
+
+    "Dynamic stdevs",
+    "Static stdevs",
 ]
 
 
@@ -173,6 +176,9 @@ def _extract_key_stats(backtest_name, backtest_dict):
         np.round(backtest_stats["eq_mdd"], 4),
         np.round(backtest_stats["eq_sharpe_ratio"], 4),
         # np.round(backtest_stats["eq_sharpe_ratio_ann"], 4),
+
+        np.round(np.mean(backtest_stats["dynamic_stdevs"]), 4),
+        np.round(np.mean(backtest_stats["static_stdevs"]), 4),
     ]
 
 

@@ -120,11 +120,13 @@ def aggregate_backtest_stats(filtered_history):
     dynamic_mdds = []
     dynamic_sharpe_ratios = []
     dynamic_sharpe_ratios_ann = []
+    dynamic_stdevs = []
 
     static_pf_values = []
     static_mdds = []
     static_sharpe_ratios = []
     static_sharpe_ratios_ann = []
+    static_stdevs = []
 
     cash_investments = []
     crypto_weight_averages = []
@@ -162,6 +164,7 @@ def aggregate_backtest_stats(filtered_history):
         dynamic_pf_values.append(dynamic["pf_value"])
         dynamic_mdds.append(dynamic["mdd"])
         dynamic_sharpe_ratios.append(dynamic["sharpe_ratio"])
+        dynamic_stdevs.append(dynamic["std_dev"])
 
         try:
             dynamic_sharpe_ratios_ann.append(dynamic["sharpe_ratio_ann"])
@@ -171,6 +174,7 @@ def aggregate_backtest_stats(filtered_history):
         static_pf_values.append(static["pf_value"])
         static_mdds.append(static["mdd"])
         static_sharpe_ratios.append(static["sharpe_ratio"])
+        static_stdevs.append(static["std_dev"])
 
         try:
             static_sharpe_ratios_ann.append(static["sharpe_ratio_ann"])
@@ -188,10 +192,12 @@ def aggregate_backtest_stats(filtered_history):
         "dynamic_mdds": dynamic_mdds,
         "dynamic_sharpe_ratios": dynamic_sharpe_ratios,
         "dynamic_sharpe_ratios_ann": dynamic_sharpe_ratios_ann if dynamic_sharpe_ratios_ann else [42],
+        "dynamic_stdevs": dynamic_stdevs,
         "static_pf_values": static_pf_values,
         "static_mdds": static_mdds,
         "static_sharpe_ratios": static_sharpe_ratios,
         "static_sharpe_ratios_ann": static_sharpe_ratios_ann if static_sharpe_ratios_ann else [42],
+        "static_stdevs": static_stdevs,
         "cash_investments": cash_investments,
         "crypto_weight_averages": crypto_weight_averages,
         "crypto_weight_std_devs": crypto_weight_std_devs,
