@@ -66,14 +66,20 @@ def main(hack_equal):
         # fig.set_size_inches(16.6, 8)
         fig.set_size_inches(14.5, 10)
 
-        gs = axes[0][0].get_gridspec()
+        gs = axes[2][0].get_gridspec()
         axes[0][0].remove()
         axes[0][1].remove()
         axes[0][2].remove()
 
+        axes[2][0].remove()
+        axes[2][1].remove()
+        axes[2][2].remove()
+
         # make table similar to train reports
         # pf value variance
         table_ax = fig.add_subplot(gs[0:3])
+
+        relative_ax = fig.add_subplot(3,1,3)
 
         _make_backtest_summary_table(table_ax, backtest_name, backtest_stats)
 
@@ -153,8 +159,10 @@ def main(hack_equal):
             "Sharpe ratio",
             "Equal",
         )
+
+        divider = make_axes_locatable(relative_ax)
         _plot_line(
-            axes[2][0],
+            relative_ax,
             backtest_stats["dynamic_over_static"]["pf_value"],
             "Impact of trading action: Ptf. value",
             None,
@@ -162,8 +170,10 @@ def main(hack_equal):
             "Relative ptf. value",
         )
 
+        relative_ax2 = divider.append_axes("right", size="100%", pad=0.5, sharex=relative_ax)
+
         _plot_line(
-            axes[2][1],
+            relative_ax2,
             backtest_stats["dynamic_over_static"]["std_dev"],
             "Impact of trading action: Stdev",
             None,
@@ -209,7 +219,7 @@ def _make_backtest_summary_table(axis, session_name, backtest_stats):
 
     meta_columns = ("#", "Period", "Simulations")
 
-    meta_table = plt.table(
+    meta_table = axis.table(
         cellText=meta_table_data,
         colLabels=meta_columns,
         loc='center',
@@ -274,7 +284,7 @@ def _make_backtest_summary_table(axis, session_name, backtest_stats):
         ],
     )
 
-    summary_table = plt.table(
+    summary_table = axis.table(
         cellText=summary_data,
         colLabels=summary_columns,
         loc='center',
