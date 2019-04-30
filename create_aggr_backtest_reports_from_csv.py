@@ -9,6 +9,7 @@ import seaborn as sns
 from pprint import pprint
 
 from matplotlib.font_manager import FontProperties
+from matplotlib.ticker import FuncFormatter
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 PERIOD_INDECES = {
@@ -35,9 +36,9 @@ SESSION_NAME_START_INDECES = {
 
 # Choose which eq weight hour to use for each backtest, default 2h
 SESSION_NAME_EQ_INDECES = {
-    "calm": 0,
+    "calm": 1,
     "awake": 3,
-    "ripple": 2,
+    "ripple": 4,
     "ether": 1,
     "high": 2,
     "rock": 4,
@@ -78,7 +79,7 @@ def main(hack_equal):
         # pf value variance
         table_ax = fig.add_subplot(gs[0:3])
 
-        relative_ax = fig.add_subplot(3,1,3)
+        relative_ax = fig.add_subplot(3, 1, 3)
 
         _make_backtest_summary_table(table_ax, backtest_name, backtest_stats)
 
@@ -107,6 +108,9 @@ def main(hack_equal):
             "Portfolio value",
             "Equal",
         )
+
+        axes[1][0].yaxis.set_major_formatter(
+            FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
 
         _plot_line(
             axes[1][1],
@@ -169,7 +173,11 @@ def main(hack_equal):
             "Relative ptf. value",
         )
 
-        relative_ax2 = divider.append_axes("right", size="100%", pad=0.5, sharex=relative_ax)
+        relative_ax.yaxis.set_major_formatter(
+            FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
+
+        relative_ax2 = divider.append_axes(
+            "right", size="100%", pad=0.7, sharex=relative_ax)
 
         _plot_line(
             relative_ax2,
@@ -179,10 +187,12 @@ def main(hack_equal):
             None,
             "Relative stdev",
         )
+        relative_ax2.yaxis.set_major_formatter(
+            FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
 
         output_path = os.path.join(BACKTEST_AGGR_PLOTS_FP, f"backtest_aggr_plot_{backtest_name}.png")
         print(f"Saving plot to path: {output_path}")
-        plt.subplots_adjust(hspace=0.35)
+        plt.subplots_adjust(hspace=0.35, wspace=.3)
         plt.savefig(output_path, bbox_inches="tight")
 
 
@@ -246,13 +256,16 @@ def _make_backtest_summary_table(axis, session_name, backtest_stats):
     for i in range(6):
         summary_data.append(
             [
-                backtest_stats["dynamic"]["pf_value"][i],
+                str(round(backtest_stats["dynamic"][
+                    "pf_value"][i] * 100, 2)) + "%",
                 backtest_stats["dynamic"]["mdd"][i],
                 backtest_stats["dynamic"]["sharpe"][i],
-                backtest_stats["static"]["pf_value"][i],
+                str(round(backtest_stats["static"][
+                    "pf_value"][i] * 100, 2)) + "%",
                 backtest_stats["static"]["mdd"][i],
                 backtest_stats["static"]["sharpe"][i],
-                backtest_stats["equal"]["pf_value"][i],
+                str(round(backtest_stats["equal"][
+                    "pf_value"][i] * 100, 2)) + "%",
                 backtest_stats["equal"]["mdd"][i],
                 backtest_stats["equal"]["sharpe"][i],
             ]
@@ -399,11 +412,13 @@ def _make_backtest_dict(hack_equal):
 
             backtest_stats["no_of_simulations"][period_idx] = row[4]
 
-            backtest_stats["dynamic"]["pf_value"][period_idx] = row[5]
+            backtest_stats["dynamic"]["pf_value"][
+                period_idx] = float(row[5]) - 1
             backtest_stats["dynamic"]["mdd"][period_idx] = row[6]
             backtest_stats["dynamic"]["sharpe"][period_idx] = row[7]
 
-            backtest_stats["static"]["pf_value"][period_idx] = row[8]
+            backtest_stats["static"]["pf_value"][
+                period_idx] = float(row[8]) - 1
             backtest_stats["static"]["mdd"][period_idx] = row[9]
             backtest_stats["static"]["sharpe"][period_idx] = row[10]
 
@@ -411,14 +426,15 @@ def _make_backtest_dict(hack_equal):
             stat_stdev = float(row[15])
 
             backtest_stats['dynamic_over_static']["pf_value"][
-                period_idx] = float(row[5]) / float(row[8])
+                period_idx] = (float(row[5]) / float(row[8])) - 1
 
             backtest_stats['dynamic_over_static'][
-                "std_dev"][period_idx] = dyn_stdev / stat_stdev
+                "std_dev"][period_idx] = (dyn_stdev / stat_stdev) - 1
 
             if not hack_equal:
 
-                backtest_stats["equal"]["pf_value"][period_idx] = row[11]
+                backtest_stats["equal"]["pf_value"][
+                    period_idx] = float(row[11]) - 1
                 backtest_stats["equal"]["mdd"][period_idx] = row[12]
                 backtest_stats["equal"]["sharpe"][period_idx] = row[13]
 
@@ -429,7 +445,8 @@ def _make_backtest_dict(hack_equal):
                         eq_period_idx = SESSION_NAME_EQ_INDECES[sess_name_part]
 
                 if eq_period_idx == period_idx:
-                    backtest_stats["equal"]["pf_value"] = [row[11]] * 6
+                    backtest_stats["equal"]["pf_value"] = [
+                        float(row[11]) - 1] * 6
                     backtest_stats["equal"]["mdd"] = [row[12]] * 6
                     backtest_stats["equal"]["sharpe"] = [row[13]] * 6
 
