@@ -114,6 +114,8 @@ def make_backtest_aggregation_table():
 
         collected_backtests = {}
 
+        csv_rows = []
+
         for backtest_name, backtest_dict in backtest_dicts.items():
 
             if "Dynamic_agent" in backtest_name:
@@ -136,7 +138,14 @@ def make_backtest_aggregation_table():
 
                 backtest_nro = BACKTEST_NROS[backtest_name_nice.replace(
                     " ", '_')][key_stats[1]]
-                csv_writer.writerow([backtest_nro, backtest_name_nice, *key_stats])
+                # csv_writer.writerow([backtest_nro, backtest_name_nice,
+                # *key_stats])
+                csv_rows.append([backtest_nro, backtest_name_nice, *key_stats])
+
+        csv_rows.sort(key=lambda x: x[0])
+
+        for row in csv_rows:
+            csv_writer.writerow(row)
 
     _make_individual_tables_for_backtests(collected_backtests, MEGA_TABLE_COLS)
 
@@ -145,7 +154,8 @@ def make_backtest_aggregation_table():
 
 def _extract_key_stats(backtest_name, backtest_dict):
 
-    filtered_history = filter_history_dict(backtest_dict, backtest_name, move_valid_to_own_dir = True)
+    filtered_history = filter_history_dict(
+        backtest_dict, backtest_name, move_valid_to_own_dir=True)
 
     n_simulations = len(filtered_history)
 
