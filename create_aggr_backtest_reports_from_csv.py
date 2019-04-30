@@ -21,17 +21,17 @@ PERIOD_INDECES = {
     "1d": 5,
 }
 
-PERIODS = ["5min", "15min", "30min", "2h", "4h", "1d"]
+PERIODS = ["15min", "30min", "2h", "4h", "1d"]
 
 
 SESSION_NAME_START_INDECES = {
-    "calm": 1,
-    "awake": 7,
-    "ripple": 13,
-    "ether": 19,
-    "high": 25,
-    "rock": 31,
-    "recent": 37,
+    "calm": 0,
+    "awake": 5,
+    "ripple": 10,
+    "ether": 15,
+    "high": 20,
+    "rock": 25,
+    "recent": 30,
 }
 
 # Choose which eq weight hour to use for each backtest, default 2h
@@ -39,9 +39,9 @@ SESSION_NAME_EQ_INDECES = {
     "calm": 1,
     "awake": 3,
     "ripple": 4,
-    "ether": 1,
+    "ether": 2,
     "high": 2,
-    "rock": 4,
+    "rock": 3,
     "recent": 1,
 }
 
@@ -64,7 +64,7 @@ def main(hack_equal):
 
         # width, height
         # fig.set_size_inches(16.6, 8)
-        fig.set_size_inches(14.5, 10)
+        fig.set_size_inches(15.5, 11)
 
         gs = axes[2][0].get_gridspec()
         axes[0][0].remove()
@@ -110,7 +110,7 @@ def main(hack_equal):
         )
 
         axes[1][0].yaxis.set_major_formatter(
-            FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
+            FuncFormatter(lambda y, _: '{:.1%}'.format(y)))
 
         _plot_line(
             axes[1][1],
@@ -167,14 +167,14 @@ def main(hack_equal):
         _plot_line(
             relative_ax,
             backtest_stats["dynamic_over_static"]["pf_value"],
-            "Impact of trading action: Ptf. value",
+            "Impact of trading action: Added Ptf. value",
             None,
             None,
             "Relative ptf. value",
         )
 
         relative_ax.yaxis.set_major_formatter(
-            FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
+            FuncFormatter(lambda y, _: '{:.1%}'.format(y)))
 
         relative_ax2 = divider.append_axes(
             "right", size="100%", pad=0.7, sharex=relative_ax)
@@ -182,13 +182,13 @@ def main(hack_equal):
         _plot_line(
             relative_ax2,
             backtest_stats["dynamic_over_static"]["std_dev"],
-            "Impact of trading action: Stdev",
+            "Impact of trading action: Added Stdev",
             None,
             None,
             "Relative stdev",
         )
         relative_ax2.yaxis.set_major_formatter(
-            FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
+            FuncFormatter(lambda y, _: '{:.1%}'.format(y)))
 
         output_path = os.path.join(BACKTEST_AGGR_PLOTS_FP, f"backtest_aggr_plot_{backtest_name}.png")
         print(f"Saving plot to path: {output_path}")
@@ -218,7 +218,6 @@ def _make_backtest_summary_table(axis, session_name, backtest_stats):
     )
 
     meta_table_data = [
-        [simulation_nos[0], "5min", backtest_stats["no_of_simulations"][0]],
         [simulation_nos[1], "15min", backtest_stats["no_of_simulations"][1]],
         [simulation_nos[2], "30min", backtest_stats["no_of_simulations"][2]],
         [simulation_nos[3], "2h", backtest_stats["no_of_simulations"][3]],
@@ -253,7 +252,7 @@ def _make_backtest_summary_table(axis, session_name, backtest_stats):
 
     summary_data = []
 
-    for i in range(6):
+    for i in range(5):
         summary_data.append(
             [
                 str(round(backtest_stats["dynamic"][
@@ -439,7 +438,6 @@ def _make_backtest_dict(hack_equal):
                 backtest_stats["equal"]["sharpe"][period_idx] = row[13]
 
             else:
-                # Take the 2h values for equal weight
                 for sess_name_part in SESSION_NAME_EQ_INDECES.keys():
                     if sess_name_part in backtest_name.lower():
                         eq_period_idx = SESSION_NAME_EQ_INDECES[sess_name_part]
@@ -457,28 +455,28 @@ def _make_backtest_dict(hack_equal):
         for label in ["dynamic", "static", "equal"]:
 
             bt_stats[label]["pf_value"] = pd.Series(
-                bt_stats[label]["pf_value"],
+                bt_stats[label]["pf_value"][1:],
                 index=PERIODS,
                 dtype=float
             )
             bt_stats[label]["mdd"] = pd.Series(
-                bt_stats[label]["mdd"],
+                bt_stats[label]["mdd"][1:],
                 index=PERIODS,
                 dtype=float
             )
             bt_stats[label]["sharpe"] = pd.Series(
-                bt_stats[label]["sharpe"],
+                bt_stats[label]["sharpe"][1:],
                 index=PERIODS,
                 dtype=float
             )
 
         bt_stats["dynamic_over_static"]["pf_value"] = pd.Series(
-            bt_stats["dynamic_over_static"]["pf_value"],
+            bt_stats["dynamic_over_static"]["pf_value"][1:],
             index=PERIODS,
             dtype=float
         )
         bt_stats["dynamic_over_static"]["std_dev"] = pd.Series(
-            bt_stats["dynamic_over_static"]["std_dev"],
+            bt_stats["dynamic_over_static"]["std_dev"][1:],
             index=PERIODS,
             dtype=float
         )
