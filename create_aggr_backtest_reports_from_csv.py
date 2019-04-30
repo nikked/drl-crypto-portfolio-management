@@ -11,8 +11,6 @@ from pprint import pprint
 from matplotlib.font_manager import FontProperties
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from make_backtest_aggregation_table import BACKTEST_AGGR_CSV_FP
-
 PERIOD_INDECES = {
     "5min": 0,
     "15min": 1,
@@ -46,6 +44,7 @@ SESSION_NAME_EQ_INDECES = {
     "recent": 1,
 }
 
+BACKTEST_AGGR_CSV_FP = 'backtests_doc_ready.csv'
 
 BACKTEST_AGGR_PLOTS_FP = 'backtest_aggr_plots/'
 
