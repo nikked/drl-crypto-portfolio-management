@@ -8,9 +8,10 @@ My master's thesis explored deep reinforcement learning in algorithmic trading. 
 2. [Repository contents](#repo_contents)
 3. [Thesis overview](#overview)
 
-## Usage and installation
 <a name="usage"/>
-This repo exposes a single CLI: `deep_rl_portfolio.py`
+
+## Usage and installation
+This repo exposes a single CLI: `python deep_rl_portfolio.py`
 
 To get started, please run a CLI with the `-h` flag. E.g.: `python deep_rl_portfolio.py -h` to get a list of acceptable flags.
 
@@ -22,9 +23,9 @@ git config core.hooksPath .githooks
 chmod -R  744 .githooks
 ```
 
+<a name="repo_contents"/>
 
 ## Repository contents
-<a name="repo_contents"/>
 
 * `src` dir holds the models, environments etc. for the actual training
 * `data` dir holds the datasets used (`.csv` files etc.)
@@ -32,8 +33,10 @@ chmod -R  744 .githooks
 * `tests` contains the unittests for this project
 
 
-## Thesis overview
 <a name="overview"/>
+
+## Thesis overview
+
 
 #### Algorithmic trading agent
 At the core of the program is the algorithmic trading agent – a computer program powered by deep reinforcement learning. The agent follows some pre-determined instructions and executes market orders. Traditionally a human trader determines these instructions by using some technical indicators. I instead gave the trading agent raw price data as input and let it figure out its instructions.
