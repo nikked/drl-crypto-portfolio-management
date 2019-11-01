@@ -3,16 +3,16 @@
 
 My master's thesis explored deep reinforcement learning in algorithmic trading. I implemented a trading computer program that balances a portfolio of cryptocurrencies. The program tries to outperform an equally weighted strategy. More specifically, the program uses a convolutional neural network (CNN) built with Tensorflow.
 
-##### Table of Contents  
-[Thesis overview](#overview)
-[Usage](#usage)
-[Installation](#installation)
-[Repository content](#repo_content)
-[Precommit hook](#precommit)
+## Table of Contents 
+1. [Thesis overview](#overview)
+2. [Usage](#usage)
+3. [Installation](#installation)
+4. [Repository content](#repo_content)
+5. [Precommit hook](#precommit)
 
-<a name="overview"/>
+
 ## Thesis overview
-
+<a name="overview"/>
 
 #### Algorithmic trading agent
 At the core of the program is the algorithmic trading agent – a computer program powered by deep reinforcement learning. The agent follows some pre-determined instructions and executes market orders. Traditionally a human trader determines these instructions by using some technical indicators. I instead gave the trading agent raw price data as input and let it figure out its instructions.
@@ -42,26 +42,28 @@ I also wanted to find out the optimal time-period for rebalancing for the dynami
 
 The results of the thesis contribute to the field of algorithmic finance. I showed that frequent rebalancing is a useful tool in the risk management of highly volatile asset classes. Further investigation is required to extend these findings beyond cryptocurrencies. For more details, please refer to [the completed work](https://github.com/nikked/rl_dl_gradu/raw/master/Linnansalo_Semi-High_Frequency_Portfolio_Optimization_With_Deep_Reinforcement_Learning.pdf).
 
-<a name="usage"/>
+
 ## Usage
+<a name="usage"/>
 This repo exposes a single CLI: `deep_rl_portfolio.py`
 
 To get started, please run a CLI with the `-h` flag. E.g.: `python deep_rl_portfolio.py -h` to get a list of acceptable flags.
 
-<a name="installation"/>
 ## Installation
+<a name="installation"/>
 This repo requires Python 3.6+. For installing the dependencies, please run `pip install -r requirements.txt`
 
-<a name="repo_content"/>
 ## Repository content
+<a name="repo_content"/>
 
 * `src` dir holds the models, environments etc. for the actual training
 * `data` dir holds the datasets used (`.csv` files etc.)
 * `data_pipelines` contains the scripts used to interact with external data APIs
 * `tests` contains the unittests for this project
 
-<a name="precommit"/>
+
 ## Git precommit hooks
+<a name="precommit"/>
 Make sure you are using the same git hooks as defined in .githooks!
 
 Please run:
