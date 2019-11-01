@@ -3,23 +3,23 @@
 
 My master's thesis explored deep reinforcement learning in algorithmic trading. I implemented a trading computer program that balances a portfolio of cryptocurrencies. The program tries to outperform an equally weighted strategy. More specifically, the program uses a convolutional neural network (CNN) built with Tensorflow.
 
-###### Cryptocurrencies as asset class
+#### Cryptocurrencies as asset class
 I chose cryptocurrencies as my underlying asset class. They are interesting to analyze due to high volatility and lack of previous research. The availability of data is also exceptional. Nevertheless, these same techniques could be utilized in other asset classes as well. I used the [Poloniex API](https://docs.poloniex.com/#introduction) as my data source.
 
-###### Algorithmic trading agent
+#### Algorithmic trading agent
 At the core of the program is the algorithmic trading agent – a computer program powered by deep reinforcement learning. The agent follows some pre-determined instructions and executes market orders. Traditionally a human trader determines these instructions by using some technical indicators. I instead gave the trading agent raw price data as input and let it figure out its instructions.
 
 The algorithmic trading agent has two goals. First, it chooses initial weights, and then it rebalances these weights periodically. Choosing proper initial weights is crucial since transaction costs make trade action costly. I evaluated the trading agent's performance in these two tasks by using two distinct agents: a static and a dynamic agent. The static agent only does the weight initialization and does not rebalance. The dynamic agent also rebalances. I found that the agent does a poor job in choosing initial weights.
 
 In reinforcement learning terminology, the goal of the agent is to maximize the cumulative reward based on market actions. The cumulative reward is the final value of the portfolio at the end of the test period. The actions are portfolio weights. The trading agent chooses the next set of weights with a convolutional neural network (CNN) policy. The neural network is implemented with Tensorflow.
 
-###### Performance evaluation
+#### Performance evaluation
 I evaluated the performance of the agent in seven different backtest stories. Each backtest story reflects some unique and remarkable period in cryptocurrency history. One backtest period was from December 2017 when Bitcoin reached its all-time high price. Another one is from April 2017 when Bitcoin almost lost its place as the most valued cryptocurrency. The stories show the market conditions where the agent excels and reveals its risks.
 
 
 ![Backtest periods](https://github.com/nikked/drl-crypto-portfolio-management/blob/master/images/backtest_choices.png)
 
-###### Results
+#### Results
 I found that the algorithmic trading agent closely follows an equally weighted strategy. This finding suggests that the agent is unavailable to decipher meaningful signals from the noisy price data. The machine learning approach does not provide an advantage over an equally weighted strategy. Nevertheless, the trading agent excels in volatile and mean-reverting market conditions. In these periods, the dynamic agent has lower volatility and a higher Sharpe ratio. However, it has a dangerous tendency to overinvest in a plummeting asset.
 
 ![Mean reversion](https://github.com/nikked/drl-crypto-portfolio-management/blob/master/images/mean_reversion.png)
