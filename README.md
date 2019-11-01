@@ -4,11 +4,32 @@
 My master's thesis explored deep reinforcement learning in algorithmic trading. I implemented a trading computer program that balances a portfolio of cryptocurrencies. The program tries to outperform an equally weighted strategy. More specifically, the program uses a convolutional neural network (CNN) built with Tensorflow.
 
 ## Table of Contents 
-1. [Thesis overview](#overview)
-2. [Usage](#usage)
-3. [Installation](#installation)
-4. [Repository content](#repo_content)
-5. [Precommit hook](#precommit)
+1. [Usage and installation](#usage)
+2. [Repository contents](#repo_contents)
+3. [Thesis overview](#overview)
+
+## Usage and installation
+<a name="usage"/>
+This repo exposes a single CLI: `deep_rl_portfolio.py`
+
+To get started, please run a CLI with the `-h` flag. E.g.: `python deep_rl_portfolio.py -h` to get a list of acceptable flags.
+
+This repo requires Python 3.6+. For installing the dependencies, please run `pip install -r requirements.txt`
+
+To enable automatic testing, linting and reformatting, add the following githook:
+```bash
+git config core.hooksPath .githooks
+chmod -R  744 .githooks
+```
+
+
+## Repository contents
+<a name="repo_contents"/>
+
+* `src` dir holds the models, environments etc. for the actual training
+* `data` dir holds the datasets used (`.csv` files etc.)
+* `data_pipelines` contains the scripts used to interact with external data APIs
+* `tests` contains the unittests for this project
 
 
 ## Thesis overview
@@ -45,36 +66,3 @@ I also wanted to find out the optimal time-period for rebalancing for the dynami
 
 
 The results of the thesis contribute to the field of algorithmic finance. I showed that frequent rebalancing is a useful tool in the risk management of highly volatile asset classes. Further investigation is required to extend these findings beyond cryptocurrencies. For more details, please refer to [the completed work](https://github.com/nikked/rl_dl_gradu/raw/master/Linnansalo_Semi-High_Frequency_Portfolio_Optimization_With_Deep_Reinforcement_Learning.pdf).
-
-
-## Usage
-<a name="usage"/>
-This repo exposes a single CLI: `deep_rl_portfolio.py`
-
-To get started, please run a CLI with the `-h` flag. E.g.: `python deep_rl_portfolio.py -h` to get a list of acceptable flags.
-
-## Installation
-<a name="installation"/>
-This repo requires Python 3.6+. For installing the dependencies, please run `pip install -r requirements.txt`
-
-## Repository content
-<a name="repo_content"/>
-
-* `src` dir holds the models, environments etc. for the actual training
-* `data` dir holds the datasets used (`.csv` files etc.)
-* `data_pipelines` contains the scripts used to interact with external data APIs
-* `tests` contains the unittests for this project
-
-
-## Git precommit hooks
-<a name="precommit"/>
-Make sure you are using the same git hooks as defined in .githooks!
-
-Please run:
-`git config core.hooksPath .githooks`
-
-
-`chmod -R  744 .githooks`
-
-This ensures that certain test procedures are ran before a commit is allowed
-
