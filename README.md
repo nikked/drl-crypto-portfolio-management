@@ -27,15 +27,19 @@ I chose cryptocurrencies as my underlying asset class. They are interesting to a
 #### Performance evaluation
 I evaluated the performance of the agent in seven different backtest stories. Each backtest story reflects some unique and remarkable period in cryptocurrency history. One backtest period was from December 2017 when Bitcoin reached its all-time high price. Another one is from April 2017 when Bitcoin almost lost its place as the most valued cryptocurrency. The stories show the market conditions where the agent excels and reveals its risks.
 
+The following figure visualizes my backtest periods against Bitcoin's dominance. 
 
 ![Backtest periods](https://github.com/nikked/drl-crypto-portfolio-management/blob/master/images/backtest_choices.png)
+
 
 #### Results
 I found that the algorithmic trading agent closely follows an equally weighted strategy. This finding suggests that the agent is unavailable to decipher meaningful signals from the noisy price data. The machine learning approach does not provide an advantage over an equally weighted strategy. Nevertheless, the trading agent excels in volatile and mean-reverting market conditions. In these periods, the dynamic agent has lower volatility and a higher Sharpe ratio. However, it has a dangerous tendency to overinvest in a plummeting asset.
 
+The following figure shows that the agent has a tendency to revert to equal weights (which is ~26% in this example).
+
 ![Mean reversion](https://github.com/nikked/drl-crypto-portfolio-management/blob/master/images/mean_reversion.png)
 
-I also wanted to find out the optimal time-period for rebalancing for the dynamic agent. Therefore, I compared rebalancing periods from 15 minutes to 1 day. To make our results robust, I ran over a thousand simulations. I found that 15 – 30 minute rebalancing periods tend to work the best.
+I also wanted to find out the optimal time-period for rebalancing for the dynamic agent. Therefore, I compared rebalancing periods from 15 minutes to 1 day. To make our results robust, I ran over a thousand simulations. I found that 15 – 30 minute rebalancing periods tend to work the best. This is visualized in the figure below where we can see that the 30 minute period had the highest Sharpe ratio.
 
 ![Rebalancing periods](https://github.com/nikked/drl-crypto-portfolio-management/blob/master/images/rebalancing_periods.png)
 
