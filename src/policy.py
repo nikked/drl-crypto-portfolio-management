@@ -1,9 +1,3 @@
-"""
-Policy is an arbitrary algorithm that an RL agent uses to select actions.
-
-Here we are using a CNN similar to Jiang
-
-"""
 import tensorflow as tf
 import numpy as np
 

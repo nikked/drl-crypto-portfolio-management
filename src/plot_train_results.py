@@ -35,9 +35,6 @@ if not os.path.exists(GRAPH_OUTPUT_DIR):
 if not os.path.exists(JSON_OUTPUT_DIR):
     os.mkdir(JSON_OUTPUT_DIR)
 
-# move crypto price above weights
-# test and train times
-
 
 def plot_train_results(  # pylint: disable= too-many-arguments, too-many-locals
     train_configs,
@@ -185,7 +182,6 @@ def _plot_backtest_perf_metadata(
     train_test_val_steps,
 ):
 
-    # axis.set_ylim(-3, 2)
     columns = ("Strategy", "Ptf value", "Sharpe", "Sharpe (ann.)", "MDD")
 
     sharpe_ratios = test_performance_lists["sharpe_ratios"]
@@ -299,25 +295,10 @@ def _plot_backtest_perf_metadata(
     _format_table(date_table)
 
     axis2 = divider.append_axes("right", size="40%", pad=0.35, sharex=axis)
-
-    #     train_params_str = f"""
-    # No. batches: {train_configs['n_batches']}
-    # No. episodes: {train_configs['n_episodes']}
-    # Batch size: {train_configs['batch_size']}
-
-    # Trading period: {train_configs['trading_period_length']}
-    # Train window length: {train_configs['window_length']}
-    # """
-    """
-    No. conv filters, layer 1: {N_FILTER_1}
-    No. conv filters, layer 2: {N_FILTER_2}
-    Kernel size: : {KERNEL1_SIZE}
-    """
     axis2.set_axis_off()
 
     trading_period = train_configs["trading_period_length"]
 
-    # import pdb; pdb.set_trace()
 
     config_table_data = [
         ["No. batches", train_configs["n_batches"]],
@@ -457,35 +438,6 @@ def _get_btc_price_data_for_period(train_configs, train_test_val_steps):
 
     return btc_data_test_period, btc_price_sharpe
 
-    """
-
-    OLD CODE THAT RETURNS BTC RELATIVE PRICE DIFF
-
-
-    Calculate the final output series by first setting its value to initial
-    portfolio value and then multiplying the prev value with the BTC price diff
-    of the period
-    """
-    # btc_price_data = pd.Series()
-    # btc_price_data = btc_price_data.append(
-    #     pd.Series(t_confs["portfolio_value"]))
-
-    # btc_data_price_diffs = btc_data_test_period.pct_change()
-
-    # for idx in range(1, len(btc_data_price_diffs)):
-    #     prev_pf_value = btc_price_data[idx - 1]
-    #     current_price_diff = btc_data_price_diffs[idx]
-    #     changed_btc_pf_value = prev_pf_value * (current_price_diff + 1)
-    #     btc_price_data.at[idx] = changed_btc_pf_value
-
-    # btc_price_sharpe = (btc_price_data[idx] - btc_price_data[0]) / np.std(
-    #     btc_price_data
-    # )
-    # btc_price_data.index = btc_data_test_period.index
-
-    # return btc_price_data, btc_price_sharpe
-
-
 def _plot_weight_evolution(axis, asset_list, w_list, btc_price_data):
 
     names = [CASH_NAME] + asset_list
@@ -529,28 +481,5 @@ def _date_gridify_axis(axis):
     axis.xaxis.set_major_locator(mdates.DayLocator(interval=7))
     axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
     axis.xaxis.set_minor_locator(mdates.HourLocator(byhour=[0, 8, 16]))
-
-    # Or if you want different settings for the grids:
     axis.grid(which="minor", alpha=0.3)
-
-    # Or if you want different settings for the grids:
     axis.grid(which="major", alpha=0.9)
-
-
-"""
-Training timestamp: {timestamp_now}
-Training duration: {train_time_secs} seconds
-
-No. batches: {train_configs['n_batches']}
-No. episodes: {train_configs['n_episodes']}
-Batch size: {train_configs['batch_size']}
-
-Trading period: {train_configs['trading_period_length']}
-Train window length: {train_configs['window_length']}
-
-Kernel size: {KERNEL1_SIZE}
-
-Epsilon greedy threshold: {EPSILON_GREEDY_THRESHOLD}
-Learning rate: {LEARNING_RATE}
-Max weight penalty: {MAX_PF_WEIGHT_PENALTY}
-"""

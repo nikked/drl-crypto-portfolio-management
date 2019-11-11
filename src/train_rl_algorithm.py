@@ -257,9 +257,6 @@ def _train_batch(  # pylint: disable=too-many-arguments
     Now it is just set to the beginning of the train set, i.e.:
     to the length of the window
     """
-    # draw the starting point of the batch
-    #
-    # i_start = memory.draw()
     i_start = train_options["window_length"]
 
     env_states = _reset_memory_states(
