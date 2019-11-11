@@ -7,7 +7,7 @@ from tqdm import tqdm
 from src.params import TRADING_COST, INTEREST_RATE, EPSILON_GREEDY_THRESHOLD
 
 from src.policy import Policy
-from src.environment import TradeEnv
+from src.trading_environment import TradingEnvironment
 from src.pvm import PVM
 
 
@@ -195,7 +195,7 @@ def _test_and_report_progress(  # pylint: disable=too-many-arguments
 
 def _validate_agent_performance(train_options, trade_env_args, train_test_split, agent):
     # environment for trading of the agent
-    env_eval = TradeEnv(**trade_env_args)
+    env_eval = TradingEnvironment(**trade_env_args)
 
     w_init_test = np.array(np.array([1] + [0] * train_options["no_of_assets"]))
 

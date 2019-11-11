@@ -8,7 +8,7 @@ from src.train_rl_algorithm import train_rl_algorithm
 from src.test_rl_algorithm import test_rl_algorithm
 from src.plot_train_results import plot_train_results
 from src.make_train_histograms import make_train_histograms
-from src.environment import TradeEnv
+from src.trading_environment import TradingEnvironment
 
 from src.params import PF_INITIAL_VALUE, TRADING_COST, INTEREST_RATE, WINDOW_LENGTH
 
@@ -116,24 +116,24 @@ def _get_train_environments(no_of_assets, trade_env_args):
 
     # environment for trading of the agent
     # this is the agent trading environment (policy network agent)
-    env = TradeEnv(**trade_env_args)
+    env = TradingEnvironment(**trade_env_args)
 
     # environment for trading of the agent
     # that just does the first cash distribution and then holds eq
-    env_first_action = TradeEnv(**trade_env_args)
+    env_first_action = TradingEnvironment(**trade_env_args)
 
     # environment for equally weighted
     # this environment is set up for an agent who only plays an equally weithed
     # portfolio (baseline)
-    env_eq = TradeEnv(**trade_env_args)
+    env_eq = TradingEnvironment(**trade_env_args)
 
     # environment secured (only money)
     # this environment is set up for an agent who plays secure, keeps its money
-    env_s = TradeEnv(**trade_env_args)
+    env_s = TradingEnvironment(**trade_env_args)
 
     # full on one stock environment
     # these environments are set up for agents who play only on one stock
-    env_fu = [TradeEnv(**trade_env_args) for asset in range(no_of_assets)]
+    env_fu = [TradingEnvironment(**trade_env_args) for asset in range(no_of_assets)]
 
     trade_envs = {
         "policy_network": env,
