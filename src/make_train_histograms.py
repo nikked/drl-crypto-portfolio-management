@@ -102,13 +102,6 @@ def make_train_histograms(session_name):
         "Both agents: Distribution of the standard deviation of weights",
         "Stdev of weights",
     )
-    # _plot_histogram(
-    #     axes[5][0],
-    #     backtest_stats["cash_investments"],
-    #     "Both agents: Distribution of BTC weights",
-    #     "BTC weight",
-    # )
-
     output_path = os.path.join(HISTOGRAM_OUTPUT_DIR, f"histogram_{session_name}.png")
     plt.subplots_adjust(hspace=0.5)
     print(f"Saving plot to path: {output_path}")
@@ -271,18 +264,6 @@ def filter_history_dict(history_dict, session_name, move_valid_to_own_dir=False)
         if any(value > 0.11 for value in initial_weights):
             continue
 
-        # static_profit = train_data["static"]["pf_value"]
-
-        # eq_profit = train_data["eq_weight"]["pf_value"]
-
-        # while True:
-        #     if eq_profit > 1 and static_profit > 1:
-        #         if eq_profit > static_profit:
-        #             continue
-        #     if eq_profit < 1 and static_profit < 1:
-        #         if eq_profit < static_profit:
-        #             continue
-
         filtered_history[timestamp] = train_data
 
         if move_valid_to_own_dir:
@@ -321,8 +302,6 @@ def filter_history_dict(history_dict, session_name, move_valid_to_own_dir=False)
 def _plot_histogram_metadata_table(axis, n_simulations, session_name, backtest_stats):
 
     divider = make_axes_locatable(axis)
-
-    # add sample size of simulation
 
     axis.set_axis_off()
 

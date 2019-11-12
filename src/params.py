@@ -7,12 +7,9 @@ PERIOD_LENGTHS = {
     "1d": 86400,
 }
 
-# Add to CLI
 EPSILON_GREEDY_THRESHOLD = 0.8
 MAX_PF_WEIGHT_PENALTY = 0.5
 
-
-# Dict hp net
 # POLICY PARAMS
 N_FILTER_1 = 5
 N_FILTER_2 = 50
@@ -27,22 +24,9 @@ TRADING_COST = 0.2 / 100
 INTEREST_RATE = 0.00 / 250
 CASH_BIAS_INIT = 0.7
 
-
-# Only imported at CLI
-
 # Training Parameters
 PF_INITIAL_VALUE = 10000
 
 # Number of the columns (number of the trading periods) in each input
 # price matrix
 WINDOW_LENGTH = 10
-
-# not imported
-# N_EPISODES = 2
-
-# N_BATCHES = 10
-# # Size of mini-batch during training
-# BATCH_SIZE = 50
-
-# # The L2 regularization coefficient applied to network training
-# REGULARIZATION = 1e-8  # not used ATM

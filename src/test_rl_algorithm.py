@@ -14,7 +14,6 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
     w_init_test = np.array(np.array([1] + [0] * no_of_assets))
 
-    # initialization of the environment
     state, _ = trade_envs["policy_network"].reset_environment(
         w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
     )
@@ -40,7 +39,6 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
             index=train_test_split["train"],
         )
 
-    # first element of the weight and portfolio value
     p_list = [train_options["portfolio_value"]]
     p_list_static = [train_options["portfolio_value"]]
     w_list = [w_init_test]
@@ -54,7 +52,6 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
     pf_value_t_fu = [0] * no_of_assets
 
-    # Using test set
 
     low_index = train_test_split["train"] + train_test_split["validation"]
     up_index = (
@@ -71,9 +68,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         x_current = state[0].reshape([-1] + list(state[0].shape))
         w_previous = state[1].reshape([-1] + list(state[1].shape))
         pf_value_previous = state[2]
-        # compute the action
         action = agent.compute_w(x_current, w_previous)
-        # step forward environment
 
         # Exit if there is a mega large weight in the 10th index
         if idx == 10:
@@ -104,7 +99,6 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         if first_step:
             first_step = False
 
-        # x_next = state[0]
         w_current = state[1]
         pf_value_t = state[2]
 
@@ -159,11 +153,10 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 def _get_max_draw_down(p_list_eval):
     p_list_eval = np.array(p_list_eval)
 
-    # end of the period
     i = np.argmax(  # pylint: disable=no-member
         np.maximum.accumulate(p_list_eval)  # pylint: disable=no-member
         - p_list_eval  # pylint: disable=no-member
     )
-    j = np.argmax(p_list_eval[:i])  # start of period
+    j = np.argmax(p_list_eval[:i])
 
     return p_list_eval[j] - p_list_eval[i]

@@ -40,7 +40,6 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
         "single_asset": [list() for item in range(train_options["no_of_assets"])],
     }
 
-    # Run training episodes
     env_states = None
     for n_episode in range(train_options["n_episodes"]):
 
@@ -99,7 +98,6 @@ def _train_episode(
 
     benchmark_weights = _initialize_benchmark_weights(train_options["no_of_assets"])
 
-    # init the PVM with the training parameters
     w_init_train = np.array(np.array([1] + [0] * train_options["no_of_assets"]))
 
     memory = PVM(train_test_split["train"], train_options["batch_size"], w_init_train)
@@ -125,11 +123,6 @@ def _train_episode(
 def _test_and_report_progress(  # pylint: disable=too-many-arguments
     train_options, n_episode, agent, trade_env_args, asset_list, train_test_split
 ):
-    """
-    This function evaluates the performance of the different types of agents.
-
-    """
-
     print("\nEvaluating agent performance")
 
     policy_performance_tracker = {
@@ -194,21 +187,17 @@ def _test_and_report_progress(  # pylint: disable=too-many-arguments
 
 
 def _validate_agent_performance(train_options, trade_env_args, train_test_split, agent):
-    # environment for trading of the agent
     env_eval = TradingEnvironment(**trade_env_args)
 
     w_init_test = np.array(np.array([1] + [0] * train_options["no_of_assets"]))
 
-    # initialization of the environment
     state_eval, _ = env_eval.reset_environment(
         w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
     )
 
-    # first element of the weight and portfolio value
     p_list_eval = [train_options["portfolio_value"]]
     w_list_eval = [w_init_test]
 
-    # Using validation set
     for _ in tqdm(
         range(
             train_test_split["train"],
@@ -218,9 +207,7 @@ def _validate_agent_performance(train_options, trade_env_args, train_test_split,
         x_t = state_eval[0].reshape([-1] + list(state_eval[0].shape))
         w_previous = state_eval[1].reshape([-1] + list(state_eval[1].shape))
 
-        # compute the action
         action = agent.compute_w(x_t, w_previous)
-        # step forward environment
         state_eval, _, _ = env_eval.step(action)
 
         w_t_eval = state_eval[1]
@@ -235,12 +222,11 @@ def _validate_agent_performance(train_options, trade_env_args, train_test_split,
 def _get_max_draw_down(p_list_eval):
     p_list_eval = np.array(p_list_eval)
 
-    # end of the period
     i = np.argmax(  # pylint: disable=no-member
         np.maximum.accumulate(p_list_eval)  # pylint: disable=no-member
         - p_list_eval  # pylint: disable=no-member
     )
-    j = np.argmax(p_list_eval[:i])  # start of period
+    j = np.argmax(p_list_eval[:i])
 
     return p_list_eval[j] - p_list_eval[i]
 
@@ -281,7 +267,6 @@ def _train_batch(  # pylint: disable=too-many-arguments
             train_performance_lists,
         )
 
-    # for each batch, train the network to maximize the reward
     agent.train(
         np.array(train_session_tracker["policy_x_t"]),
         np.array(train_session_tracker["policy_prev_weights"]),
@@ -293,8 +278,6 @@ def _train_batch(  # pylint: disable=too-many-arguments
 
 
 def _reset_memory_states(train_options, trade_envs, memory, i_start, benchmark_weights):
-    # reset the environment with the weight from PVM at the starting point
-    # reset also with a portfolio value with initial portfolio value
     state, policy_done = trade_envs["policy_network"].reset_environment(
         memory.get_w(i_start), train_options["portfolio_value"], index=i_start
     )
@@ -371,13 +354,10 @@ def _train_batch_item(  # pylint: disable=too-many-arguments, too-many-locals
         env_states, single_asset_pf_values_t, train_options["no_of_assets"]
     )
 
-    # let us compute the returns
     daily_return_t = new_state["x_next"][-1, :, -1]
 
-    # update into the PVM
     memory.update(i_start + batch_item, new_state["w_t"])
 
-    # store elements
     train_session_tracker["policy_x_t"].append(
         x_t.reshape(env_states["policy_network"]["state"][0].shape)
     )
@@ -415,7 +395,6 @@ def _train_batch_item(  # pylint: disable=too-many-arguments, too-many-locals
 
 def _take_train_step(agent, env_states, no_of_assets, trade_envs, benchmark_weights):
 
-    # load the different inputs from the previous loaded state
     x_t = env_states["policy_network"]["state"][0].reshape(
         [-1] + list(env_states["policy_network"]["state"][0].shape)
     )
@@ -424,12 +403,9 @@ def _take_train_step(agent, env_states, no_of_assets, trade_envs, benchmark_weig
     )
 
     if np.random.rand() < EPSILON_GREEDY_THRESHOLD:
-        # computation of the action of the agent
         action = agent.compute_w(x_t, w_previous)
     else:
         action = _get_random_action(no_of_assets)
-
-    # given the state and the action, call the environment to go forward one step
 
     env_states["policy_network"]["state"], _, _ = trade_envs["policy_network"].step(
         action
@@ -453,7 +429,6 @@ def _take_train_step(agent, env_states, no_of_assets, trade_envs, benchmark_weig
 
 def _update_state(env_states, single_asset_pf_values_t, no_of_assets):
 
-    # get the new state
     x_next = env_states["policy_network"]["state"][0]
     w_t = env_states["policy_network"]["state"][1]
     pf_value_t = env_states["policy_network"]["state"][2]
