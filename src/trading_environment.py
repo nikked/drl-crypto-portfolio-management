@@ -22,27 +22,26 @@ class TradingEnvironment:  # pylint: disable=too-many-instance-attributes
         self.interest_rate = interest_rate
 
         self.nb_cryptos = self.data.shape[1]
-        self.nb_features = self.data.shape[0]
         self.end_train = int((self.data.shape[2] - self.window_length) * train_size)
 
         self.index = None
         self.state = None
         self.done = False
 
-        self.seed()
+        self.initialize_environment()
 
-    def read_tensor(self, x_prices, window_length):
-        return x_prices[:, :, window_length - self.window_length : window_length]
-
-    def read_update(self):
-        return np.array([1 + self.interest_rate] + self.data[-1, :, self.index].tolist())
-
-    def seed(self, seed=None):
+    def initialize_environment(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def reset(self, w_init, p_init, index=0):
-        self.state = (self.read_tensor(self.data, self.window_length), w_init, p_init)
+    def get_crypto_prices(self, x_prices, window_length):
+        return x_prices[:, :, window_length - self.window_length : window_length]
+
+    def get_crypto_returns(self):
+        return np.array([1 + self.interest_rate] + self.data[-1, :, self.index].tolist())
+
+    def reset_environment(self, w_init, p_init, index=0):
+        self.state = (self.get_crypto_prices(self.data, self.window_length), w_init, p_init)
         self.index = index
         self.done = False
 
@@ -61,7 +60,7 @@ class TradingEnvironment:  # pylint: disable=too-many-instance-attributes
 
         value_after_tx_costs = old_ptf_value * weights_before_step - np.array([cost] + [0] * self.nb_cryptos)
 
-        new_crypto_values = value_after_tx_costs * self.read_update()
+        new_crypto_values = value_after_tx_costs * self.get_crypto_returns()
 
         new_ptf_value = np.sum(new_crypto_values)
 
@@ -71,7 +70,7 @@ class TradingEnvironment:  # pylint: disable=too-many-instance-attributes
 
         new_index = self.index + 1
 
-        self.state = (self.read_tensor(self.data, new_index), new_weights, new_ptf_value)
+        self.state = (self.get_crypto_prices(self.data, new_index), new_weights, new_ptf_value)
 
         if new_index >= self.end_train:
             self.done = True
