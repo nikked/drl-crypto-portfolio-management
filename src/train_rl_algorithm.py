@@ -200,7 +200,7 @@ def _validate_agent_performance(train_options, trade_env_args, train_test_split,
     w_init_test = np.array(np.array([1] + [0] * train_options["no_of_assets"]))
 
     # initialization of the environment
-    state_eval, _ = env_eval.reset(
+    state_eval, _ = env_eval.reset_environment(
         w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
     )
 
@@ -295,14 +295,14 @@ def _train_batch(  # pylint: disable=too-many-arguments
 def _reset_memory_states(train_options, trade_envs, memory, i_start, benchmark_weights):
     # reset the environment with the weight from PVM at the starting point
     # reset also with a portfolio value with initial portfolio value
-    state, policy_done = trade_envs["policy_network"].reset(
+    state, policy_done = trade_envs["policy_network"].reset_environment(
         memory.get_w(i_start), train_options["portfolio_value"], index=i_start
     )
 
-    state_eq, equal_done = trade_envs["equal_weighted"].reset(
+    state_eq, equal_done = trade_envs["equal_weighted"].reset_environment(
         benchmark_weights["equal"], train_options["portfolio_value"], index=i_start
     )
-    state_s, cash_done = trade_envs["only_cash"].reset(
+    state_s, cash_done = trade_envs["only_cash"].reset_environment(
         benchmark_weights["only_cash"], train_options["portfolio_value"], index=i_start
     )
 
@@ -314,7 +314,7 @@ def _reset_memory_states(train_options, trade_envs, memory, i_start, benchmark_w
     for i in range(train_options["no_of_assets"]):
         state_single_assets[i], done_single_assets[i] = trade_envs[
             "full_on_one_stocks"
-        ][i].reset(
+        ][i].reset_environment(
             full_on_one_weights[i + 1, :],
             train_options["portfolio_value"],
             index=i_start,

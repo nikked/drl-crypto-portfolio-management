@@ -15,18 +15,18 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
     w_init_test = np.array(np.array([1] + [0] * no_of_assets))
 
     # initialization of the environment
-    state, _ = trade_envs["policy_network"].reset(
+    state, _ = trade_envs["policy_network"].reset_environment(
         w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
     )
 
-    state_static, _ = trade_envs["policy_network_first_step_only"].reset(
+    state_static, _ = trade_envs["policy_network_first_step_only"].reset_environment(
         w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
     )
 
-    state_eq, _ = trade_envs["equal_weighted"].reset(
+    state_eq, _ = trade_envs["equal_weighted"].reset_environment(
         weights_equal, train_options["portfolio_value"], index=train_test_split["train"]
     )
-    state_s, _ = trade_envs["only_cash"].reset(
+    state_s, _ = trade_envs["only_cash"].reset_environment(
         weights_single,
         train_options["portfolio_value"],
         index=train_test_split["train"],
@@ -34,7 +34,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
 
     full_on_one_weights = np.eye(no_of_assets + 1, dtype=int)
     for i in range(no_of_assets):
-        state_fu[i], done_fu[i] = trade_envs["full_on_one_stocks"][i].reset(
+        state_fu[i], done_fu[i] = trade_envs["full_on_one_stocks"][i].reset_environment(
             full_on_one_weights[i + 1, :],
             train_options["portfolio_value"],
             index=train_test_split["train"],
