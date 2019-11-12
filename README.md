@@ -31,11 +31,17 @@ To see the full list of arguments, run `python deep_rl_portfolio.py -h`
 <a name="repo_contents"/>
 
 ## Repository contents
-
-* `src` dir holds the models, environments etc. for the actual training
-* `data` dir holds the datasets used (`.csv` files etc.)
-* `data_pipelines` contains the scripts used to interact with external data APIs
-* `tests` contains the unittests for this project
+* `deep_rl_portfolio`: CLI and entrypoint for repository
+* `src`: Deep reinforcement learning logic
+    * `trading_environment`: Data-structure that represents the financial portfolio that is used to store trading actions and their results
+    * `cnn_policy.py`: The CNN policy used by the agent to make actions
+    * `train_rl_algorithm.py`: Script for running reinforcement learning batches and episodes
+    * `test_rl_algorithm.py`: Script for evaluating trading agent performance
+* `visualization_scripts`: Collection of scripts that were used in the work to create charts and info-graphics
+* `data_pipelines`
+    * `get_data_from_poloniex_api.py`: fetches datasets from Poloniex and stores it to your drive
+    * `get_crypto_price_tensors`: fetches the dataset stored to your drive for training and prediction
+* `data`: downloaded datasets will be automatically stored here
 
 
 <a name="overview"/>
