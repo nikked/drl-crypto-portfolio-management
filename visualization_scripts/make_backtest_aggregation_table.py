@@ -4,7 +4,7 @@ import json
 from pprint import pprint
 import csv
 
-from src.make_train_histograms import filter_history_dict, aggregate_backtest_stats
+from visualization_scripts.make_train_histograms import filter_history_dict, aggregate_backtest_stats
 
 
 JSON_OUTPUT_DIR = "train_jsons/"

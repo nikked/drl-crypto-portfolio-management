@@ -6,11 +6,11 @@ from pprint import pprint
 
 from src.train_rl_algorithm import train_rl_algorithm
 from src.test_rl_algorithm import test_rl_algorithm
-from src.plot_train_results import plot_train_results
-from src.make_train_histograms import make_train_histograms
 from src.trading_environment import TradingEnvironment
-
 from src.params import PF_INITIAL_VALUE, TRADING_COST, INTEREST_RATE, WINDOW_LENGTH
+
+from visualization_scripts.plot_train_results import plot_train_results
+from visualization_scripts.make_train_histograms import make_train_histograms
 
 from data_pipelines import get_crypto_price_tensors
 
@@ -300,19 +300,15 @@ if __name__ == "__main__":
         default="1d",
         help="Trade period length (5min, 15min, 30min, 2h, 4h, 1d)",
     )
-    PARSER.add_argument("-demo", "--demo", default=False, action="store_true")
     PARSER.add_argument(
-        "-cbts", "--calm_before_the_storm", default=False, action="store_true"
+        "-cbts", "--calm_before_the_storm", default=False, action="store_true", help="Runs the 'calm_before_the_storm' from my thesis"
     )
-    PARSER.add_argument("-awake", "--awakening", default=False, action="store_true")
-    PARSER.add_argument("-xrp", "--ripple_bull_run", default=False, action="store_true")
-    PARSER.add_argument("-eth", "--ethereum_valley", default=False, action="store_true")
-    PARSER.add_argument("-ath", "--all_time_high", default=False, action="store_true")
-
-    PARSER.add_argument("-rock", "--rock_bottom", default=False, action="store_true")
-    PARSER.add_argument("-recent", "--recent", default=False, action="store_true")
-    PARSER.add_argument("-nano", "--nano_run", default=False, action="store_true")
-    PARSER.add_argument("-pico", "--pico_run", default=False, action="store_true")
+    PARSER.add_argument("-awake", "--awakening", default=False, action="store_true", help="Runs the 'awakening' from my thesis")
+    PARSER.add_argument("-xrp", "--ripple_bull_run", default=False, action="store_true", help="Runs the 'ripple_bull_run' from my thesis")
+    PARSER.add_argument("-eth", "--ethereum_valley", default=False, action="store_true", help="Runs the 'ethereum_valley' from my thesis")
+    PARSER.add_argument("-ath", "--all_time_high", default=False, action="store_true", help="Runs the 'all_time_high' from my thesis")
+    PARSER.add_argument("-rock", "--rock_bottom", default=False, action="store_true", help="Runs the 'rock_bottom' from my thesis")
+    PARSER.add_argument("-recent", "--recent", default=False, action="store_true", help="Runs the 'recent' from my thesis")
 
     ARGS = PARSER.parse_args()
 
@@ -365,30 +361,6 @@ if __name__ == "__main__":
             max_pf_weight_penalty=0.7,
             test_mode=True,
             train_session_name="test_run_with_long_name",
-        )
-
-    elif ARGS.demo:
-        print("\nRunning model: Ripple bull run")
-
-        end_date = "20170427"
-        test_start_date = "20170307"
-        start_date = "20170101"
-
-        demo_params = {
-            **TRAIN_BASE_PARAMS,
-            "no_of_assets": 3,
-            "n_batches": 10,
-            "n_episodes": 1,
-        }
-
-        main(
-            **demo_params,
-            start_date=start_date,
-            end_date=end_date,
-            test_start_date=test_start_date,
-            trading_period_length="4h",
-            train_session_name="Dynamic_agent_demo",
-            gpu_device=ARGS.gpu_device,
         )
 
     elif ARGS.calm_before_the_storm:
