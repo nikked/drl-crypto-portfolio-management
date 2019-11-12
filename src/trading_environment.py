@@ -3,7 +3,6 @@ import numpy as np
 
 
 class TradingEnvironment:  # pylint: disable=too-many-instance-attributes
-
     def __init__(  # pylint: disable=too-many-arguments
         self,
         window_length=50,
@@ -38,10 +37,16 @@ class TradingEnvironment:  # pylint: disable=too-many-instance-attributes
         return x_prices[:, :, window_length - self.window_length : window_length]
 
     def get_crypto_returns(self):
-        return np.array([1 + self.interest_rate] + self.data[-1, :, self.index].tolist())
+        return np.array(
+            [1 + self.interest_rate] + self.data[-1, :, self.index].tolist()
+        )
 
     def reset_environment(self, w_init, p_init, index=0):
-        self.state = (self.get_crypto_prices(self.data, self.window_length), w_init, p_init)
+        self.state = (
+            self.get_crypto_prices(self.data, self.window_length),
+            w_init,
+            p_init,
+        )
         self.index = index
         self.done = False
 
@@ -55,10 +60,14 @@ class TradingEnvironment:  # pylint: disable=too-many-instance-attributes
             weights_before_step = old_weights
 
         cost = (
-            old_ptf_value * np.linalg.norm((weights_before_step - old_weights), ord=1) * self.trading_cost
+            old_ptf_value
+            * np.linalg.norm((weights_before_step - old_weights), ord=1)
+            * self.trading_cost
         )
 
-        value_after_tx_costs = old_ptf_value * weights_before_step - np.array([cost] + [0] * self.nb_cryptos)
+        value_after_tx_costs = old_ptf_value * weights_before_step - np.array(
+            [cost] + [0] * self.nb_cryptos
+        )
 
         new_crypto_values = value_after_tx_costs * self.get_crypto_returns()
 
@@ -70,7 +79,11 @@ class TradingEnvironment:  # pylint: disable=too-many-instance-attributes
 
         new_index = self.index + 1
 
-        self.state = (self.get_crypto_prices(self.data, new_index), new_weights, new_ptf_value)
+        self.state = (
+            self.get_crypto_prices(self.data, new_index),
+            new_weights,
+            new_ptf_value,
+        )
 
         if new_index >= self.end_train:
             self.done = True

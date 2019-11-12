@@ -1,15 +1,12 @@
 import tensorflow as tf
 import numpy as np
-import matplotlib.pyplot as plt
-
-from tqdm import tqdm
 
 from src.params import TRADING_COST, INTEREST_RATE, EPSILON_GREEDY_THRESHOLD
 
 from src.cnn_policy import CNNPolicy
 
 
-def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
+def train_rl_algorithm(train_options, trade_envs, train_test_split):
     print("\nStarting to train deep reinforcement learning algorithm...")
 
     tf.reset_default_graph()
@@ -281,9 +278,11 @@ def _take_train_step(agent, env_states, no_of_assets, trade_envs, benchmark_weig
     )
 
     for i in range(no_of_assets):
-        env_states["single_assets_states"][i], _, env_states["single_assets_done"][
-            i
-        ] = trade_envs["full_on_one_stocks"][i].step(
+        (
+            env_states["single_assets_states"][i],
+            _,
+            env_states["single_assets_done"][i],
+        ) = trade_envs["full_on_one_stocks"][i].step(
             benchmark_weights["single_assets"][i + 1, :]
         )
 

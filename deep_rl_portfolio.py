@@ -50,7 +50,7 @@ def main(**train_configs):
 
     # Agent training
     agent, state_fu, done_fu, train_performance_lists = train_rl_algorithm(
-        train_configs, trade_envs, asset_list, train_test_val_steps
+        train_configs, trade_envs, train_test_val_steps
     )
 
     # Agent evaluation

@@ -43,8 +43,7 @@ class CNNPolicy:
         self.sess = sess
 
         if train_options["gpu_device"] is not None:
-            self.tf_device = "/device:GPU:{}".format(
-                train_options["gpu_device"])
+            self.tf_device = "/device:GPU:{}".format(train_options["gpu_device"])
 
         else:
             self.tf_device = "/cpu:0"
@@ -67,16 +66,13 @@ class CNNPolicy:
 
     def _define_input_placeholders(self, nb_feature_map):
         self.x_current = tf.placeholder(
-            tf.float32, [None, nb_feature_map,
-                         self.no_of_assets, self.window_length]
+            tf.float32, [None, nb_feature_map, self.no_of_assets, self.window_length]
         )
 
-        self.w_previous = tf.placeholder(
-            tf.float32, [None, self.no_of_assets + 1])
+        self.w_previous = tf.placeholder(tf.float32, [None, self.no_of_assets + 1])
         self.pf_value_previous = tf.placeholder(tf.float32, [None, 1])
 
-        self.daily_return_t = tf.placeholder(
-            tf.float32, [None, self.no_of_assets])
+        self.daily_return_t = tf.placeholder(tf.float32, [None, self.no_of_assets])
 
     def _define_policy_layers(self):
         bias = tf.get_variable(
@@ -155,8 +151,7 @@ class CNNPolicy:
             cost = tf.expand_dims(cost, 1)
 
             zero = tf.constant(
-                np.array([0.0] * self.no_of_assets).reshape(1,
-                                                            self.no_of_assets),
+                np.array([0.0] * self.no_of_assets).reshape(1, self.no_of_assets),
                 shape=[1, self.no_of_assets],
                 dtype=tf.float32,
             )
@@ -206,8 +201,7 @@ class CNNPolicy:
         with tf.device(self.tf_device):
             return self.sess.run(
                 tf.squeeze(self.action),
-                feed_dict={self.x_current: x_current,
-                           self.w_previous: w_previous},
+                feed_dict={self.x_current: x_current, self.w_previous: w_previous},
             )
 
     def train(self, x_current, w_previous, pf_value_previous, daily_return_t):
