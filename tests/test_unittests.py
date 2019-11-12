@@ -24,7 +24,6 @@ class TestTrainTestAnalyse(unittest.TestCase):
             "trading_period_length": "2h",
             "max_pf_weight_penalty": 0.7,
             "test_mode": True,
-            "validate_during_training": False,
             "train_session_name": "test_run_with_long_name",
         }
 

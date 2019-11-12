@@ -31,7 +31,6 @@ TRAIN_BASE_PARAMS = {
     "window_length": 70,
     "batch_size": 50,
     "portfolio_value": 1,
-    "validate_during_training": False,
     "ratio_val": 0,
     "max_pf_weight_penalty": 0.5,
 }
@@ -281,13 +280,6 @@ if __name__ == "__main__":
         action="store_true",
     )
     PARSER.add_argument(
-        "-vdt",
-        "--validate_during_training",
-        help="Run additional validation during training to monitor overfitting",
-        default=False,
-        action="store_true",
-    )
-    PARSER.add_argument(
         "-sd",
         "--start_date",
         type=str,
@@ -348,7 +340,6 @@ if __name__ == "__main__":
             trading_period_length="4h",
             max_pf_weight_penalty=0.7,
             test_mode=True,
-            validate_during_training=ARGS.validate_during_training,
             train_session_name="quick_test_run_with_long_name",
         )
 
@@ -373,7 +364,6 @@ if __name__ == "__main__":
             trading_period_length="2h",
             max_pf_weight_penalty=0.7,
             test_mode=True,
-            validate_during_training=ARGS.validate_during_training,
             train_session_name="test_run_with_long_name",
         )
 
@@ -527,5 +517,4 @@ if __name__ == "__main__":
             start_date=ARGS.start_date,
             end_date=ARGS.end_date,
             trading_period_length=ARGS.trading_period_length,
-            validate_during_training=ARGS.validate_during_training,
         )

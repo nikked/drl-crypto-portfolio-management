@@ -8,7 +8,6 @@ from src.params import TRADING_COST, INTEREST_RATE, EPSILON_GREEDY_THRESHOLD
 
 from src.policy import Policy
 from src.trading_environment import TradingEnvironment
-from src.pvm import PVM
 
 
 def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
@@ -44,29 +43,10 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
     for n_episode in range(train_options["n_episodes"]):
 
         print("\nStarting reinforcement learning episode", n_episode + 1)
-        if n_episode == 0 and train_options["validate_during_training"]:
-            _test_and_report_progress(
-                train_options,
-                "Before Training",
-                agent,
-                trade_envs["args"],
-                asset_list,
-                train_test_split,
-            )
 
         env_states = _train_episode(
             train_options, trade_envs, train_test_split, agent, train_performance_lists
         )
-
-        if train_options["validate_during_training"]:
-            _test_and_report_progress(
-                train_options,
-                n_episode,
-                agent,
-                trade_envs["args"],
-                asset_list,
-                train_test_split,
-            )
 
     return (
         agent,
@@ -100,7 +80,7 @@ def _train_episode(
 
     w_init_train = np.array(np.array([1] + [0] * train_options["no_of_assets"]))
 
-    memory = PVM(train_test_split["train"], w_init_train)
+    memory = np.transpose(np.array([w_init_train] * train_test_split["train"]))
 
     env_states = None
 
@@ -120,117 +100,6 @@ def _train_episode(
     return env_states
 
 
-def _test_and_report_progress(  # pylint: disable=too-many-arguments
-    train_options, n_episode, agent, trade_env_args, asset_list, train_test_split
-):
-    print("\nEvaluating agent performance")
-
-    policy_performance_tracker = {
-        "list_weight_end_val": [],
-        "list_pf_end_training": [],
-        "list_pf_min_training": [],
-        "list_pf_max_training": [],
-        "list_pf_mean_training": [],
-        "list_pf_dd_training": [],
-    }
-
-    w_list_eval, p_list_eval = _validate_agent_performance(
-        train_options, trade_env_args, train_test_split, agent
-    )
-
-    policy_performance_tracker["list_weight_end_val"].append(w_list_eval[-1])
-    policy_performance_tracker["list_pf_end_training"].append(p_list_eval[-1])
-    policy_performance_tracker["list_pf_min_training"].append(np.min(p_list_eval))
-    policy_performance_tracker["list_pf_max_training"].append(np.max(p_list_eval))
-    policy_performance_tracker["list_pf_mean_training"].append(np.mean(p_list_eval))
-
-    policy_performance_tracker["list_pf_dd_training"].append(
-        _get_max_draw_down(p_list_eval)
-    )
-
-    print("\nPerformance report:")
-    print("End of test PF value:", round(p_list_eval[-1]))
-    print("Min of test PF value:", round(np.min(p_list_eval)))
-    print("Max of test PF value:", round(np.max(p_list_eval)))
-    print("Mean of test PF value:", round(np.mean(p_list_eval)))
-    print("Max Draw Down of test PF value:", round(_get_max_draw_down(p_list_eval)))
-    print("End of test weights:", w_list_eval[-1])
-    print("\n")
-
-    if train_options["interactive_session"]:
-        plt.title("Portfolio evolution (validation set) episode {}".format(n_episode))
-        plt.plot(p_list_eval, label="Agent Portfolio Value")
-        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
-        plt.show()
-        plt.title(
-            "Portfolio weights (end of validation set) episode {}".format(n_episode)
-        )
-        plt.bar(
-            np.arange(train_options["no_of_assets"] + 1),
-            policy_performance_tracker["list_weight_end_val"][-1],
-        )
-        plt.xticks(
-            np.arange(train_options["no_of_assets"] + 1),
-            ["Money"] + asset_list,
-            rotation=45,
-        )
-        plt.show()
-
-    names = ["Money"] + asset_list
-    w_list_eval = np.array(w_list_eval)
-
-    if train_options["interactive_session"]:
-        for j in range(train_options["no_of_assets"] + 1):
-            plt.plot(w_list_eval[:, j], label="Weight Stock {}".format(names[j]))
-            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.5)
-        plt.show()
-
-
-def _validate_agent_performance(train_options, trade_env_args, train_test_split, agent):
-    env_eval = TradingEnvironment(**trade_env_args)
-
-    w_init_test = np.array(np.array([1] + [0] * train_options["no_of_assets"]))
-
-    state_eval, _ = env_eval.reset_environment(
-        w_init_test, train_options["portfolio_value"], index=train_test_split["train"]
-    )
-
-    p_list_eval = [train_options["portfolio_value"]]
-    w_list_eval = [w_init_test]
-
-    for _ in tqdm(
-        range(
-            train_test_split["train"],
-            train_test_split["train"] + train_test_split["validation"],
-        )
-    ):
-        x_t = state_eval[0].reshape([-1] + list(state_eval[0].shape))
-        w_previous = state_eval[1].reshape([-1] + list(state_eval[1].shape))
-
-        action = agent.compute_w(x_t, w_previous)
-        state_eval, _, _ = env_eval.step(action)
-
-        w_t_eval = state_eval[1]
-        pf_value_t_eval = state_eval[2]
-
-        p_list_eval.append(pf_value_t_eval)
-        w_list_eval.append(w_t_eval)
-
-    return w_list_eval, p_list_eval
-
-
-def _get_max_draw_down(p_list_eval):
-    p_list_eval = np.array(p_list_eval)
-
-    i = np.argmax(  # pylint: disable=no-member
-        np.maximum.accumulate(p_list_eval)  # pylint: disable=no-member
-        - p_list_eval  # pylint: disable=no-member
-    )
-    j = np.argmax(p_list_eval[:i])
-
-    return p_list_eval[j] - p_list_eval[i]
-
-
 def _train_batch(  # pylint: disable=too-many-arguments
     agent, train_performance_lists, train_options, memory, trade_envs, benchmark_weights
 ):
@@ -238,11 +107,6 @@ def _train_batch(  # pylint: disable=too-many-arguments
     no_of_assets = train_options["no_of_assets"]
     single_asset_pf_values_t = [0] * no_of_assets
 
-    """
-    Initially the starting point was chosen randomly with PVM.
-    Now it is just set to the beginning of the train set, i.e.:
-    to the length of the window
-    """
     i_start = train_options["window_length"]
 
     env_states = _reset_memory_states(
@@ -279,7 +143,7 @@ def _train_batch(  # pylint: disable=too-many-arguments
 
 def _reset_memory_states(train_options, trade_envs, memory, i_start, benchmark_weights):
     state, policy_done = trade_envs["policy_network"].reset_environment(
-        memory.get_weight(i_start), train_options["portfolio_value"], index=i_start
+        memory[:, i_start], train_options["portfolio_value"], index=i_start
     )
 
     state_eq, equal_done = trade_envs["equal_weighted"].reset_environment(
@@ -356,7 +220,7 @@ def _train_batch_item(  # pylint: disable=too-many-arguments, too-many-locals
 
     daily_return_t = new_state["x_next"][-1, :, -1]
 
-    memory.update_weight(i_start + batch_item, new_state["w_t"])
+    memory[:, i_start + batch_item] = new_state["w_t"]
 
     train_session_tracker["policy_x_t"].append(
         x_t.reshape(env_states["policy_network"]["state"][0].shape)
