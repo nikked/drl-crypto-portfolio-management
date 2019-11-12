@@ -7,6 +7,7 @@ My master's thesis explored deep reinforcement learning in algorithmic trading. 
 1. [Usage and installation](#usage)
 2. [Repository contents](#repo_contents)
 3. [Thesis overview](#overview)
+3. [Credits](#credits)
 
 <a name="usage"/>
 
@@ -74,7 +75,7 @@ I also wanted to find out the optimal time-period for rebalancing for the dynami
 
 The results of the thesis contribute to the field of algorithmic finance. I showed that frequent rebalancing is a useful tool in the risk management of highly volatile asset classes. Further investigation is required to extend these findings beyond cryptocurrencies. For more details, please refer to [the complete work](https://github.com/nikked/rl_dl_gradu/raw/master/Linnansalo_Semi-High_Frequency_Portfolio_Optimization_With_Deep_Reinforcement_Learning.pdf).
 
+<a name="credits"/>
 
-
-### Credits
+## Credits
 My thesis was heavily based on the paper "A Deep Reinforcement Learning Framework for the Financial Portfolio Management Problem" by Jiang et. al. They have released their [source code on GitHub](https://github.com/ZhengyaoJiang/PGPortfolio). Also, I found [this IPython Notebook by selimamrouni very helpful](https://github.com/selimamrouni/Deep-Portfolio-Management-Reinforcement-Learning).
