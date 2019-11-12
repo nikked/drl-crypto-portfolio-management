@@ -1,3 +1,7 @@
+"""
+This module defines the Convolutional neural network that
+the trading agent uses to make trading actions
+"""
 import tensorflow as tf
 import numpy as np
 

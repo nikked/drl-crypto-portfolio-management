@@ -3,7 +3,7 @@
 
 My master's thesis explored deep reinforcement learning in algorithmic trading. I implemented a trading computer program that balances a portfolio of cryptocurrencies. The program tries to outperform an equally weighted strategy. More specifically, the program uses a convolutional neural network (CNN) built with Tensorflow.
 
-## Table of Contents 
+## Table of Contents
 1. [Usage and installation](#usage)
 2. [Repository contents](#repo_contents)
 3. [Thesis overview](#overview)
@@ -11,17 +11,21 @@ My master's thesis explored deep reinforcement learning in algorithmic trading. 
 <a name="usage"/>
 
 ## Usage and installation
-This repo exposes a single CLI: `python deep_rl_portfolio.py`
-
-To get started, please run a CLI with the `-h` flag. E.g.: `python deep_rl_portfolio.py -h` to get a list of acceptable flags.
-
 This repo requires Python 3.6+. For installing the dependencies, please run `pip install -r requirements.txt`
 
-To enable automatic testing, linting and reformatting, add the following githook:
-```bash
-git config core.hooksPath .githooks
-chmod -R  744 .githooks
+
+This repo exposes a single CLI: `python deep_rl_portfolio.py`. You do not need to worry about downloading datasets since they are automatically fetched from [Poloniex API](https://docs.poloniex.com/#introduction). (Provided that the Poloniex API still works as it did on April 2018).
+
+I used this CLI to run the actual backtests of my thesis across different machines. Each backtest of my thesis has its' own keyword argument.
+
+If you want to run one of my backtests, just type for example:
 ```
+python deep_rl_portfolio.py --recent
+```
+
+To see the full list of arguments, run `python deep_rl_portfolio.py -h`
+
+
 
 <a name="repo_contents"/>
 
@@ -51,7 +55,7 @@ I chose cryptocurrencies as my underlying asset class. They are interesting to a
 #### Performance evaluation
 I evaluated the performance of the agent in seven different backtest stories. Each backtest story reflects some unique and remarkable period in cryptocurrency history. One backtest period was from December 2017 when Bitcoin reached its all-time high price. Another one is from April 2017 when Bitcoin almost lost its place as the most valued cryptocurrency. The stories show the market conditions where the agent excels and reveals its risks.
 
-The following figure visualizes my backtest periods against Bitcoin's dominance. 
+The following figure visualizes my backtest periods against Bitcoin's dominance.
 
 ![Backtest periods](https://github.com/nikked/drl-crypto-portfolio-management/blob/master/images/backtest_choices.png)
 
@@ -69,3 +73,8 @@ I also wanted to find out the optimal time-period for rebalancing for the dynami
 
 
 The results of the thesis contribute to the field of algorithmic finance. I showed that frequent rebalancing is a useful tool in the risk management of highly volatile asset classes. Further investigation is required to extend these findings beyond cryptocurrencies. For more details, please refer to [the complete work](https://github.com/nikked/rl_dl_gradu/raw/master/Linnansalo_Semi-High_Frequency_Portfolio_Optimization_With_Deep_Reinforcement_Learning.pdf).
+
+
+
+### Credits
+My thesis was heavily based on the paper "A Deep Reinforcement Learning Framework for the Financial Portfolio Management Problem" by Jiang et. al. They have released their (source code on GitHub)[https://github.com/ZhengyaoJiang/PGPortfolio]. Also, I found (this IPython Notebook by selimamrouni very helpful)[https://github.com/selimamrouni/Deep-Portfolio-Management-Reinforcement-Learning].
