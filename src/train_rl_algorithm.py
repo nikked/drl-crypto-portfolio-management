@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from src.params import TRADING_COST, INTEREST_RATE, EPSILON_GREEDY_THRESHOLD
 
-from src.policy import Policy
+from src.cnn_policy import CNNPolicy
 from src.trading_environment import TradingEnvironment
 
 
@@ -19,7 +19,7 @@ def train_rl_algorithm(train_options, trade_envs, asset_list, train_test_split):
     print("\nInitializing Agent CNN with Tensorflow")
     benchmark_weights = _initialize_benchmark_weights(train_options["no_of_assets"])
     nb_feature_map = trade_envs["args"]["data"].shape[0]
-    agent = Policy(
+    agent = CNNPolicy(
         train_options["no_of_assets"],
         train_options,
         sess,
@@ -267,7 +267,7 @@ def _take_train_step(agent, env_states, no_of_assets, trade_envs, benchmark_weig
     )
 
     if np.random.rand() < EPSILON_GREEDY_THRESHOLD:
-        action = agent.compute_w(x_t, w_previous)
+        action = agent.compute_new_ptf_weights(x_t, w_previous)
     else:
         action = _get_random_action(no_of_assets)
 

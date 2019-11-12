@@ -68,7 +68,7 @@ def test_rl_algorithm(  # pylint:  disable=too-many-arguments, too-many-locals
         x_current = state[0].reshape([-1] + list(state[0].shape))
         w_previous = state[1].reshape([-1] + list(state[1].shape))
         pf_value_previous = state[2]
-        action = agent.compute_w(x_current, w_previous)
+        action = agent.compute_new_ptf_weights(x_current, w_previous)
 
         # Exit if there is a mega large weight in the 10th index
         if idx == 10:

@@ -14,7 +14,7 @@ from src.params import (
 OPTIMIZER = tf.train.AdamOptimizer(LEARNING_RATE)
 
 
-class Policy:
+class CNNPolicy:
     def __init__(
         self,
         no_of_assets,
@@ -58,45 +58,34 @@ class Policy:
 
                 self._calculate_rewards(shape_x_current, weights_equal)
 
-        # objective function
-        # maximize reward over the batch
         with tf.device(self.tf_device):
             self.train_op = OPTIMIZER.minimize(-self.adjusted_reward)
 
     def _define_input_placeholders(self, nb_feature_map):
-        # Price tensor
         self.x_current = tf.placeholder(
             tf.float32, [None, nb_feature_map,
                          self.no_of_assets, self.window_length]
         )
 
-        # weights at the previous time step
         self.w_previous = tf.placeholder(
             tf.float32, [None, self.no_of_assets + 1])
-        # portfolio value at the previous time step
         self.pf_value_previous = tf.placeholder(tf.float32, [None, 1])
 
-        # vector of Open(t+1)/Open(t)
         self.daily_return_t = tf.placeholder(
             tf.float32, [None, self.no_of_assets])
 
     def _define_policy_layers(self):
-        # variable of the cash bias
         bias = tf.get_variable(
             "cash_bias",
             shape=[1, 1, 1, 1],
             initializer=tf.constant_initializer(CASH_BIAS_INIT),
         )
-        # shape of the tensor == batchsize
         shape_x_current = tf.shape(self.x_current)[0]
-        # trick to get a "tensor size" for the cash bias
         self.cash_bias = tf.tile(  # pylint: disable=no-member
             bias, tf.stack([shape_x_current, 1, 1, 1])
         )
 
-        with tf.variable_scope("Conv1"):
-            # first layer on the x_current tensor
-            # return a tensor of depth 2
+        with tf.variable_scope("Convolution_1"):
             self.conv1 = tf.layers.conv2d(
                 inputs=tf.transpose(self.x_current, perm=[0, 3, 2, 1]),
                 activation=tf.nn.relu,  # pylint: disable=no-member
@@ -106,9 +95,7 @@ class Policy:
                 padding="same",
             )
 
-        with tf.variable_scope("Conv2"):
-
-            # feature maps
+        with tf.variable_scope("Convolution_2"):
             self.conv2 = tf.layers.conv2d(
                 inputs=self.conv1,
                 activation=tf.nn.relu,  # pylint: disable=no-member
@@ -118,16 +105,13 @@ class Policy:
                 padding="same",
             )
 
-        with tf.variable_scope("Tensor3"):
-            # w from last periods
-            # trick to have good dimensions
+        with tf.variable_scope("Tensor_3"):
             w_wo_c = self.w_previous[:, 1:]
             w_wo_c = tf.expand_dims(w_wo_c, 1)
             w_wo_c = tf.expand_dims(w_wo_c, -1)
             self.tensor3 = tf.concat([self.conv2, w_wo_c], axis=3)
 
-        with tf.variable_scope("Conv3"):
-            # last feature map WITHOUT cash bias
+        with tf.variable_scope("Convolution_3"):
             self.conv3 = tf.layers.conv2d(
                 inputs=self.conv2,
                 activation=tf.nn.relu,  # pylint: disable=no-member
@@ -137,22 +121,17 @@ class Policy:
                 padding="same",
             )
 
-        with tf.variable_scope("Tensor4"):
-            # last feature map WITH cash bias
+        with tf.variable_scope("Tensor_4"):
             self.tensor4 = tf.concat([self.cash_bias, self.conv3], axis=2)
-            # we squeeze to reduce and get the good dimension
             self.squeezed_tensor4 = tf.squeeze(self.tensor4, [1, 3])
 
         with tf.variable_scope("Policy_Output"):
-            # softmax layer to obtain weights
             self.action = tf.nn.softmax(self.squeezed_tensor4)
 
         return shape_x_current
 
     def _calculate_rewards(self, shape_x_current, weights_equal):
         with tf.variable_scope("Reward"):
-            # computation of the reward
-            # please look at the chronological map to understand
             constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
             cash_return = tf.tile(  # pylint: disable=no-member
                 constant_return, tf.stack([shape_x_current, 1])
@@ -161,7 +140,6 @@ class Policy:
             v_prime_t = self.action * self.pf_value_previous
             v_previous = self.w_previous * self.pf_value_previous
 
-            # this is just a trick to get the good shape for cost
             constant = tf.constant(1.0, shape=[1])
 
             cost = (
@@ -192,7 +170,7 @@ class Policy:
                 self.portfolio_value - self.pf_value_previous
             ) / self.pf_value_previous
 
-        with tf.variable_scope("Reward_Equiweighted"):
+        with tf.variable_scope("Reward_Equally_weighted"):
             constant_return = tf.constant(1 + self.interest_rate, shape=[1, 1])
             cash_return = tf.tile(  # pylint: disable=no-member
                 constant_return, tf.stack([shape_x_current, 1])
@@ -220,14 +198,7 @@ class Policy:
                 - self.max_pf_weight_penalty * self.max_weight
             )
 
-    def compute_w(self, x_current, w_previous):
-        """
-        This function returns the action the agent takes
-        given the input tensor and the w_previous
-
-        It is a vector of weight
-
-        """
+    def compute_new_ptf_weights(self, x_current, w_previous):
         with tf.device(self.tf_device):
             return self.sess.run(
                 tf.squeeze(self.action),
@@ -236,11 +207,6 @@ class Policy:
             )
 
     def train(self, x_current, w_previous, pf_value_previous, daily_return_t):
-        """
-        This function trains the neural network
-        maximizing the reward
-        the input is a batch of the different values
-        """
         with tf.device(self.tf_device):
             self.sess.run(
                 self.train_op,
