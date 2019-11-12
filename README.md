@@ -77,4 +77,4 @@ The results of the thesis contribute to the field of algorithmic finance. I show
 
 
 ### Credits
-My thesis was heavily based on the paper "A Deep Reinforcement Learning Framework for the Financial Portfolio Management Problem" by Jiang et. al. They have released their (source code on GitHub)[https://github.com/ZhengyaoJiang/PGPortfolio]. Also, I found (this IPython Notebook by selimamrouni very helpful)[https://github.com/selimamrouni/Deep-Portfolio-Management-Reinforcement-Learning].
+My thesis was heavily based on the paper "A Deep Reinforcement Learning Framework for the Financial Portfolio Management Problem" by Jiang et. al. They have released their [source code on GitHub](https://github.com/ZhengyaoJiang/PGPortfolio). Also, I found [this IPython Notebook by selimamrouni very helpful](https://github.com/selimamrouni/Deep-Portfolio-Management-Reinforcement-Learning).
