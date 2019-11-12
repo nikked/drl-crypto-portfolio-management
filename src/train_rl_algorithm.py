@@ -100,7 +100,7 @@ def _train_episode(
 
     w_init_train = np.array(np.array([1] + [0] * train_options["no_of_assets"]))
 
-    memory = PVM(train_test_split["train"], train_options["batch_size"], w_init_train)
+    memory = PVM(train_test_split["train"], w_init_train)
 
     env_states = None
 
@@ -279,7 +279,7 @@ def _train_batch(  # pylint: disable=too-many-arguments
 
 def _reset_memory_states(train_options, trade_envs, memory, i_start, benchmark_weights):
     state, policy_done = trade_envs["policy_network"].reset_environment(
-        memory.get_w(i_start), train_options["portfolio_value"], index=i_start
+        memory.get_weight(i_start), train_options["portfolio_value"], index=i_start
     )
 
     state_eq, equal_done = trade_envs["equal_weighted"].reset_environment(
@@ -356,7 +356,7 @@ def _train_batch_item(  # pylint: disable=too-many-arguments, too-many-locals
 
     daily_return_t = new_state["x_next"][-1, :, -1]
 
-    memory.update(i_start + batch_item, new_state["w_t"])
+    memory.update_weight(i_start + batch_item, new_state["w_t"])
 
     train_session_tracker["policy_x_t"].append(
         x_t.reshape(env_states["policy_network"]["state"][0].shape)
